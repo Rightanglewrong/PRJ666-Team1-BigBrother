@@ -8,11 +8,11 @@
 * Alex Choi 177037215
 
 # Executive Summary
-    The "Big Brother" project was initiated in response to utilizing various tools to communicate with parents, track daily activities, manage health updates, and monitor developmental milestones. Our project aims to introduce a centralized solution that streamlines daycare management tasks while supporting educational objectives, thereby enhancing both the operational efficiency of daycare centers and the developmental outcomes for children.
+  The "Big Brother" project was initiated in response to utilizing various tools to communicate with parents, track daily activities, manage health updates, and monitor developmental milestones. Our project aims to introduce a centralized solution that streamlines daycare management tasks while supporting educational objectives, thereby enhancing both the operational efficiency of daycare centers and the developmental outcomes for children.
 ## Description
-    A centralized daycare management system that allows for the management and entry of data for the teachers on their students in attendance. Allowing for the logging of progress, activities, videos, pictures, and personal details of each student within the daycare and the communication of stored information to their respective parents.
+  A centralized daycare management system that allows for the management and entry of data for the teachers on their students in attendance. Allowing for the logging of progress, activities, videos, pictures, and personal details of each student within the daycare and the communication of stored information to their respective parents.
 ## Value Statement
-    An increased efficiency and management in data keeping and analysis in the field of child daycares. A streamlined application that will provide an intuitive and secure platform available for all child daycare providers that aims to make information access and recording as easy and efficient as possible.   
+  An increased efficiency and management in data keeping and analysis in the field of child daycares. A streamlined application that will provide an intuitive and secure platform available for all child daycare providers that aims to make information access and recording as easy and efficient as possible.   
 ## Scope
 ### What is Included
 * Web platform
