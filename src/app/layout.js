@@ -1,19 +1,18 @@
-import './globals.css'; 
-import NavBar from '../components/NavBar'; 
+// app/layout.js
+import './globals.css';
+import NavBar from '../components/NavBar';
 
 export const metadata = {
   title: 'Big Brother App',
-  description: 'A child monitoring and management application',
+  description: 'Daycare Management System',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <NavBar /> 
-        <div className="container mx-auto p-4">
-          {children}
-        </div>
+        <NavBar /> {}
+        {children} {}
       </body>
     </html>
   );
