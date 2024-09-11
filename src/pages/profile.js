@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import styles from './Profile.module.css';
 
 export default function ProfilePage() {
   const [email, setEmail] = useState('parent@example.com');
@@ -10,22 +11,24 @@ export default function ProfilePage() {
   };
 
   return (
-    <div>
-      <h1>Profile</h1>
-      <form onSubmit={handleUpdate}>
-        <label>Email</label>
+    <div className={styles.container}>
+      <h1 className={styles.heading}>Profile</h1> {}
+      <form className={styles.form} onSubmit={handleUpdate}> {}
+        <label className={styles.label}>Email</label>
         <input
+          className={styles.input}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <label>Phone</label>
+        <label className={styles.label}>Phone</label>
         <input
+          className={styles.input}
           type="text"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />
-        <button type="submit">Update Info</button>
+        <button className={styles.button} type="submit">Update Info</button>
       </form>
     </div>
   );
