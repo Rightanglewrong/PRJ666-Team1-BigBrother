@@ -1,5 +1,5 @@
-import './globals.css'; // import your global styles
-import NavBar from '../components/NavBar'; // adjust path if needed
+import './globals.css'; 
+import NavBar from '../components/NavBar'; 
 
 export const metadata = {
   title: 'Big Brother App',
@@ -10,8 +10,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <NavBar /> {/* Navbar will now be displayed across all pages */}
-        {children} {/* This will render the content of each page */}
+        <NavBar /> 
+        <div className="container mx-auto p-4">
+          {children}
+        </div>
       </body>
     </html>
   );
