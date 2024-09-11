@@ -1,0 +1,25 @@
+.nav {
+    background-color: #333;
+    padding: 1rem;
+  }
+  
+  .navList {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .navItem {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .navItem:hover {
+    background-color: #555;
+    border-radius: 4px;
+  }
+  
