@@ -9,11 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@aws-amplify/ui-react": "^6.3.1",
     "@headlessui/react": "^2.1.7",
     "@heroicons/react": "^2.1.5",
     "@popperjs/core": "^2.11.8",
-    "aws-amplify": "^6.6.0",
     "bootstrap": "^5.3.3",
     "next": "14.2.8",
     "react": "^18",
