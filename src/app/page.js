@@ -1,8 +1,21 @@
+import Link from 'next/link';
+import styles from './page.module.css';
+
 export default function Home() {
   return (
-    <div>
-      <h1>Welcome to Big Brother App</h1>
-      <p>This is the homepage</p>
+    <div className={styles.container}>
+      <div className={styles.inner}>
+        <h1 className={styles.title}>Welcome to Big Brother App</h1>
+        <br />
+        <div className={styles.buttonContainer}>
+          <Link href="/login">
+            <button className={styles.button}>Login</button>
+          </Link>
+          <Link href="/register">
+            <button className={styles.button}>Register</button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
