@@ -12,7 +12,20 @@ export default function RegisterPage() {
         <input className={styles.input} type="email" id="email" name="email" required />
 
         <label className={styles.label} htmlFor="password">Password</label>
-        <input className={styles.input} type="password" id="password" name="password" required />
+        <input
+          className={styles.input}
+          type="password"
+          id="password"
+          name="password"
+          placeholder="At least 6 characters"
+          required
+        />
+        <small className={styles.hint}>
+          <i>Passwords must be at least 6 characters.</i>
+        </small>
+
+        <label className={styles.label} htmlFor="confirmPassword">Re-enter password</label>
+        <input className={styles.input} type="password" id="confirmPassword" name="confirmPassword" required />
 
         <button type="submit" className={styles.button}>Sign Up</button>
       </form>
