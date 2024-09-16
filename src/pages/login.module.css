@@ -1,29 +1,44 @@
+/* Container styles to center the login box */
 .container {
-  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; 
+  max-width: 100%; 
   margin: 0 auto;
   padding: 20px;
+  background-color: #f0f4f8;
+}
+
+/* Login box styling */
+.form {
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 8px;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
 }
 
+/* Heading styling */
 .heading {
   text-align: center;
   margin-bottom: 20px;
   color: #333;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-}
-
+/* Label styling */
 .label {
   font-size: 14px;
   margin-bottom: 5px;
   color: #555;
 }
 
+/* Input styling */
 .input {
   padding: 10px;
   margin-bottom: 15px;
@@ -32,6 +47,7 @@
   font-size: 16px;
 }
 
+/* Button styling */
 .button {
   background-color: #0070f3;
   color: white;
@@ -51,6 +67,7 @@
   box-shadow: 0 0 3px #0070f3;
 }
 
+/* Footer link styling */
 .footer-link {
   text-align: center;
   margin-top: 20px;
