@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import styles from './media.module.css';
 
 export default function MediaUploadPage() {
   const [child, setChild] = useState('');
@@ -14,37 +15,42 @@ export default function MediaUploadPage() {
   };
 
   return (
-    <div className="upload-page">
-      <h1>Upload Picture/Video</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="upload-section">
-          <label>Upload Section</label>
-          <input type="file" multiple onChange={handleFileUpload} />
+    <div className={styles.mediaUploadPage}>
+      <h1 className={styles.title}>Upload Picture/Video</h1>
+      <form className={styles.mediaUploadForm} onSubmit={handleSubmit}>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>Choose Files to Upload</label>
+          <input type="file" multiple onChange={handleFileUpload} className={styles.formInputFile} />
         </div>
-        <div className="child-selection">
-          <label>Child Selection</label>
-          <select value={child} onChange={(e) => setChild(e.target.value)}>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>Child Selection</label>
+          <select
+            value={child}
+            onChange={(e) => setChild(e.target.value)}
+            className={styles.formInputSelect}
+          >
             <option value="">Select Child</option>
             <option value="child1">Child 1</option>
             <option value="child2">Child 2</option>
           </select>
         </div>
-        <div className="description">
-          <label>Description</label>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>Description</label>
           <textarea
-            placeholder="Enter texts..."
+            placeholder="Enter description..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            className={styles.formInputTextarea}
           />
         </div>
-        <div className="buttons">
-          <button type="submit">Upload</button>
-          <button type="button">Cancel</button>
+        <div className={styles.formActions}>
+          <button type="submit" className={styles.buttonUpload}>Upload</button>
+          <button type="button" className={styles.buttonCancel}>Cancel</button>
         </div>
       </form>
-      <footer className="footer">
-        <a href="/contacts" className="contact">Contacts</a>
-        <a href="/terms" className="terms">Terms of service</a>
+      <footer className={styles.mediaFooter}>
+        <a href="/contacts" className={styles.footerLink}>Contacts</a>
+        <a href="/terms" className={styles.footerLink}>Terms of Service</a>
       </footer>
     </div>
   );
