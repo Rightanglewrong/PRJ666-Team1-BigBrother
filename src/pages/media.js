@@ -30,8 +30,20 @@ export default function MediaUploadPage() {
             className={styles.formInputSelect}
           >
             <option value="">Select Child</option>
-            <option value="child1">Child 1</option>
-            <option value="child2">Child 2</option>
+            <option value="child1">Benny</option>
+            <option value="child2">Alex</option>
+            <option value="child3">Justin</option>
+          </select>
+        </div>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>Parent Selection</label>
+          <select
+            value={child}
+            onChange={(e) => setChild(e.target.value)}
+            className={styles.formInputSelect}
+          >
+            <option value="">Select Parent</option>
+            <option value="parent1">Steven</option>
           </select>
         </div>
         <div className={styles.formGroup}>
