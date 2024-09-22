@@ -2,8 +2,8 @@ import Link from 'next/link';
 import styles from './page.module.css';
 
 export default function Home() {
-  const cognitoLoginUrl = 'https://big-brother2-pool.auth.us-east-1.amazoncognito.com/login?client_id=69n73oh4j7t8ou9f1u9sqs8e3g&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fbig-brother-psi.vercel.app%2F';
-  const cognitoRegisterUrL = 'https://big-brother2-pool.auth.us-east-1.amazoncognito.com/signup?client_id=69n73oh4j7t8ou9f1u9sqs8e3g&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fbig-brother-psi.vercel.app%2F'
+  const cognitoLoginUrl = 'https://big-brother2-pool.auth.us-east-1.amazoncognito.com/login?client_id=69n73oh4j7t8ou9f1u9sqs8e3g&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fbig-brother-psi.vercel.app%2Fdashboard';
+  const cognitoRegisterUrL = 'https://big-brother2-pool.auth.us-east-1.amazoncognito.com/signup?client_id=69n73oh4j7t8ou9f1u9sqs8e3g&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fbig-brother-psi.vercel.app%2Fdashboard'
   return (
     <div className={styles.container}>
       <div className={styles.inner}>
