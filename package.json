@@ -12,6 +12,7 @@
     "@headlessui/react": "^2.1.7",
     "@heroicons/react": "^2.1.5",
     "@popperjs/core": "^2.11.8",
+    "aws-amplify": "^6.6.2",
     "bootstrap": "^5.3.3",
     "dotenv": "^16.4.5",
     "next": "14.2.8",
