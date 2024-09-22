@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { login } from '../utils/api';
+import { login, checkUser } from '../utils/api';  // Import checkUser function
 import styles from './login.module.css';
 
 export default function LoginPage() {
@@ -11,13 +11,21 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const result = await login(email, password);
       if (result.token) {
         localStorage.setItem('token', result.token);
 
-        router.push('/dashboard');
+        // Call the checkUser function after successful login
+        const checkUserResult = await checkUser(email);
+
+        // Redirect based on the checkUser result
+        if (checkUserResult.hasAccountDetails) {
+          router.push('/dashboard');  // If fields are present, go to dashboard
+        } else {
+          router.push('/profile');  // If fields are missing, go to profile
+        }
       } else {
         setError('Login failed. Please check your credentials.');
       }
@@ -56,7 +64,7 @@ export default function LoginPage() {
         {error && <p className={styles.error}>{error}</p>}
       </form>
 
-    <br />
+      <br />
       <a href="/forgot-password" className={styles['footer-link']}>Forgot password?</a>
     </div>
   );
