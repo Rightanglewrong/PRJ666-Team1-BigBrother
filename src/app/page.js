@@ -14,9 +14,9 @@ export default function Home() {
           <a href={cognitoLoginUrl}>
             <button className={styles.button}>Login</button>
           </a>
-          <Link href={cognitoRegisterUrL}>
+          <a href={cognitoRegisterUrL}>
             <button className={styles.button}>Register</button>
-          </Link>
+          </a>
         </div>
       </div>
     </div>
