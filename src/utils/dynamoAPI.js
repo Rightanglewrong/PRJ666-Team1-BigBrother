@@ -3,7 +3,7 @@ const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/"; // Rep
 // Create an item in DynamoDB
 export const createItemInDynamoDB = async (item) => {
   try {
-    const response = await fetch(`${BACKEND_URL}api/create-item`, {
+    const response = await fetch(`${BACKEND_URL}api/add-item`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export const createItemInDynamoDB = async (item) => {
 // Retrieve an item from DynamoDB
 export const retrieveItemFromDynamoDB = async (itemID) => {
   try {
-    const response = await fetch(`${BACKEND_URL}api/retrieve-item/${itemID}`, {
+    const response = await fetch(`${BACKEND_URL}api/get-item/${itemID}`, {
       method: "GET",
     });
 

@@ -73,7 +73,7 @@ export default function DynamoDBCrudTest() {
         <input
           type="text"
           value={itemData}
-          placeholder="Item Data"
+          placeholder="Name"
           onChange={(e) => setItemData(e.target.value)}
         />
         <button type="submit">Create Item</button>
