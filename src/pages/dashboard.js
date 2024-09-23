@@ -12,7 +12,7 @@ export default function DashboardPage() {
       try {
         const { username, userId } = await getCurrentUser();
 
-        if (username && userId) {
+        if (username || userId) {
           console.log("username", username);
           console.log("user id", userId);
 
