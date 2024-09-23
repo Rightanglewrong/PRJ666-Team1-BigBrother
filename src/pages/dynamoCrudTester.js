@@ -19,7 +19,7 @@ export default function DynamoDBCrudTest() {
   const handleCreateItem = async (e) => {
     e.preventDefault();
     try {
-      const data = await createItemInDynamoDB({ ownerId: 'yourOwnerId', id: createItemID, name: createItemData });
+      const data = await createItemInDynamoDB({createItemID, createItemData});
       setMessage(`Item created successfully: ${JSON.stringify(data)}`);
       setCreateItemID(''); 
       setCreateItemData(''); 
