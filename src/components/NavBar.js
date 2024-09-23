@@ -14,6 +14,7 @@ const NavBar = () => {
             <li><Link href="/profile" className={styles.navItem}>Profile</Link></li>
             <li><Link href="/media" className={styles.navItem}>Media</Link></li>
             <li><Link href="/crudTester" className={styles.navItem}>Crud Testing</Link></li>
+            <li><Link href="/dynamoCrudTester" className={styles.navItem}> Dynamo CRUD Testing </Link></li>
           </ul>
         </div>
 
