@@ -7,8 +7,11 @@ import {
 } from '../utils/dynamoAPI'; 
 
 export default function DynamoDBCrudTest() {
-  const [itemID, setItemID] = useState('');
-  const [itemData, setItemData] = useState('');
+  const [createItemID, setCreateItemID] = useState('');
+  const [createItemData, setCreateItemData] = useState('');
+  const [updateItemID, setUpdateItemID] = useState('');
+  const [updateItemData, setUpdateItemData] = useState('');
+  const [retrieveItemID, setRetrieveItemID] = useState('');
   const [message, setMessage] = useState('');
   const [retrievedItem, setRetrievedItem] = useState(null);
 
@@ -16,8 +19,10 @@ export default function DynamoDBCrudTest() {
   const handleCreateItem = async (e) => {
     e.preventDefault();
     try {
-      const data = await createItemInDynamoDB({ itemID, itemData });
+      const data = await createItemInDynamoDB({ ownerId: 'yourOwnerId', id: createItemID, name: createItemData });
       setMessage(`Item created successfully: ${JSON.stringify(data)}`);
+      setCreateItemID(''); 
+      setCreateItemData(''); 
     } catch (error) {
       setMessage(`Error creating item: ${error.message}`);
     }
@@ -26,9 +31,10 @@ export default function DynamoDBCrudTest() {
   // Handle retrieving an item from DynamoDB
   const handleRetrieveItem = async () => {
     try {
-      const data = await retrieveItemFromDynamoDB(itemID);
+      const data = await retrieveItemFromDynamoDB(retrieveItemID);
       setRetrievedItem(data);
       setMessage('Item retrieved successfully');
+      setRetrieveItemID(''); 
     } catch (error) {
       setMessage(`Error retrieving item: ${error.message}`);
     }
@@ -38,8 +44,10 @@ export default function DynamoDBCrudTest() {
   const handleUpdateItem = async (e) => {
     e.preventDefault();
     try {
-      const data = await updateItemInDynamoDB(itemID, { itemData });
+      const data = await updateItemInDynamoDB(updateItemID, { name: updateItemData });
       setMessage(`Item updated successfully: ${JSON.stringify(data)}`);
+      setUpdateItemID(''); 
+      setUpdateItemData('');
     } catch (error) {
       setMessage(`Error updating item: ${error.message}`);
     }
@@ -50,7 +58,7 @@ export default function DynamoDBCrudTest() {
     try {
       const data = await deleteItemFromDynamoDB(itemID);
       setMessage('Item deleted successfully');
-      setItemID(''); // Clear the item ID after deletion
+      setDeleteItemID(''); 
     } catch (error) {
       setMessage(`Error deleting item: ${error.message}`);
     }
@@ -66,15 +74,15 @@ export default function DynamoDBCrudTest() {
       <form onSubmit={handleCreateItem}>
         <input
           type="text"
-          value={itemID}
+          value={createItemID}
           placeholder="Item ID"
-          onChange={(e) => setItemID(e.target.value)}
+          onChange={(e) => setCreateItemID(e.target.value)}
         />
         <input
           type="text"
-          value={itemData}
+          value={createItemData}
           placeholder="Name"
-          onChange={(e) => setItemData(e.target.value)}
+          onChange={(e) => setCreateItemData(e.target.value)}
         />
         <button type="submit">Create Item</button>
       </form>
@@ -83,11 +91,11 @@ export default function DynamoDBCrudTest() {
       <h3>Retrieve Item</h3>
       <input
         type="text"
-        value={itemID}
+        value={retrieveItemID}
         placeholder="Item ID"
-        onChange={(e) => setItemID(e.target.value)}
+        onChange={(e) => setRetrieveItemID(e.target.value)}
       />
-      <button onClick={handleRetrieveItem} disabled={!itemID}>
+      <button onClick={handleRetrieveItem} disabled={!retrieveItemID}>
         Retrieve Item
       </button>
       {retrievedItem && <p>Retrieved Item: {JSON.stringify(retrievedItem)}</p>}
@@ -97,28 +105,28 @@ export default function DynamoDBCrudTest() {
       <form onSubmit={handleUpdateItem}>
         <input
           type="text"
-          value={itemID}
+          value={updateItemID}
           placeholder="Item ID"
-          onChange={(e) => setItemID(e.target.value)}
+          onChange={(e) => setUpdateItemID(e.target.value)}
         />
         <input
           type="text"
-          value={itemData}
+          value={updateItemData}
           placeholder="New Item Data"
-          onChange={(e) => setItemData(e.target.value)}
+          onChange={(e) => setUpdateItemData(e.target.value)}
         />
-        <button type="submit" disabled={!itemID}>Update Item</button>
+        <button type="submit" disabled={!updateItemID}>Update Item</button>
       </form>
 
       {/* Delete Item */}
       <h3>Delete Item</h3>
       <input
         type="text"
-        value={itemID}
+        value={deleteItemID}
         placeholder="Item ID"
-        onChange={(e) => setItemID(e.target.value)}
+        onChange={(e) => setDeleteItemID(e.target.value)}
       />
-      <button onClick={handleDeleteItem} disabled={!itemID}>Delete Item</button>
+      <button onClick={handleDeleteItem} disabled={!deleteItemID}>Delete Item</button>
     </div>
   );
 }
