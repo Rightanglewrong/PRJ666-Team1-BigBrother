@@ -14,6 +14,12 @@ export default function MediaUploadPage() {
     console.log('Uploading media for child:', child, 'with description:', description);
   };
 
+  const handleCancel = () => {
+    setChild('');
+    setDescription('');
+    console.log('Form reset');
+  };
+
   return (
     <div className={styles.mediaUploadPage}>
       <h1 className={styles.title}>Upload Picture/Video</h1>
@@ -33,17 +39,7 @@ export default function MediaUploadPage() {
             <option value="child1">Benny</option>
             <option value="child2">Alex</option>
             <option value="child3">Justin</option>
-          </select>
-        </div>
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Parent Selection</label>
-          <select
-            value={child}
-            onChange={(e) => setChild(e.target.value)}
-            className={styles.formInputSelect}
-          >
-            <option value="">Select Parent</option>
-            <option value="parent1">Steven</option>
+            <option value="child3">Steven</option>
           </select>
         </div>
         <div className={styles.formGroup}>
@@ -57,7 +53,7 @@ export default function MediaUploadPage() {
         </div>
         <div className={styles.formActions}>
           <button type="submit" className={styles.buttonUpload}>Upload</button>
-          <button type="button" className={styles.buttonCancel}>Cancel</button>
+          <button type="button" className={styles.buttonCancel} onClick={handleCancel}>Cancel</button>
         </div>
       </form>
       <footer className={styles.mediaFooter}>

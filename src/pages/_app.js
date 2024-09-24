@@ -10,8 +10,8 @@ Amplify.configure(awsconfig);
 function MyApp({ Component, pageProps }) {
   return (
     <>
-      <NavBar /> {}
-      <Component {...pageProps} /> {}
+      <NavBar /> {/* Render the NavBar component */}
+      <Component {...pageProps} /> {/* Render the page component */}
     </>
   );
 }
