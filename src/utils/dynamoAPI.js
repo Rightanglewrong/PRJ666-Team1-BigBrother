@@ -3,7 +3,7 @@ const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/"; // Rep
 // Create an item in DynamoDB
 export const createItemInDynamoDB = async (item) => {
   try {
-    const response = await fetch(`${BACKEND_URL}api/add-item`, {
+    const response = await fetch(`${BACKEND_URL}v1/add-item`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -24,9 +24,9 @@ export const createItemInDynamoDB = async (item) => {
 };
 
 // Retrieve an item from DynamoDB
-export const retrieveItemFromDynamoDB = async (itemID) => {
+export const retrieveItemFromDynamoDB = async (ownerId, itemId) => {
   try {
-    const response = await fetch(`${BACKEND_URL}api/get-item/${itemID}`, {
+      const response = await fetch(`${BACKEND_URL}v1/get-item?ownerId=${ownerId}&id=${itemId}`, {
       method: "GET",
     });
 
@@ -45,7 +45,7 @@ export const retrieveItemFromDynamoDB = async (itemID) => {
 // Update an item in DynamoDB
 export const updateItemInDynamoDB = async (itemID, updatedData) => {
   try {
-    const response = await fetch(`${BACKEND_URL}api/update-item/${itemID}`, {
+    const response = await fetch(`${BACKEND_URL}v1/update-item/${itemID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export const updateItemInDynamoDB = async (itemID, updatedData) => {
 // Delete an item from DynamoDB
 export const deleteItemFromDynamoDB = async (itemID) => {
   try {
-    const response = await fetch(`${BACKEND_URL}api/delete-item/${itemID}`, {
+    const response = await fetch(`${BACKEND_URL}v1/delete-item/${itemID}`, {
       method: "DELETE",
     });
 
