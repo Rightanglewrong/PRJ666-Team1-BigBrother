@@ -50,20 +50,11 @@ export const updateItemInDynamoDB = async (item) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        ...item,
-        updateExpression: 'SET #name = :nameValue',  
-        expressionAttributeNames: {
-          '#name': 'name',  
-        },
-        expressionAttributeValues: {
-          ':nameValue': item.name,  
-        },
-      }),
+      body: JSON.stringify(item),
     });
 
     if (!response.ok) {
-      throw new Error("Error updating item in DynamoDB");
+      throw new Error("Error updating item in DynamoDB: ${errorDetails}`");
     }
 
     const data = await response.json();
