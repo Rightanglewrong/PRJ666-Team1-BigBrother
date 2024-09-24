@@ -1,9 +1,9 @@
-const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/"; // Replace with your backend URL
+const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
 // Create an item in DynamoDB
 export const createItemInDynamoDB = async (item) => {
   try {
-    const response = await fetch(`${BACKEND_URL}v1/add-item`, {
+    const response = await fetch(`${BACKEND_URL}v1/test/add-item`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -24,9 +24,9 @@ export const createItemInDynamoDB = async (item) => {
 };
 
 // Retrieve an item from DynamoDB
-export const retrieveItemFromDynamoDB = async (ownerId, itemId) => {
+export const retrieveItemFromDynamoDB = async (item) => {
   try {
-      const response = await fetch(`${BACKEND_URL}v1/get-item?ownerId=${ownerId}&id=${itemId}`, {
+      const response = await fetch(`${BACKEND_URL}v1/test/get-item?ownerId=${item.ownerId}&id=${item.id}`, {
       method: "GET",
     });
 
@@ -43,14 +43,14 @@ export const retrieveItemFromDynamoDB = async (ownerId, itemId) => {
 };
 
 // Update an item in DynamoDB
-export const updateItemInDynamoDB = async (itemID, updatedData) => {
+export const updateItemInDynamoDB = async (item) => {
   try {
-    const response = await fetch(`${BACKEND_URL}v1/update-item/${itemID}`, {
+    const response = await fetch(`${BACKEND_URL}v1/test/update-item/${item.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedData),
+      body: JSON.stringify({ ownerId: item.ownerId, id: item.id, ...item }),
     });
 
     if (!response.ok) {
@@ -66,10 +66,14 @@ export const updateItemInDynamoDB = async (itemID, updatedData) => {
 };
 
 // Delete an item from DynamoDB
-export const deleteItemFromDynamoDB = async (itemID) => {
+export const deleteItemFromDynamoDB = async (item) => {
   try {
-    const response = await fetch(`${BACKEND_URL}v1/delete-item/${itemID}`, {
+    const response = await fetch(`${BACKEND_URL}v1/test/delete-item/${item.id}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ownerId: item.ownerId }), 
     });
 
     if (!response.ok) {
