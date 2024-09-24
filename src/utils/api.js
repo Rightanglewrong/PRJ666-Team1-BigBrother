@@ -2,26 +2,23 @@ const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
 export const checkUser = async (sub) => {
   try {
-    const response = await fetch(
-      `${BACKEND_URL}api/check-user`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sub }),
-      }
-    );
+    const response = await fetch(`${BACKEND_URL}api/check-user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sub }),  // Pass sub to backend
+    });
 
     if (!response.ok) {
       throw new Error("Failed to check user details.");
     }
 
     const data = await response.json();
-    return data; // This should return the response whether fields are present or not
+    return data;  // This should return whether fields are present or not
   } catch (error) {
     console.error("Error checking user details:", error);
-    return { hasAccountDetails: false }; // Default to false on error
+    return { hasAccountDetails: false };  // Default to false on error
   }
 };
 
