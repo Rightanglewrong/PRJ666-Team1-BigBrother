@@ -1,9 +1,9 @@
-const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/"; // Replace with your backend URL
+const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
 // Create an item in DynamoDB
 export const createItemInDynamoDB = async (item) => {
   try {
-    const response = await fetch(`${BACKEND_URL}v1/add-item`, {
+    const response = await fetch(`${BACKEND_URL}v1/test/add-item`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export const createItemInDynamoDB = async (item) => {
 // Retrieve an item from DynamoDB
 export const retrieveItemFromDynamoDB = async (ownerId, itemId) => {
   try {
-      const response = await fetch(`${BACKEND_URL}v1/get-item?ownerId=${ownerId}&id=${itemId}`, {
+      const response = await fetch(`${BACKEND_URL}v1/test/get-item?ownerId=${ownerId}&id=${itemId}`, {
       method: "GET",
     });
 
@@ -45,12 +45,12 @@ export const retrieveItemFromDynamoDB = async (ownerId, itemId) => {
 // Update an item in DynamoDB
 export const updateItemInDynamoDB = async (itemID, updatedData) => {
   try {
-    const response = await fetch(`${BACKEND_URL}v1/update-item/${itemID}`, {
+    const response = await fetch(`${BACKEND_URL}v1/test/update-item/${itemID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedData),
+      body: JSON.stringify({ ownerId, id: itemID, ...updatedData }),
     });
 
     if (!response.ok) {
@@ -68,8 +68,12 @@ export const updateItemInDynamoDB = async (itemID, updatedData) => {
 // Delete an item from DynamoDB
 export const deleteItemFromDynamoDB = async (itemID) => {
   try {
-    const response = await fetch(`${BACKEND_URL}v1/delete-item/${itemID}`, {
+    const response = await fetch(`${BACKEND_URL}v1/test/delete-item/${itemID}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ownerId, id: itemID }), 
     });
 
     if (!response.ok) {
