@@ -90,7 +90,7 @@ const NavBar = () => {
                 </li>
               </>
             ) : (
-              <li className={styles.navItem}>You are not login  </li>
+              <li className={styles.navItem}>You are not logged in</li>
             )}
           </ul>
         </div>
