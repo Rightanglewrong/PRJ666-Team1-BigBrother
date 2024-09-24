@@ -90,9 +90,7 @@ const NavBar = () => {
                 </li>
               </>
             ) : (
-              <li><button onClick={handleLogout} className={styles.navItem}>
-              Logoutout
-            </button></li>
+              <li className={styles.navItem}>You are not login  </li>
             )}
           </ul>
         </div>
