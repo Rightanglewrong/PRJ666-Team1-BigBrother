@@ -45,12 +45,13 @@ export const retrieveItemFromDynamoDB = async (item) => {
 // Update an item in DynamoDB
 export const updateItemInDynamoDB = async (item) => {
   try {
-    const response = await fetch(`${BACKEND_URL}v1/test/update-item?ownerId=${item.ownerId}&id=${item.id}`, {
+    const response = await fetch(`${BACKEND_URL}v1/test/update-item`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        ...item,
         updateExpression: 'SET #name = :nameValue',  
         expressionAttributeNames: {
           '#name': 'name',  
@@ -76,11 +77,9 @@ export const updateItemInDynamoDB = async (item) => {
 // Delete an item from DynamoDB
 export const deleteItemFromDynamoDB = async (item) => {
   try {
-    const response = await fetch(`${BACKEND_URL}v1/test/delete-item?ownerId=${item.ownerId}&id=${item.id}`, {
+    const response = await fetch(`${BACKEND_URL}v1/test/delete-item`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: JSON.stringify(item),
     });
 
     if (!response.ok) {
