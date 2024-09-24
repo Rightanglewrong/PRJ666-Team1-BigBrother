@@ -1,4 +1,5 @@
 import { useState } from 'react';
+const {v4: uuidv4} = require ('uuid');
 import {
   createItemInDynamoDB,
   retrieveItemFromDynamoDB,
@@ -9,20 +10,34 @@ import {
 export default function DynamoDBCrudTest() {
   const [createItemID, setCreateItemID] = useState('');
   const [createItemData, setCreateItemData] = useState('');
+  const [updateOwnerID, setUpdateOwnerID] = useState('');
   const [updateItemID, setUpdateItemID] = useState('');
   const [updateItemData, setUpdateItemData] = useState('');
+  const [retrieveOwnerID, setRetrieveOwnerID] = useState('');
   const [retrieveItemID, setRetrieveItemID] = useState('');
-  const [deleteItemID, setDeleteItemID] = useState(''); 
-  const [message, setMessage] = useState('');
   const [retrievedItem, setRetrievedItem] = useState(null);
+  const [deleteItemID, setDeleteItemID] = useState(''); 
+  const [deleteOwnerID, setDeleteOwnerID] = useState(''); 
+  const [message, setMessage] = useState('');
+  
+
 
   // Handle creating an item in DynamoDB
   const handleCreateItem = async (e) => {
     e.preventDefault();
     try {
-      const data = await createItemInDynamoDB({ createItemID, createItemData });
+      const ownerID = uuidv4();
+  
+      const newItem = {
+        ownerId: ownerID,        
+        id: createItemID,        
+        name: createItemData,    
+      };
+  
+      const data = await createItemInDynamoDB(newItem);
+  
       setMessage(`Item created successfully: ${JSON.stringify(data)}`);
-      setCreateItemID('');
+      setCreateItemID('');       
       setCreateItemData('');
     } catch (error) {
       setMessage(`Error creating item: ${error.message}`);
@@ -30,14 +45,20 @@ export default function DynamoDBCrudTest() {
   };
 
   // Handle retrieving an item from DynamoDB
-  const handleRetrieveItem = async () => {
+  const handleRetrieveItem = async (e) => {
+    e.preventDefault(); 
     try {
-      const data = await retrieveItemFromDynamoDB(retrieveItemID);
-      setRetrievedItem(data);
-      setMessage('Item retrieved successfully');
-      setRetrieveItemID('');
+      const retrieveData = {
+        ownerId: retrieveOwnerID, 
+        id: retrieveItemID,       
+      };
+  
+      const data = await retrieveItemFromDynamoDB(retrieveData);
+      setRetrievedItem(data); 
+      setMessage('Item retrieved successfully'); 
+      setRetrieveItemID(''); 
     } catch (error) {
-      setMessage(`Error retrieving item: ${error.message}`);
+      setMessage(`Error retrieving item: ${error.message}`); 
     }
   };
 
@@ -45,21 +66,43 @@ export default function DynamoDBCrudTest() {
   const handleUpdateItem = async (e) => {
     e.preventDefault();
     try {
-      const data = await updateItemInDynamoDB(updateItemID, { updateItemData });
+      const updateData = {
+        ownerId: updateOwnerID,  
+        id: updateItemID,        
+        updateExpression: 'SET #name = :nameValue',  
+        expressionAttributeNames: {
+          '#name': 'name',  
+        },
+        expressionAttributeValues: {
+          ':nameValue': updateItemData,  
+        },
+      };
+  
+      const data = await updateItemInDynamoDB(updateData);
+      
       setMessage(`Item updated successfully: ${JSON.stringify(data)}`);
-      setUpdateItemID('');
-      setUpdateItemData('');
+      setUpdateOwnerID('');  
+      setUpdateItemID('');   
+      setUpdateItemData(''); 
     } catch (error) {
       setMessage(`Error updating item: ${error.message}`);
     }
   };
 
   // Handle deleting an item from DynamoDB
-  const handleDeleteItem = async () => {
+  const handleDeleteItem = async (e) => {
+    e.preventDefault();
     try {
-      const data = await deleteItemFromDynamoDB(deleteItemID);
+      const deleteData = {
+        ownerId: deleteOwnerID, 
+        id: deleteItemID,         
+      };
+  
+      const data = await deleteItemFromDynamoDB(deleteData);
+  
       setMessage('Item deleted successfully');
       setDeleteItemID(''); 
+      setDeleteOwnerID(''); 
     } catch (error) {
       setMessage(`Error deleting item: ${error.message}`);
     }
@@ -77,13 +120,13 @@ export default function DynamoDBCrudTest() {
           type="text"
           value={createItemID}
           placeholder="Item ID"
-          onChange={(e) => setItemID(e.target.value)}
+          onChange={(e) => setCreateItemID(e.target.value)}
         />
         <input
           type="text"
           value={createItemData}
           placeholder="Name"
-          onChange={(e) => setItemData(e.target.value)}
+          onChange={(e) => setCreateItemData(e.target.value)}
         />
         <button type="submit">Create Item</button>
       </form>
@@ -92,11 +135,17 @@ export default function DynamoDBCrudTest() {
       <h3>Retrieve Item</h3>
       <input
         type="text"
+        value={retrieveOwnerID} 
+        placeholder="Owner ID"
+        onChange={(e) => setRetrieveOwnerID(e.target.value)}
+      />
+      <input
+        type="text"
         value={retrieveItemID}
         placeholder="Item ID"
         onChange={(e) => setRetrieveItemID(e.target.value)}
       />
-      <button onClick={handleRetrieveItem} disabled={!retrieveItemID}>
+      <button onClick={handleRetrieveItem} disabled={!retrieveOwnerID || !retrieveItemID}>
         Retrieve Item
       </button>
       {retrievedItem && <p>Retrieved Item: {JSON.stringify(retrievedItem)}</p>}
@@ -104,6 +153,13 @@ export default function DynamoDBCrudTest() {
       {/* Update Item */}
       <h3>Update Item</h3>
       <form onSubmit={handleUpdateItem}>
+        
+        <input
+          type="text"
+          value={updateOwnerID}
+          placeholder="Owner ID"
+          onChange={(e) => setUpdateOwnerID(e.target.value)}
+        />
         <input
           type="text"
           value={updateItemID}
@@ -123,11 +179,19 @@ export default function DynamoDBCrudTest() {
       <h3>Delete Item</h3>
       <input
         type="text"
+        value={deleteOwnerID}
+        placeholder="Owner ID"
+        onChange={(e) => setDeleteOwnerID(e.target.value)}
+      />
+      <input
+        type="text"
         value={deleteItemID}
         placeholder="Item ID"
         onChange={(e) => setDeleteItemID(e.target.value)}
       />
-      <button onClick={handleDeleteItem} disabled={!deleteItemID}>Delete Item</button>
+      <button onClick={handleDeleteItem} disabled={!deleteOwnerID || !deleteItemID}>
+        Delete Item
+      </button>
     </div>
   );
 }
