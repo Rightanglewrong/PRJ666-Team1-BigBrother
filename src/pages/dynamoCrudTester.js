@@ -66,6 +66,19 @@ export default function DynamoDBCrudTest() {
   const handleUpdateItem = async (e) => {
     e.preventDefault();
     try {
+      
+      const retrieveData = {
+        ownerId: updateOwnerID,  
+        id: updateItemID,        
+      };
+  
+      const existingItem = await retrieveItemFromDynamoDB(retrieveData);
+  
+      if (!existingItem) {
+        setMessage(`Error: Item with ownerID: ${updateOwnerID} and id: ${updateItemID} does not exist.`);
+        return; 
+      }
+      
       const updateData = {
         ownerId: updateOwnerID,  
         id: updateItemID,        
