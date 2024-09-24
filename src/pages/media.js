@@ -3,7 +3,6 @@ import styles from './media.module.css';
 
 export default function MediaUploadPage() {
   const [child, setChild] = useState('');
-  const [parent, setParent] = useState('');
   const [description, setDescription] = useState('');
 
   const handleFileUpload = (e) => {
@@ -17,7 +16,6 @@ export default function MediaUploadPage() {
 
   const handleCancel = () => {
     setChild('');
-    setParent('');
     setDescription('');
     console.log('Form reset');
   };
@@ -41,17 +39,7 @@ export default function MediaUploadPage() {
             <option value="child1">Benny</option>
             <option value="child2">Alex</option>
             <option value="child3">Justin</option>
-          </select>
-        </div>
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Parent Selection</label>
-          <select
-            value={parent}
-            onChange={(e) => setParent(e.target.value)}
-            className={styles.formInputSelect}
-          >
-            <option value="">Select Parent</option>
-            <option value="parent1">Steven</option>
+            <option value="child3">Steven</option>
           </select>
         </div>
         <div className={styles.formGroup}>
