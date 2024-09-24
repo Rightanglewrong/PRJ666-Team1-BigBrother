@@ -79,6 +79,9 @@ export const deleteItemFromDynamoDB = async (item) => {
   try {
     const response = await fetch(`${BACKEND_URL}v1/test/delete-item`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(item),
     });
 
