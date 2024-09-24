@@ -15,11 +15,15 @@ const NavBar = () => {
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
-        const user = await Auth.currentAuthenticatedUser();
-        setIsLoggedIn(true);
-        setUsername(user.username); // Set the username from Cognito
+        const session = await Auth.currentSession();
+        if (session) {
+          const user = await Auth.currentAuthenticatedUser();
+          setIsLoggedIn(true);
+          setUsername(user.username); // Set the username from Cognito
+        }
       } catch (error) {
         setIsLoggedIn(false);
+        setUsername("");
       }
     };
     checkUserStatus();
@@ -30,8 +34,8 @@ const NavBar = () => {
     try {
       await Auth.signOut();
       setIsLoggedIn(false);
-      setUsername(""); // Clear the username after logout
-      router.push("/"); // Redirect to home page after logout
+      setUsername(''); // Clear the username after logout
+      router.push('/'); // Redirect to home page after logout
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -75,8 +79,8 @@ const NavBar = () => {
         </div>
 
         <div className={styles.rightSection}>
-          <ul className={styles.navList}>
-            {isLoggedIn && (
+        <ul className={styles.navList}>
+            {isLoggedIn ? (
               <>
                 <li className={styles.navItem}>Welcome, {username}</li>
                 <li>
@@ -85,6 +89,10 @@ const NavBar = () => {
                   </button>
                 </li>
               </>
+            ) : (
+              <li><button onClick={handleLogout} className={styles.navItem}>
+              Logoutout
+            </button></li>
             )}
           </ul>
         </div>
