@@ -1,23 +1,22 @@
-"use client";
-
+"use client"
+import { Auth } from 'aws-amplify';
 import styles from './page.module.css';
 
 export default function Home() {
   const handleLogin = async () => {
     try {
-      // Redirect directly to Cognito hosted login page
-      const loginUrl = 'https://big-brother2-pool.auth.us-east-1.amazoncognito.com/login?client_id=69n73oh4j7t8ou9f1u9sqs8e3g&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fprj-666-team1-big-brother.vercel.app%2Fdashboard';
-      window.location.href = loginUrl;
+      // This will redirect to Cognito hosted login page
+      await Auth.federatedSignIn();
     } catch (error) {
-      console.error("Error during login redirect:", error);
+      console.error("Error during federated sign in:", error);
     }
   };
 
   const handleRegister = async () => {
     try {
-      // Redirect to Cognito hosted signup page
+      // This will redirect to Cognito hosted signup page
       const signUpUrl = 'https://big-brother2-pool.auth.us-east-1.amazoncognito.com/signup?client_id=69n73oh4j7t8ou9f1u9sqs8e3g&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fprj-666-team1-big-brother.vercel.app%2Fdashboard';
-      window.location.href = signUpUrl;
+      window.location.href = signUpUrl; // Redirect to signup
     } catch (error) {
       console.error("Error during registration redirect:", error);
     }
