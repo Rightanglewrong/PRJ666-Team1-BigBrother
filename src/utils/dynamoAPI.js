@@ -81,7 +81,6 @@ export const deleteItemFromDynamoDB = async (item) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ownerId: item.ownerId }), 
     });
 
     if (!response.ok) {
