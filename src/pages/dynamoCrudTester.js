@@ -36,7 +36,7 @@ export default function DynamoDBCrudTest() {
   
       const data = await createItemInDynamoDB(newItem);
   
-      setMessage(`Item created successfully: ${JSON.stringify(data)}`);
+      setMessage(`Item created successfully with ownerID: ${ownerID}, data: ${JSON.stringify(data)}`);
       setCreateItemID('');       
       setCreateItemData('');
     } catch (error) {
