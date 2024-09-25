@@ -1,52 +1,51 @@
-"use client"
 import { useEffect, useState } from 'react';
-import { Auth } from 'aws-amplify'; 
 import { useRouter } from 'next/router'; 
-import { checkUser } from '../utils/api'; 
+import { getCurrentUser } from '../utils/api'; // Import the new API function
 
 export default function DashboardPage() {
   const [userDetails, setUserDetails] = useState(null);
+  const [error, setError] = useState('');
   const router = useRouter();
 
+  // Function to check if user is authenticated
+  const checkAuth = async () => {
+    const token = localStorage.getItem('token'); 
+    if (!token) {
+      // If no token, redirect to login
+      router.push('/login');
+      return;
+    }
+
+    try {
+      // Fetch user details from API
+      const userData = await getCurrentUser();
+      setUserDetails(userData); // Set user details in state
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Failed to load user details. Please log in again.');
+      router.push('/login'); // Redirect to login on error
+    }
+  };
+
+  // On component mount, check if user is authenticated
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const session = await Auth.currentSession(); // Get current session
-        const user = await Auth.currentAuthenticatedUser(); // Get current authenticated user
-        const { attributes } = user;
-        const userId = attributes.sub;
-        const email = attributes.email;
-
-        console.log("User ID (sub):", userId);
-        console.log("Email:", email);
-
-        setUserDetails({
-          userId,
-          email,
-        });
-
-        const result = await checkUser(userId); // Pass userId to checkUser function
-        if (result.hasAccountDetails) {
-          console.log("User has account details.");
-        } else {
-          console.log("Redirecting to profile page...");
-          router.push('/profile'); 
-        }
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
-    };
-
-    fetchUserDetails(); 
-  }, [router]);
+    checkAuth();
+  }, []);
 
   return (
     <div>
       <h1>Dashboard</h1>
-      {userDetails ? (
+      {error ? (
+        <p>{error}</p>
+      ) : userDetails ? (
         <div>
-          <p>Welcome, {userDetails.email}</p>
-          <p>User ID: {userDetails.userId}</p>
+          <p>Welcome, {userDetails.firstname}</p>
+          <p>User ID: {userDetails.userID}</p>
+          <div>
+            <p>First Name: {userDetails.firstName}</p>
+            <p>Account Type: {userDetails.accountType}</p>
+            <p>Location ID: {userDetails.locationID}</p>
+          </div>
         </div>
       ) : (
         <p>Loading user details...</p>
