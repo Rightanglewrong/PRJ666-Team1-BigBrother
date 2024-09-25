@@ -14,7 +14,6 @@ export default function RegisterPage() {
   const [accountTypeError, setAccountTypeError] = useState(''); // State for error message
   const router = useRouter();
 
-  // Handler for accountType input to allow only numbers between 1 and 4
 
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$]).{6,}$/;

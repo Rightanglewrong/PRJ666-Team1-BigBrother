@@ -16,6 +16,7 @@ export default function DashboardPage() {
       return;
     }
 
+    
     try {
       // Fetch user details from API
       const userData = await getCurrentUser();
