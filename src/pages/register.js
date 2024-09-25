@@ -14,20 +14,6 @@ export default function RegisterPage() {
   const [accountTypeError, setAccountTypeError] = useState(''); // State for error message
   const router = useRouter();
 
-  // Handler for accountType input to allow only numbers between 1 and 4
-  const handleAccountTypeChange = (e) => {
-    const value = e.target.value;
-
-    // Check if input is not a number or if it's out of range
-    if (isNaN(value) || value < 1 || value > 4) {
-      setAccountTypeError('Account type must be a number between 1 and 4.');
-    } else {
-      setAccountTypeError(''); // Clear error if input is valid
-    }
-
-    // Allow only numeric input and set the value
-    setAccountType(value);
-  };
 
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$]).{6,}$/;
@@ -121,7 +107,7 @@ export default function RegisterPage() {
           id="accountType"
           name="accountType"
           value={accountType} // Default value set here
-          onChange={handleAccountTypeChange}
+          onChange={(e) => setAccountType(e.target.value)}
           required
         />
         {accountTypeError && <small className={styles.error}>{accountTypeError}</small>}
