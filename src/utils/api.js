@@ -1,5 +1,25 @@
 const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
+export async function updateUserProfile(updatedData) {
+  const token = localStorage.getItem('token'); // Retrieve token from localStorage
+
+  const response = await fetch(`${BACKEND_URL}/update`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`, // Pass JWT token for authentication
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(updatedData) // Send updated user data
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to update profile');
+  }
+
+  return await response.json(); // Return the success message or updated data
+}
+
 // Get the current user's details using the token
 export async function getCurrentUser() {
   const token = localStorage.getItem('token');
@@ -28,6 +48,7 @@ export async function getCurrentUser() {
     throw new Error(error.message);
   }
 }
+
 export async function login(email, password) {
   try {
     const response = await fetch(`${BACKEND_URL}/login`, {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router'; // Import useRouter for navigation
 import { signup } from '../utils/api';
 import styles from './register.module.css';
@@ -14,11 +14,6 @@ export default function RegisterPage() {
   const [accountTypeError, setAccountTypeError] = useState(''); // State for error message
   const router = useRouter();
 
-  const validatePassword = (password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$]).{6,}$/;
-    return passwordRegex.test(password);
-  };
-
   // Handler for accountType input to allow only numbers between 1 and 4
   const handleAccountTypeChange = (e) => {
     const value = e.target.value;
@@ -32,6 +27,11 @@ export default function RegisterPage() {
 
     // Allow only numeric input and set the value
     setAccountType(value);
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$]).{6,}$/;
+    return passwordRegex.test(password);
   };
 
   const handleSubmit = async (e) => {
@@ -57,7 +57,7 @@ export default function RegisterPage() {
     try {
       await signup(signupData);
       alert('Registration successful!');
-      
+
       // Redirect to dashboard after successful registration
       router.push('/dashboard');
     } catch (error) {

@@ -1,77 +1,101 @@
 import { useState, useEffect } from 'react';
-import { getUserProfile } from '../utils/api'; // Import the backend API call function
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../utils/firebase';  // Assuming you still want to use Firebase auth for authentication state
+import { getCurrentUser } from '../utils/api'; // Use getCurrentUser instead of getUserProfile
 import styles from './Profile.module.css';
 
 export default function ProfilePage() {
+  const [userID, setUserID] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [locationID, setLocationID] = useState('');
   const [accountType, setAccountType] = useState('');
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
+  // Fetch user profile data when the component mounts
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          // Fetch user data from the backend using the uid
-          const profile = await getUserProfile(user.uid);
-
-          if (profile) {
-            // Populate the fields with the data retrieved from the backend
-            setEmail(profile.email || '');
-            setPhone(profile.phone || '');
-            setLocationID(profile.locationID || '');
-            setAccountType(profile.accountType || '');
-          }
-        } catch (err) {
-          setError('Failed to load profile data');
-          console.error(err);
-        }
-        setLoading(false);
-      } else {
-        setLoading(false); // User not logged in
+    async function fetchProfile() {
+      try {
+        const userProfile = await getCurrentUser(); // Fetch user data using getCurrentUser
+        setUserID(userProfile.userID);     // Set userID
+        setEmail(userProfile.email);       // Set email
+        setFirstName(userProfile.firstName); // Set first name
+        setLastName(userProfile.lastName); // Set last name
+        setLocationID(userProfile.locationID); // Set location ID
+        setAccountType(userProfile.accountType); // Set account type
+      } catch (err) {
+        console.error('Failed to fetch profile', err);
+        setError('Failed to load profile');
       }
-    });
+    }
 
-    return () => unsubscribe(); // Clean up the subscription on unmount
+    fetchProfile();
   }, []);
 
+  // Handle form submission to update user info
   const handleUpdate = async (e) => {
     e.preventDefault();
-    // Logic for updating user data in Firebase (you can add this if needed)
-    console.log('Updating user info', { email, phone, locationID, accountType });
+
+    const updatedData = {
+      firstName,
+      lastName,
+      locationID,
+      accountType
+    };
+
+    try {
+      await updateUserProfile(updatedData); // Assume this sends updated data to backend
+      setSuccess('Profile updated successfully');
+    } catch (err) {
+      console.error('Failed to update profile', err);
+      setError('Failed to update profile');
+    }
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   return (
     <div className={styles.container}>
       <h1 className={styles.heading}>Profile</h1>
+      {error && <p className={styles.error}>{error}</p>}
+      {success && <p className={styles.success}>{success}</p>}
       <form className={styles.form} onSubmit={handleUpdate}>
+        {/* UserID - Uneditable */}
+        <label className={styles.label}>User ID</label>
+        <input
+          className={styles.input}
+          type="text"
+          value={userID}
+          disabled
+        />
+
+        {/* Email - Uneditable */}
         <label className={styles.label}>Email</label>
         <input
           className={styles.input}
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
           disabled
         />
-        <label className={styles.label}>Phone</label>
+
+        {/* First Name */}
+        <label className={styles.label}>First Name</label>
         <input
           className={styles.input}
           type="text"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
         />
+
+        {/* Last Name */}
+        <label className={styles.label}>Last Name</label>
+        <input
+          className={styles.input}
+          type="text"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+
+
+        {/* Location ID */}
         <label className={styles.label}>Location ID</label>
         <input
           className={styles.input}
@@ -79,6 +103,8 @@ export default function ProfilePage() {
           value={locationID}
           onChange={(e) => setLocationID(e.target.value)}
         />
+
+        {/* Account Type */}
         <label className={styles.label}>Account Type</label>
         <input
           className={styles.input}
@@ -86,6 +112,8 @@ export default function ProfilePage() {
           value={accountType}
           onChange={(e) => setAccountType(e.target.value)}
         />
+
+        {/* Submit Button */}
         <button className={styles.button} type="submit">Update Info</button>
       </form>
     </div>
