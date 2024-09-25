@@ -16,6 +16,7 @@
     "aws-amplify": "^5.3.23",
     "bootstrap": "^5.3.3",
     "dotenv": "^16.4.5",
+    "firebase": "^10.13.2",
     "next": "14.2.8",
     "react": "^18",
     "react-dom": "^18"

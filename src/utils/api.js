@@ -1,26 +1,50 @@
 const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
-export const checkUser = async (sub) => {
+// Function to handle login
+export const login = async (email, password) => {
   try {
-    const response = await fetch(`${BACKEND_URL}api/check-user`, {
-      method: "POST",
+    const response = await fetch(`${BACKEND_URL}login`, {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ sub }),  // Pass sub to backend
+      body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
-      throw new Error("Failed to check user details.");
+      throw new Error('Login failed');
     }
 
-    const data = await response.json();
-    return data;  // This should return whether fields are present or not
-  } catch (error) {
-    console.error("Error checking user details:", error);
-    return { hasAccountDetails: false };  // Default to false on error
+    const result = await response.json();
+    return result;  // Should return an object with the token
+  } catch (err) {
+    console.error(err);
+    throw err;
   }
 };
+
+// Function to retrieve user profile data
+export const getUserProfile = async (uid) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/profile/${uid}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch user profile');
+    }
+
+    const userProfile = await response.json();
+    return userProfile;
+  } catch (err) {
+    console.error('Error fetching profile:', err);
+    throw err;
+  }
+};
+
 
 const determineContentType = (key) => {
   const extension = key.split('.').pop().toLowerCase();
