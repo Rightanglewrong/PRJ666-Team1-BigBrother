@@ -8,12 +8,12 @@ export default function RegisterPage() {
   const [firstname, setFirstName] = useState('');
   const [lastname, setLastName] = useState('');
   const [locationID, setLocationID] = useState('');
-  const [accountType, setAccountType] = useState('1'); // Set default value of 1
+  const [accountType, setAccountType] = useState(''); 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [accountTypeError, setAccountTypeError] = useState(''); // State for error message
   const router = useRouter();
-
+  
 
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$]).{6,}$/;
