@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router'; 
 import { getCurrentUser } from '../utils/api'; // Import the new API function
 
@@ -8,7 +8,7 @@ export default function DashboardPage() {
   const router = useRouter();
 
   // Function to check if user is authenticated
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     const token = localStorage.getItem('token'); 
     if (!token) {
       // If no token, redirect to login
@@ -25,12 +25,12 @@ export default function DashboardPage() {
       setError('Failed to load user details. Please log in again.');
       router.push('/login'); // Redirect to login on error
     }
-  };
+  }, [router]);
 
   // On component mount, check if user is authenticated
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   return (
     <div>

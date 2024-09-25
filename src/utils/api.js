@@ -3,7 +3,7 @@ const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 export async function updateUserProfile(updatedData) {
   const token = localStorage.getItem('token'); // Retrieve token from localStorage
 
-  const response = await fetch(`${BACKEND_URL}/update`, {
+  const response = await fetch(`${BACKEND_URL}update`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`, // Pass JWT token for authentication
@@ -29,7 +29,7 @@ export async function getCurrentUser() {
   }
 
   try {
-    const response = await fetch(`${BACKEND_URL}/me`, {
+    const response = await fetch(`${BACKEND_URL}me`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`, // Pass JWT in headers
@@ -51,7 +51,7 @@ export async function getCurrentUser() {
 
 export async function login(email, password) {
   try {
-    const response = await fetch(`${BACKEND_URL}/login`, {
+    const response = await fetch(`${BACKEND_URL}login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export async function login(email, password) {
 }
 
 export async function signup(signupData) {
-  const response = await fetch(`${BACKEND_URL}/register`, {
+  const response = await fetch(`${BACKEND_URL}register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
