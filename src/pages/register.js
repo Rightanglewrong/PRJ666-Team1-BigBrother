@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router'; // Import useRouter for navigation
 import { signup } from '../utils/api';
 import styles from './register.module.css';
@@ -11,17 +11,30 @@ export default function RegisterPage() {
   const [accountType, setAccountType] = useState(''); 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [accountTypeError, setAccountTypeError] = useState(''); // State for error message
+  const [emailError, setEmailError] = useState(''); // State for email error message
+  const [accountTypeError, setAccountTypeError] = useState(''); // State for account type error message
   const router = useRouter();
   
-
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$]).{6,}$/;
     return passwordRegex.test(password);
   };
 
+  const validateEmail = (email) => {
+    // Regular expression to check for an email with "@" and "."
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address in the format: name@domain.extension.');
+      return;
+    } else {
+      setEmailError(''); // Clear error if email is valid
+    }
 
     if (accountTypeError) {
       alert('Please fix the errors before submitting.');
@@ -66,6 +79,7 @@ export default function RegisterPage() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+        {emailError && <small className={styles.error}>{emailError}</small>} {/* Display email error if present */}
 
         <label className={styles.label} htmlFor="FirstName">First Name</label>
         <input
@@ -103,10 +117,10 @@ export default function RegisterPage() {
         <label className={styles.label} htmlFor="AccountType">Account Type</label>
         <input
           className={styles.input}
-          type="text" // Keep this as "text" to handle manual input validation
+          type="text"
           id="accountType"
           name="accountType"
-          value={accountType} // Default value set here
+          value={accountType}
           onChange={(e) => setAccountType(e.target.value)}
           required
         />

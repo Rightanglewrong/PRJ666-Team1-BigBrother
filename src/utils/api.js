@@ -4,7 +4,7 @@ export async function updateUserProfile(updatedData) {
   const token = localStorage.getItem('token'); // Retrieve token from localStorage
 
   const response = await fetch(`${BACKEND_URL}update`, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
       'Authorization': `Bearer ${token}`, // Pass JWT token for authentication
       'Content-Type': 'application/json'
@@ -30,7 +30,7 @@ export async function getCurrentUser() {
 
   try {
     const response = await fetch(`${BACKEND_URL}me`, {
-      method: 'GET',
+      method: "GET",
       headers: {
         'Authorization': `Bearer ${token}`, // Pass JWT in headers
         'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export async function getCurrentUser() {
 export async function login(email, password) {
   try {
     const response = await fetch(`${BACKEND_URL}login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         'Content-Type': 'application/json',
       },
@@ -73,7 +73,7 @@ export async function login(email, password) {
 
 export async function signup(signupData) {
   const response = await fetch(`${BACKEND_URL}register`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       'Content-Type': 'application/json',
     },
