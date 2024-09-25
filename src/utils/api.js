@@ -1,9 +1,36 @@
 const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
-// Function to handle login
-export const login = async (email, password) => {
+// Get the current user's details using the token
+export async function getCurrentUser() {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error("No token found");
+  }
+
   try {
-    const response = await fetch(`${BACKEND_URL}login`, {
+    const response = await fetch(`${BACKEND_URL}/me`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Pass JWT in headers
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch user details');
+    }
+
+    const userData = await response.json();
+    return userData;  // Return user details from backend
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw new Error(error.message);
+  }
+}
+export async function login(email, password) {
+  try {
+    const response = await fetch(`${BACKEND_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -15,35 +42,32 @@ export const login = async (email, password) => {
       throw new Error('Login failed');
     }
 
-    const result = await response.json();
-    return result;  // Should return an object with the token
-  } catch (err) {
-    console.error(err);
-    throw err;
+    const data = await response.json();
+    return data;  // Should return token or error message
+  } catch (error) {
+    console.error('Error logging in:', error);
+    return { error: error.message };
   }
-};
+}
 
-// Function to retrieve user profile data
-export const getUserProfile = async (uid) => {
-  try {
-    const response = await fetch(`${BACKEND_URL}/profile/${uid}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+export async function signup(signupData) {
+  const response = await fetch(`${BACKEND_URL}/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(signupData),  // Send user data to backend
+  });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch user profile');
-    }
-
-    const userProfile = await response.json();
-    return userProfile;
-  } catch (err) {
-    console.error('Error fetching profile:', err);
-    throw err;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Registration failed');
   }
-};
+
+  return await response.json();
+}
+
+
 
 
 const determineContentType = (key) => {
