@@ -173,7 +173,7 @@ export const updateFileInS3 = async (fileKey, newFile) => {
 
 // To DELETE from S3
 export const deleteFileFromS3 = async (fileKey) => {
-  const res = await fetch(`${process.env.BACKEND_URL}v1/test/delete-file`, {
+  const res = await fetch(`${BACKEND_URL}v1/test/delete-file`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ key: fileKey }),
