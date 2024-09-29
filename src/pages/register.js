@@ -51,7 +51,7 @@ export default function RegisterPage() {
       return;
     }
 
-    const signupData = { email, password, firstname, lastname, locationID, accountType };
+    const signupData = { firstname, lastname, email,  locationID, accountType, password };
 
     try {
       await signup(signupData);
