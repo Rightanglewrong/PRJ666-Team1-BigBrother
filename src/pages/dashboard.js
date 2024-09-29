@@ -1,67 +1,56 @@
-import { useEffect, useState } from 'react';
-import { Auth } from 'aws-amplify'; // Import Amplify's Auth module
-import { useRouter } from 'next/router'; // Use Next.js router for navigation
-import { checkUser } from '../utils/api'; // Import your checkUser function
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/router'; 
+import { getCurrentUser } from '../utils/api'; // Import the new API function
 
 export default function DashboardPage() {
   const [userDetails, setUserDetails] = useState(null);
+  const [error, setError] = useState('');
   const router = useRouter();
 
+  // Function to check if user is authenticated
+  const checkAuth = useCallback(async () => {
+    const token = localStorage.getItem('token'); 
+    if (!token) {
+      // If no token, redirect to login
+      router.push('/login');
+      return;
+    }
+
+    
+    try {
+      // Fetch user details from API
+      const userData = await getCurrentUser();
+      setUserDetails(userData); // Set user details in state
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Failed to load user details. Please log in again.');
+      router.push('/login'); // Redirect to login on error
+    }
+  }, [router]);
+
+  // On component mount, check if user is authenticated
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        // Check if the user has a valid session
-        const session = await Auth.currentSession();
-        if (!session) {
-          throw new Error("No active session found");
-        }
-        
-        // If session exists, get the current authenticated user
-        const user = await Auth.currentAuthenticatedUser();
-        const { attributes } = user;
-        const userId = attributes.sub;  // This is the user's unique Cognito ID
-        const email = attributes.email;
-
-        console.log("User ID (sub):", userId);
-        console.log("Email:", email);
-
-        // Save user details in state
-        setUserDetails({
-          userId,
-          email,
-        });
-
-        // Pass userId (or 'sub') to checkUser and await the response
-        const result = await checkUser(userId);
-
-        if (result.hasAccountDetails) {
-          console.log("User has account details.");
-        } else {
-          console.log("Redirecting to profile page...");
-          router.push('/profile'); // Redirect to profile page
-        }
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-        // If there's an error (like no session), redirect to login
-
-      }
-    };
-
-    fetchUserDetails(); // Call the function
-  }, [router]); // Add router as a dependency
+    checkAuth();
+  }, [checkAuth]);
 
   return (
     <div>
       <h1>Dashboard</h1>
-      {userDetails ? (
+      {error ? (
+        <p>{error}</p>
+      ) : userDetails ? (
         <div>
-          <p>Welcome, {userDetails.username}</p>
-          <p>User ID: {userDetails.userId}</p>
-          <p>Email: {userDetails.email}</p>
+          <p>Welcome, {userDetails.firstname}</p>
+          <p>User ID: {userDetails.userID}</p>
+          <div>
+            <p>First Name: {userDetails.firstName}</p>
+            <p>Account Type: {userDetails.accountType}</p>
+            <p>Location ID: {userDetails.locationID}</p>
+          </div>
         </div>
       ) : (
         <p>Loading user details...</p>
       )}
     </div>
   );
-};
+}

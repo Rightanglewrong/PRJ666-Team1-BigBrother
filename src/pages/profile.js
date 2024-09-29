@@ -1,33 +1,119 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getCurrentUser } from '../utils/api'; // Use getCurrentUser instead of getUserProfile
 import styles from './Profile.module.css';
 
 export default function ProfilePage() {
-  const [email, setEmail] = useState('parent@example.com');
-  const [phone, setPhone] = useState('123-456-7890');
+  const [userID, setUserID] = useState('');
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [locationID, setLocationID] = useState('');
+  const [accountType, setAccountType] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleUpdate = (e) => {
+  // Fetch user profile data when the component mounts
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const userProfile = await getCurrentUser(); // Fetch user data using getCurrentUser
+        setUserID(userProfile.userID);     // Set userID
+        setEmail(userProfile.email);       // Set email
+        setFirstName(userProfile.firstName); // Set first name
+        setLastName(userProfile.lastName); // Set last name
+        setLocationID(userProfile.locationID); // Set location ID
+        setAccountType(userProfile.accountType); // Set account type
+      } catch (err) {
+        console.error('Failed to fetch profile', err);
+        setError('Failed to load profile');
+      }
+    }
+
+    fetchProfile();
+  }, []);
+
+  // Handle form submission to update user info
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    console.log('Updating contact info', { email, phone });
+
+    const updatedData = {
+      firstName,
+      lastName,
+      locationID,
+      accountType
+    };
+
+    try {
+      await updateUserProfile(updatedData); // Assume this sends updated data to backend
+      setSuccess('Profile updated successfully');
+    } catch (err) {
+      console.error('Failed to update profile', err);
+      setError('Failed to update profile');
+    }
   };
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.heading}>Profile</h1> {}
-      <form className={styles.form} onSubmit={handleUpdate}> {}
+      <h1 className={styles.heading}>Profile</h1>
+      {error && <p className={styles.error}>{error}</p>}
+      {success && <p className={styles.success}>{success}</p>}
+      <form className={styles.form} onSubmit={handleUpdate}>
+        {/* UserID - Uneditable */}
+        <label className={styles.label}>User ID</label>
+        <input
+          className={styles.input}
+          type="text"
+          value={userID}
+          disabled
+        />
+
+        {/* Email - Uneditable */}
         <label className={styles.label}>Email</label>
         <input
           className={styles.input}
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          disabled
         />
-        <label className={styles.label}>Phone</label>
+
+        {/* First Name */}
+        <label className={styles.label}>First Name</label>
         <input
           className={styles.input}
           type="text"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
         />
+
+        {/* Last Name */}
+        <label className={styles.label}>Last Name</label>
+        <input
+          className={styles.input}
+          type="text"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+
+
+        {/* Location ID */}
+        <label className={styles.label}>Location ID</label>
+        <input
+          className={styles.input}
+          type="text"
+          value={locationID}
+          onChange={(e) => setLocationID(e.target.value)}
+        />
+
+        {/* Account Type */}
+        <label className={styles.label}>Account Type</label>
+        <input
+          className={styles.input}
+          type="text"
+          value={accountType}
+          onChange={(e) => setAccountType(e.target.value)}
+        />
+
+        {/* Submit Button */}
         <button className={styles.button} type="submit">Update Info</button>
       </form>
     </div>
