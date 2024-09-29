@@ -40,7 +40,7 @@ export default function DashboardPage() {
         <p>{error}</p>
       ) : userDetails ? (
         <div>
-          <p>Welcome, {userDetails.firstname}</p>
+          <p>Welcome, {userDetails.firstName}</p>
           <p>User ID: {userDetails.userID}</p>
           <div>
             <p>First Name: {userDetails.firstName}</p>
