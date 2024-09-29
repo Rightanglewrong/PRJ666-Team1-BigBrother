@@ -5,8 +5,8 @@ import styles from './register.module.css';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
-  const [firstname, setFirstName] = useState('');
-  const [lastname, setLastName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [locationID, setLocationID] = useState('');
   const [accountType, setAccountType] = useState(''); 
   const [password, setPassword] = useState('');
@@ -51,7 +51,7 @@ export default function RegisterPage() {
       return;
     }
 
-    const signupData = { firstname, lastname, email,  locationID, accountType, password };
+    const signupData = { firstName, lastName, email,  locationID, accountType, password };
 
     try {
       await signup(signupData);
@@ -85,9 +85,9 @@ export default function RegisterPage() {
         <input
           className={styles.input}
           type="text"
-          id="firstname"
-          name="firstname"
-          value={firstname}
+          id="firstName"
+          name="firstName"
+          value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           required
         />
@@ -96,9 +96,9 @@ export default function RegisterPage() {
         <input
           className={styles.input}
           type="text"
-          id="lastname"
-          name="lastname"
-          value={lastname}
+          id="lastName"
+          name="lastName"
+          value={lastName}
           onChange={(e) => setLastName(e.target.value)}
           required
         />
