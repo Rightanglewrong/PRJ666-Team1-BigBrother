@@ -75,6 +75,12 @@ const NavBar = () => {
                 Dynamo CRUD Testing{" "}
               </Link>
             </li>
+            <li>
+              <Link href="/calendar" className={styles.navItem}>
+                {" "}
+                Calendar{" "}
+              </Link>
+            </li>
           </ul>
         </div>
 
