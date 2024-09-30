@@ -38,7 +38,13 @@ export async function getCurrentUser() {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch user details');
+      if (response.status === 401) {
+        throw new Error('Unauthorized access. Please log in again.');
+      } else if (response.status === 404) {
+        throw new Error('User not found. Please check your account.');
+      } else {
+        throw new Error('Failed to fetch user details. Please try again later.');
+      }
     }
 
     const userData = await response.json();
@@ -48,6 +54,7 @@ export async function getCurrentUser() {
     throw new Error(error.message);
   }
 }
+
 
 export async function login(email, password) {
   try {
