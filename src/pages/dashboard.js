@@ -44,6 +44,7 @@ export default function DashboardPage() {
           <p>User ID: {userDetails.userID}</p>
           <div>
             <p>First Name: {userDetails.firstName}</p>
+            <p>First Name: {userDetails.lastName}</p>
             <p>Account Type: {userDetails.accountType}</p>
             <p>Location ID: {userDetails.locationID}</p>
           </div>
