@@ -75,6 +75,12 @@ const NavBar = () => {
                 Dynamo CRUD Testing{" "}
               </Link>
             </li>
+            <li>
+              <Link href="/calendar" className={styles.navItem}>
+                {" "}
+                Calendar{" "}
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -90,7 +96,7 @@ const NavBar = () => {
                 </li>
               </>
             ) : (
-              <li className={styles.navItem}>You are not login  </li>
+              <li className={styles.navItem}>You are not logged in</li>
             )}
           </ul>
         </div>
