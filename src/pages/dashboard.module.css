@@ -1,0 +1,89 @@
+.dashboardContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    padding: 20px;
+  }
+  
+  .dashboard {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-align: center;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .error {
+    color: #e74c3c;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .welcome {
+    font-size: 1.75rem;
+    color: #27ae60;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .userDetails {
+    background-color: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    animation: fadeIn 0.8s ease-in-out;
+  }
+  
+  .userInfo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  
+  .userInfo p {
+    margin: 0;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  /* Ensure User ID takes up full width if needed */
+  .userInfo p:nth-child(5) {
+    grid-column: span 2;
+    text-align: center;
+  }
+  
+  .loading {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
