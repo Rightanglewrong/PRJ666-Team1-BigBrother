@@ -49,11 +49,11 @@ export default function DashboardPage() {
             <p className={styles.welcome}>Welcome, {userDetails.firstName}</p>
             <div className={styles.userDetails}>
               <div className={styles.userInfo}>
-                <p>First Name: {userDetails.firstName}</p>
-                <p>Last Name: {userDetails.lastName}</p>
-                <p>Account Type: {userDetails.accountType}</p>
-                <p>Location ID: {userDetails.locationID}</p>
-                <p>User ID: {userDetails.userID}</p>
+                <p><strong>First Name: </strong>{userDetails.firstName}</p>
+                <p><strong>Last Name: </strong>{userDetails.lastName}</p>
+                <p><strong>Account Type: </strong>{userDetails.accountType}</p>
+                <p><strong>Location ID: </strong>{userDetails.locationID}</p>
+                <p><strong>User ID: </strong>{userDetails.userID}</p>
               </div>
             </div>
           </div>
