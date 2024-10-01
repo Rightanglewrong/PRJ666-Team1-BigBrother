@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router'; 
 import { getCurrentUser } from '../utils/api'; // Import the new API function
-import styles from './Dashboard.module.css';
+import styles from './dashboard.module.css';
 
 export default function DashboardPage() {
   const [userDetails, setUserDetails] = useState(null);
