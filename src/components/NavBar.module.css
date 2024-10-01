@@ -1,5 +1,5 @@
 .nav {
-  background-color: #333;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
   padding: 10px 20px;
   position: sticky;
   top: 0;
@@ -19,7 +19,7 @@
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #fff;
   text-decoration: none;
   font-weight: bold;
@@ -37,13 +37,14 @@
   margin-left: 20px;
   color: #fff;
   text-decoration: none;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: color 0.3s ease;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, color 0.3s ease;
 }
 
 .navItem:hover {
-  color: #ffcc00;
+  transform: translateY(-2px);
+  color: #fbc531;
 }
 
 
@@ -58,4 +59,58 @@
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+/* Dropdown container */
+.dropdown {
+  cursor: pointer;
+  position: relative;
+}
+
+/* Dropdown menu styling */
+.dropdownMenu {
+  display: block;
+  position: absolute;
+  background: linear-gradient(90deg, #f52ad3f4, #25dcfce4);
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  border-radius: 4px;
+}
+
+/* Dropdown items */
+.dropdownItem {
+  color: #fff;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdownItem:hover {
+  background-color: #ffcf4d;
+  color: #9318a5;
+}
+
+/* Optional styling for when the dropdown is open */
+.navItem:hover .dropdownMenu {
+  display: block;
+}
+
+/* Style for buttons, including Logout */
+.button {
+  background-color: transparent;
+  border: none;
+  color: #f1bc2b;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  color: #ff7d7d; /* Yellow */
 }

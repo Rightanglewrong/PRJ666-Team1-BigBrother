@@ -9,6 +9,7 @@ import { getCurrentUser } from '../utils/api';
 const NavBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [firstName, setFirstName] = useState(''); 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
 
   // Check user authentication status when the component is mounted
@@ -59,6 +60,11 @@ const NavBar = () => {
     }
   };
 
+  // Toggle dropdown menu visibility
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
   return (
     <nav className={styles.nav}>
       <div className={styles.navContainer}>
@@ -83,24 +89,26 @@ const NavBar = () => {
               </Link>
             </li>
             <li>
-              <Link href="/crudTester" className={styles.navItem}>
-                Crud Testing
-              </Link>
-            </li>
-            <li>
-              <Link href="/dynamoCrudTester" className={styles.navItem}>
-                {" "}
-                Dynamo CRUD Testing{" "}
-              </Link>
-            </li>
-            <li>
               <Link href="/calendar" className={styles.navItem}>
                 {" "}
                 Calendar{" "}
               </Link>
             </li>
+
+            {/* Dropdown for Testing */}
+            <li className={styles.navItem} onMouseEnter={toggleDropdown} onMouseLeave={toggleDropdown}>
+              <span className={styles.dropdown}>Testing</span>
+              {dropdownOpen && (
+                <ul className={styles.dropdownMenu}>
+                  <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
+                  <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
+                </ul>
+              )}
+            </li>
           </ul>
         </div>
+
+        
 
         <div className={styles.rightSection}>
           <ul className={styles.navList}>
@@ -108,7 +116,7 @@ const NavBar = () => {
               <>
                 <li className={styles.navItem}>Welcome, {firstName}</li>
                 <li>
-                  <button onClick={handleLogout} className={styles.navItem}>
+                  <button onClick={handleLogout} className={styles.button}>
                     Logout
                   </button>
                 </li>
