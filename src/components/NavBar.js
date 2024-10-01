@@ -2,42 +2,60 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Auth } from "aws-amplify";
 import Link from "next/link";
 import styles from "./NavBar.module.css";
+import { getCurrentUser } from '../utils/api';
 
 const NavBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState(''); 
   const router = useRouter();
 
   // Check user authentication status when the component is mounted
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
-        const session = await Auth.currentSession();
-        if (session) {
-          const user = await Auth.currentAuthenticatedUser();
+        const token = localStorage.getItem('token');
+        
+        if (token) {
+          const userDetails = await getCurrentUser(); 
+          setFirstName(userDetails.firstName);
           setIsLoggedIn(true);
-          setUsername(user.username); // Set the username from Cognito
+        } else {
+          setIsLoggedIn(false);
         }
       } catch (error) {
+        console.error('Error fetching user details:', error);
         setIsLoggedIn(false);
-        setUsername("");
       }
     };
+
     checkUserStatus();
+
+    // Listen for storage events to trigger a refresh when the login status changes
+    const handleStorageChange = () => {
+      const loggedIn = localStorage.getItem('userLoggedIn') === 'true';
+      if (loggedIn) {
+        checkUserStatus();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // Handle Logout
   const handleLogout = async () => {
     try {
-      await Auth.signOut();
+      localStorage.removeItem('token');  // Remove the token when logging out
       setIsLoggedIn(false);
-      setUsername(''); // Clear the username after logout
-      router.push('/'); // Redirect to home page after logout
+      setFirstName('');
+      router.push('/');  // Redirect to home page after logout
     } catch (error) {
-      console.error("Error logging out:", error);
+      console.error('Error logging out:', error);
     }
   };
 
@@ -85,10 +103,10 @@ const NavBar = () => {
         </div>
 
         <div className={styles.rightSection}>
-        <ul className={styles.navList}>
+          <ul className={styles.navList}>
             {isLoggedIn ? (
               <>
-                <li className={styles.navItem}>Welcome, {username}</li>
+                <li className={styles.navItem}>Welcome, {firstName}</li>
                 <li>
                   <button onClick={handleLogout} className={styles.navItem}>
                     Logout

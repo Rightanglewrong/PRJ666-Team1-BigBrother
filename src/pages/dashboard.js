@@ -21,6 +21,11 @@ export default function DashboardPage() {
       // Fetch user details from API
       const userData = await getCurrentUser();
       setUserDetails(userData); // Set user details in state
+
+      // Optionally trigger a recheck in NavBar
+      localStorage.setItem('userLoggedIn', 'true'); 
+      window.dispatchEvent(new Event('storage'));
+
     } catch (error) {
       console.error('Error fetching user data:', error);
       setError('Failed to load user details. Please log in again.');
