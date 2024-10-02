@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router'; // Import useRouter for navigation
+import { useRouter } from 'next/router';
 import { signup } from '../utils/api';
 import styles from './register.module.css';
 
@@ -8,7 +8,7 @@ export default function RegisterPage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [locationID, setLocationID] = useState('');
-  const [accountType, setAccountType] = useState(''); 
+  const [accountType, setAccountType] = useState('Parent');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [emailError, setEmailError] = useState(''); // State for email error message
@@ -115,15 +115,18 @@ export default function RegisterPage() {
         />
 
         <label className={styles.label} htmlFor="AccountType">Account Type</label>
-        <input
+        <select
           className={styles.input}
-          type="text"
           id="accountType"
           name="accountType"
           value={accountType}
           onChange={(e) => setAccountType(e.target.value)}
           required
-        />
+        >
+          <option value="Parent">Parent</option>
+          <option value="Staff">Staff</option>
+          <option value="Admin">Admin</option>
+        </select>
         {accountTypeError && <small className={styles.error}>{accountTypeError}</small>}
 
         <label className={styles.label} htmlFor="password">Password</label>
