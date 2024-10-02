@@ -1,14 +1,14 @@
-import NavBar from '../components/NavBar';
+// pages/_app.js
 import '../app/globals.css';
+import NavBar from '../components/NavBar';
+import Authenticate from '../components/authenticate';
 
-
-function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps }) {
   return (
-    <>
-      <NavBar /> {/* Render the NavBar component */}
-      <Component {...pageProps} /> {/* Render the page component */}
-    </>
+    <Authenticate>
+      <NavBar />
+      <Component {...pageProps} />
+    </Authenticate>
   );
 }
 
-export default MyApp;
