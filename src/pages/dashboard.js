@@ -1,42 +1,26 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/router'; 
+// app/dashboard.js
+import { useEffect, useState } from 'react';
 import { getCurrentUser } from '../utils/api'; // Import the new API function
 import styles from './dashboard.module.css';
 
 export default function DashboardPage() {
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState('');
-  const router = useRouter();
 
-  // Function to check if user is authenticated
-  const checkAuth = useCallback(async () => {
-    const token = localStorage.getItem('token'); 
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-
-    
-    try {
-      // Fetch user details from API
-      const userData = await getCurrentUser();
-      setUserDetails(userData);
-
-      // Optionally trigger a recheck in NavBar
-      localStorage.setItem('userLoggedIn', 'true'); 
-      window.dispatchEvent(new Event('storage'));
-
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      setError('Failed to load user details. Please log in again.');
-      router.push('/login');
-    }
-  }, [router]);
-
-  // On component mount, check if user is authenticated
+  // Fetch user details on component mount
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    const fetchUserDetails = async () => {
+      try {
+        const userData = await getCurrentUser();
+        setUserDetails(userData);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        setError('Failed to load user details. Please log in again.');
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
 
   return (
     <div className={styles.dashboardContainer}>
