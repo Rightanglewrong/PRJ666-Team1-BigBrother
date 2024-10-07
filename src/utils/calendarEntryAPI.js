@@ -91,7 +91,7 @@ export const deleteCalendarEntryFromDynamoDB = async (item) => {
 
 export const retrieveCalendarEntriesByDate = async (datePosted) => {
     try {
-      const response = await fetch(`${BACKEND_URL}v1/calendar-entry?datePosted=${datePosted}`, {
+      const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?datePosted=${datePosted}`, {
         method: "GET",
       });
   
@@ -105,4 +105,4 @@ export const retrieveCalendarEntriesByDate = async (datePosted) => {
       console.error("Error retrieving calendar entries by date:", error);
       throw new Error(error.message);
     }
-  };
+};
