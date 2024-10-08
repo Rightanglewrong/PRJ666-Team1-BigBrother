@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "../utils/api"; // Use getCurrentUser instead of getUserProfile
+import { updateUserProfile } from '../utils/api';
 import styles from "./profile.module.css";
 
 export default function ProfilePage() {
