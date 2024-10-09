@@ -97,12 +97,12 @@ export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
         const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?dateStart=${startDate}&dateEnd=${endDate}`, {
             method: "GET", 
             headers: {
-              'Authorization': `Bearer ${token}`, // Pass JWT in headers
+              'Authorization': `Bearer ${token}`, 
             }
         });
   
       if (!response.ok) {
-        throw new Error("No calendar entries found for the specified date range");
+        throw new Error("No calendar entries found for this specified date range");
       }
   
       const data = await response.json();
