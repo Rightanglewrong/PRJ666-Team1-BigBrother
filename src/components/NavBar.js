@@ -94,6 +94,12 @@ const NavBar = () => {
                 Calendar{" "}
               </Link>
             </li>
+            <li>
+              <Link href="/contactList" className={styles.navItem}>
+                {" "}
+                Contact List{" "}
+              </Link>
+            </li>
 
             {/* Dropdown for Testing */}
             <li className={styles.navItem} onMouseEnter={toggleDropdown} onMouseLeave={toggleDropdown}>
