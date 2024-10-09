@@ -12,12 +12,14 @@ export const createCalendarEntryInDynamoDB = async (item) => {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${token}`, 
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(item),
         });
 
         if (!response.ok) {
+            const errorText = await response.text(); // Get error response text
+            console.error("Error response:", errorText); // Log error response text
             throw new Error("Error creating Calendar Entry in DynamoDB");
         }
 
@@ -129,7 +131,7 @@ export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
           const errorText = await response.text(); // Get error response text
           console.error("Error response:", errorText); // Log error response text
           throw new Error(`Error ${response.status}: No calendar entries found for this specified date range`);
-      }
+        }
   
       const data = await response.json();
       return data.entries; 
