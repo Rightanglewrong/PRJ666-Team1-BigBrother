@@ -230,7 +230,7 @@ const CalendarView = () => {
               <input
                 className={styles.input}
                 type="datetime-local"
-                value={formatDateToYYYYMMDD(newEvent.dateStart)}
+                value={newEvent.dateStart}
                 onChange={(e) =>
                   setNewEvent({ ...newEvent, dateStart: e.target.value })
                 }
@@ -240,7 +240,7 @@ const CalendarView = () => {
               <input
                 className={styles.input}
                 type="datetime-local"
-                value={formatDateToYYYYMMDD(newEvent.dateEnd)}
+                value={newEvent.dateEnd}
                 onChange={(e) =>
                   setNewEvent({ ...newEvent, dateEnd: e.target.value })
                 }
