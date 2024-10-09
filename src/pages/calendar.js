@@ -18,7 +18,7 @@ const CalendarView = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false); // Delete confirmation modal
     const [editingEvent, setEditingEvent] = useState(null); // Editing event
     const [newEvent, setNewEvent] = useState({
-        title: "",
+        entrytitle: "",
         description: '',
         dateStart: "",
         dateEnd: "",
@@ -48,7 +48,7 @@ const CalendarView = () => {
         const entries = await retrieveCalendarEntriesByDate(formattedStartDate, formattedEndDate);
             setEvents(entries.map(entry => ({
                 id: entry.calEntryID,
-                title: entry.entryTitle,
+                entrytitle: entry.entryTitle,
                 dateStart: entry.dateStart,
                 dateEnd: entry.dateEnd,
                 allDay: true // Adjust as necessary
@@ -71,9 +71,10 @@ const CalendarView = () => {
 
     const handleSelect = (selectionInfo) => {
         setNewEvent({
-          title: "",
+          entryTitle: "",
           dateStart: selectionInfo.startStr,
           dateEnd: selectionInfo.endStr,
+          createdBy: newEvent.createdBy,
         });
         setEditingEvent(null); // Reset editingEvent when creating a new event
         setShowModal(true);
@@ -84,7 +85,7 @@ const CalendarView = () => {
         const event = events.find((e) => e.id === eventClickInfo.event.id);
         if (event) {
             setNewEvent({
-                title: event.title,
+                entryTitle: event.entryTitle,
                 description: event.description || "",
                 dateStart: event.start,
                 dateEnd: event.end,
@@ -96,7 +97,7 @@ const CalendarView = () => {
 
     // Save or update event
     const handleSubmitEvent = async () => {
-      if (!newEvent.title) {
+      if (!newEvent.entryTitle) {
         alert("Event title is required.");
         return;
       }
@@ -115,10 +116,10 @@ const CalendarView = () => {
             event.id === editingEvent
               ? {
                   ...event,
-                  title: newEvent.title,
+                  entryTitle: newEvent.entryTitle,
                   description: newEvent.description,
-                  dateStart: newEvent.dateStart,
-                  dateEnd: newEvent.dateEnd,
+                  dateStart: formatDateToYYYYMMDD(newEvent.dateStart),
+                  dateEnd: formatDateToYYYYMMDD(newEvent.dateEnd),
                 }
               : event
           );
@@ -129,10 +130,11 @@ const CalendarView = () => {
       } else {
         // Add new event
         const newCreatedEvent = {
-          title: newEvent.title,
+          entryTitle: newEvent.entryTitle,
           description: newEvent.description,
           dateStart: newEvent.dateStart,
           dateEnd: newEvent.dateEnd,
+          createdBy: newEvent.createdBy
         };
         try {
           await createCalendarEntryInDynamoDB(newCreatedEvent);
@@ -203,9 +205,9 @@ const CalendarView = () => {
                 className={styles.input}
                 type="text"
                 placeholder="Enter event title"
-                value={newEvent.title}
+                value={newEvent.entryTitle}
                 onChange={(e) =>
-                  setNewEvent({ ...newEvent, title: e.target.value })
+                  setNewEvent({ ...newEvent, entryTitle: e.target.value })
                 }
                 required
               />
