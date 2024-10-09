@@ -1,5 +1,13 @@
 const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
+  // Format date to YYYY-MM-DD
+  const formatDateToYYYYMMDD = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 // Create an item in DynamoDB
 export const createCalendarEntryInDynamoDB = async (item) => {
   try {
