@@ -89,14 +89,17 @@ export const deleteCalendarEntryFromDynamoDB = async (item) => {
   
 };
 
-export const retrieveCalendarEntriesByDate = async (datePosted) => {
+export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
     try {
-      const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?datePosted=${datePosted}`, {
+
+      const formattedStartDate = formatDateToYYYYMMDD(startDate);
+      const formattedEndDate = formatDateToYYYYMMDD(endDate);
+      const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?dateStart=${formattedStartDate}&dateEnd=${formattedEndDate}`, {
         method: "GET",
       });
   
       if (!response.ok) {
-        throw new Error("No calendar entries found for the specified date");
+        throw new Error("No calendar entries found for the specified date range");
       }
   
       const data = await response.json();

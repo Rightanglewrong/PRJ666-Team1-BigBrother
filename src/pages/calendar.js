@@ -4,9 +4,48 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid'; // For week and day views
 import interactionPlugin from '@fullcalendar/interaction'; // For dateClick, eventClick, and selection
 import { v4 as uuidv4 } from 'uuid';  // To generate unique event IDs
+import {retrieveCalendarEntriesByDate} from '../utils/calendarEntryAPI';
 
 const CalendarView = () => {
   const [events, setEvents] = useState([]);
+
+   // Function to load calendar entries by date range
+  const loadCalendarEntries = async () => {
+    const startDate = new Date();
+    startDate.setFullYear(startDate.getFullYear() - 1); // Start date: 1 year ago
+    const endDate = new Date();
+    endDate.setFullYear(endDate.getFullYear() + 1); // End date: 1 year from now
+
+    // Format dates as YYYY-MM-DD
+    const formattedStartDate = formatDateToYYYYMMDD(startDate);
+    const formattedEndDate = formatDateToYYYYMMDD(endDate);
+
+    try {
+      const entries = await retrieveCalendarEntriesByDate(formattedStartDate);
+        setEvents(entries.map(entry => ({
+          id: entry.calEntryID,
+          title: entry.entryTitle,
+          start: entry.dateStart,
+          end: entry.dateEnd,
+          allDay: true // Adjust as necessary
+        })));
+    } catch (error) {
+      console.error('Error fetching calendar entries:', error);
+    }
+  };
+
+  // Format date to YYYY-MM-DD
+  const formatDateToYYYYMMDD = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  useEffect(() => {
+    loadCalendarEntries(); // Load entries when component mounts
+  }, []);
+
 
   // Handle event creation (with date and time selection)
   const handleSelect = (selectionInfo) => {
