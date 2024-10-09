@@ -98,6 +98,7 @@ export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
             method: "GET", 
             headers: {
               'Authorization': `Bearer ${token}`, 
+              'Content-Type': 'application/json',
             }
         });
   
