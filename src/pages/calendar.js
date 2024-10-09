@@ -56,7 +56,7 @@ const CalendarView = () => {
       } catch (error) {
         console.error('Error fetching calendar entries:', error);
       }
-    };
+  };
 
     useEffect(() => {
         loadCalendarEntries(); 
