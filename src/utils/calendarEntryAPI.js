@@ -11,6 +11,7 @@ export const createCalendarEntryInDynamoDB = async (item) => {
         const response = await fetch(`${BACKEND_URL}v1/calendar-entry`, {
             method: "POST",
             headers: {
+                'Authorization': `Bearer ${token}`, 
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(item),
@@ -63,6 +64,7 @@ export const updateCalendarEntryInDynamoDB = async (item) => {
         const response = await fetch(`${BACKEND_URL}v1/calendar-entry/${item.id}`, {
             method: "PUT",
             headers: {
+                'Authorization': `Bearer ${token}`, 
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(item),
@@ -91,6 +93,7 @@ export const deleteCalendarEntryFromDynamoDB = async (item) => {
     const response = await fetch(`${BACKEND_URL}v1/calendar-entry/${item.id}`, {
       method: "DELETE",
       headers: {
+        'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
     });

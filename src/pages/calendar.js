@@ -128,12 +128,10 @@ const CalendarView = () => {
     } else {
       // Add new event
       const newCreatedEvent = {
-        id: uuidv4(),
         title: newEvent.title,
         description: newEvent.description,
         start: newEvent.start,
         end: newEvent.end,
-        createdBy: newEvent.createdBy,
       };
       try {
         await createCalendarEntryInDynamoDB(newCreatedEvent);
