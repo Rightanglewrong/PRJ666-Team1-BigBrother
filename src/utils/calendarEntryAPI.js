@@ -2,6 +2,11 @@ const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
 // Create an item in DynamoDB
 export const createCalendarEntryInDynamoDB = async (item) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        throw new Error("No token found");
+    }
     try {
         const response = await fetch(`${BACKEND_URL}v1/calendar-entry`, {
             method: "POST",
@@ -25,6 +30,11 @@ export const createCalendarEntryInDynamoDB = async (item) => {
 
 // Retrieve an item from DynamoDB
 export const retrieveCalendarEntryFromDynamoDB = async (item) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        throw new Error("No token found");
+    }
     try {
         const response = await fetch(`${BACKEND_URL}v1/calendar-entry/${item.id}`, {
             method: "GET",
@@ -44,6 +54,11 @@ export const retrieveCalendarEntryFromDynamoDB = async (item) => {
 
 // Update an item in DynamoDB
 export const updateCalendarEntryInDynamoDB = async (item) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        throw new Error("No token found");
+    }
     try {
         const response = await fetch(`${BACKEND_URL}v1/calendar-entry/${item.id}`, {
             method: "PUT",
@@ -67,7 +82,12 @@ export const updateCalendarEntryInDynamoDB = async (item) => {
 
 // Delete an item from DynamoDB
 export const deleteCalendarEntryFromDynamoDB = async (item) => {
-  try {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        throw new Error("No token found");
+    }
+    try {
     const response = await fetch(`${BACKEND_URL}v1/calendar-entry/${item.id}`, {
       method: "DELETE",
       headers: {
