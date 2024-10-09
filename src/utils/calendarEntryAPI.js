@@ -102,8 +102,10 @@ export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
             }
         });
   
-      if (!response.ok) {
-        throw new Error("No calendar entries found for this specified date range");
+        if (!response.ok) {
+          const errorText = await response.text(); // Get error response text
+          console.error("Error response:", errorText); // Log error response text
+          throw new Error(`Error ${response.status}: No calendar entries found for this specified date range`);
       }
   
       const data = await response.json();
