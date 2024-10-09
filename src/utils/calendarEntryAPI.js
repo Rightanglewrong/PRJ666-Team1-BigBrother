@@ -25,21 +25,21 @@ export const createCalendarEntryInDynamoDB = async (item) => {
 
 // Retrieve an item from DynamoDB
 export const retrieveCalendarEntryFromDynamoDB = async (item) => {
-  try {
-      const response = await fetch(`${BACKEND_URL}v1/calendar-entry/${item.id}`, {
-      method: "GET",
-    });
+    try {
+        const response = await fetch(`${BACKEND_URL}v1/calendar-entry/${item.id}`, {
+            method: "GET",
+        });
 
-    if (!response.ok) {
-      throw new Error("Calendar Entry not found");
+        if (!response.ok) {
+            throw new Error("Calendar Entry not found");
+        }
+
+        const data = await response.json();
+        return data; 
+    } catch (error) {
+        console.error("Error retrieving Calendar Entry:", error);
+        throw new Error(error.message);
     }
-
-    const data = await response.json();
-    return data; 
-  } catch (error) {
-    console.error("Error retrieving Calendar Entry:", error);
-    throw new Error(error.message);
-  }
 };
 
 // Update an item in DynamoDB
