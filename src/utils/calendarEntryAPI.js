@@ -90,11 +90,18 @@ export const deleteCalendarEntryFromDynamoDB = async (item) => {
 };
 
 export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
-    try {
+    const token = localStorage.getItem('token');
 
-      const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?dateStart=${startDate}&dateEnd=${endDate}`, {
-        method: "GET",
-      });
+    if (!token) {
+        throw new Error("No token found");
+    }
+    try {
+        const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?dateStart=${startDate}&dateEnd=${endDate}`, {
+            method: "GET", 
+            headers: {
+              'Authorization': `Bearer ${token}`, // Pass JWT in headers
+            }
+        });
   
       if (!response.ok) {
         throw new Error("No calendar entries found for the specified date range");
