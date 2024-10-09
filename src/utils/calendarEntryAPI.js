@@ -1,13 +1,5 @@
 const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
-  // Format date to YYYY-MM-DD
-  const formatDateToYYYYMMDD = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
-
 // Create an item in DynamoDB
 export const createCalendarEntryInDynamoDB = async (item) => {
   try {
@@ -100,9 +92,7 @@ export const deleteCalendarEntryFromDynamoDB = async (item) => {
 export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
     try {
 
-      const formattedStartDate = formatDateToYYYYMMDD(startDate);
-      const formattedEndDate = formatDateToYYYYMMDD(endDate);
-      const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?dateStart=${formattedStartDate}&dateEnd=${formattedEndDate}`, {
+      const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?dateStart=${startDate}&dateEnd=${endDate}`, {
         method: "GET",
       });
   
