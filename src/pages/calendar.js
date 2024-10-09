@@ -5,7 +5,12 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid'; // For week and day views
 import interactionPlugin from '@fullcalendar/interaction'; // For dateClick, eventClick, and selection
 import { v4 as uuidv4 } from 'uuid';  // To generate unique event IDs
-import {retrieveCalendarEntriesByDate} from '../utils/calendarEntryAPI';
+import {
+  createCalendarEntryInDynamoDB,
+  updateCalendarEntryInDynamoDB,
+  deleteCalendarEntryFromDynamoDB,
+  retrieveCalendarEntriesByDate} from '../utils/calendarEntryAPI';
+import { getCurrentUser } from '../utils/api'
 import styles from "./calendar.module.css";
 
 const CalendarView = () => {
@@ -15,8 +20,10 @@ const CalendarView = () => {
   const [editingEvent, setEditingEvent] = useState(null); // Editing event
   const [newEvent, setNewEvent] = useState({
     title: "",
+    description: '',
     start: "",
     end: "",
+    createdBy: "",
   });
 
   // Format date to YYYY-MM-DD
@@ -53,7 +60,11 @@ const CalendarView = () => {
   };
 
   useEffect(() => {
-    loadCalendarEntries(); // Load entries when component mounts
+    loadCalendarEntries(); 
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+        setNewEvent((prev) => ({ ...prev, createdBy: currentUser.userID }));
+    }
   }, []);
 
 
@@ -75,6 +86,7 @@ const CalendarView = () => {
     if (event) {
       setNewEvent({
         title: event.title,
+        description: event.description || "",
         start: event.start,
         end: event.end,
       });
@@ -84,7 +96,7 @@ const CalendarView = () => {
   };
 
   // Save or update event
-  const handleSubmitEvent = () => {
+  const handleSubmitEvent = async () => {
     if (!newEvent.title) {
       alert("Event title is required.");
       return;
@@ -92,27 +104,43 @@ const CalendarView = () => {
 
     if (editingEvent) {
       // Update existing event
-      const updatedEvents = events.map((event) =>
-        event.id === editingEvent
-          ? {
-              ...event,
-              title: newEvent.title,
-              start: newEvent.start,
-              end: newEvent.end,
-            }
-          : event
-      );
-      setEvents(updatedEvents);
-      setEditingEvent(null);
+      const updatedEvent = {
+        ...newEvent,
+        id: editingEvent,
+      };
+      try {
+        await updateCalendarEntryInDynamoDB(updatedEvent);
+        const updatedEvents = events.map((event) =>
+          event.id === editingEvent
+            ? {
+                ...event,
+                title: newEvent.title,
+                description: newEvent.description,
+                start: newEvent.start,
+                end: newEvent.end,
+              }
+            : event
+        );
+        setEvents(updatedEvents);
+      } catch (error) {
+        console.error("Error updating event:", error);
+      }
     } else {
       // Add new event
       const newCreatedEvent = {
         id: uuidv4(),
         title: newEvent.title,
+        description: newEvent.description,
         start: newEvent.start,
         end: newEvent.end,
+        createdBy: newEvent.createdBy,
       };
-      setEvents([...events, newCreatedEvent]);
+      try {
+        await createCalendarEntryInDynamoDB(newCreatedEvent);
+        setEvents([...events, newCreatedEvent]);
+      } catch (error) {
+        console.error("Error creating new event:", error);
+      }
     }
     setShowModal(false);
   };
@@ -123,12 +151,17 @@ const CalendarView = () => {
   };
 
   // Confirm the event deletion
-  const confirmDeleteEvent = () => {
-    const updatedEvents = events.filter((event) => event.id !== editingEvent);
-    setEvents(updatedEvents);
-    setShowDeleteModal(false);
-    setShowModal(false);
-    setEditingEvent(null); // Reset editingEvent after deletion
+  const confirmDeleteEvent = async () => {
+    try {
+      await deleteCalendarEntryFromDynamoDB({ id: editingEvent });
+      const updatedEvents = events.filter((event) => event.id !== editingEvent);
+      setEvents(updatedEvents);
+      setShowDeleteModal(false);
+      setShowModal(false);
+      setEditingEvent(null); // Reset editingEvent after deletion
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
   };
 
   // Close modal and reset editingEvent state
@@ -174,6 +207,18 @@ const CalendarView = () => {
               value={newEvent.title}
               onChange={(e) =>
                 setNewEvent({ ...newEvent, title: e.target.value })
+              }
+              required
+            />
+            
+            
+            <label>Description</label>
+            <input
+              className={styles.input}
+              placeholder='Enter event description'
+              value={newEvent.description}
+              onChange={(e) =>
+                setNewEvent({ ...newEvent, description: e.target.value })
               }
               required
             />
