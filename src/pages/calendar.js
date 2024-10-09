@@ -143,6 +143,7 @@ const CalendarView = () => {
           console.error("Error creating new event:", error);
         }
       }
+      await loadCalendarEntries();
       setShowModal(false);
     };
 
@@ -229,7 +230,7 @@ const CalendarView = () => {
               <input
                 className={styles.input}
                 type="datetime-local"
-                value={newEvent.dateStart}
+                value={formatDateToYYYYMMDD(newEvent.dateStart)}
                 onChange={(e) =>
                   setNewEvent({ ...newEvent, dateStart: e.target.value })
                 }
@@ -239,7 +240,7 @@ const CalendarView = () => {
               <input
                 className={styles.input}
                 type="datetime-local"
-                value={newEvent.dateEnd}
+                value={formatDateToYYYYMMDD(newEvent.dateEnd)}
                 onChange={(e) =>
                   setNewEvent({ ...newEvent, dateEnd: e.target.value })
                 }
