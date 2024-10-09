@@ -2,25 +2,25 @@ const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
 // Create an item in DynamoDB
 export const createCalendarEntryInDynamoDB = async (item) => {
-  try {
-    const response = await fetch(`${BACKEND_URL}v1/calendar-entry`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(item),
-    });
+    try {
+        const response = await fetch(`${BACKEND_URL}v1/calendar-entry`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(item),
+        });
 
-    if (!response.ok) {
-      throw new Error("Error creating Calendar Entry in DynamoDB");
+        if (!response.ok) {
+            throw new Error("Error creating Calendar Entry in DynamoDB");
+        }
+
+        const data = await response.json();
+        return { message: "Calendar Entry created successfully", item: data };
+    } catch (error) {
+        console.error("Error creating Calendar Entry:", error);
+        throw new Error(error.message);
     }
-
-    const data = await response.json();
-    return { message: "Calendar Entry created successfully", item: data };
-  } catch (error) {
-    console.error("Error creating Calendar Entry:", error);
-    throw new Error(error.message);
-  }
 };
 
 // Retrieve an item from DynamoDB
@@ -84,9 +84,7 @@ export const deleteCalendarEntryFromDynamoDB = async (item) => {
   } catch (error) {
     console.error("Error deleting Calendar Entry:", error);
     throw new Error(error.message);
-  }
-
-  
+  }  
 };
 
 export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
