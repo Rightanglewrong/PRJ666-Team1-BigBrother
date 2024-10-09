@@ -44,25 +44,25 @@ export const retrieveCalendarEntryFromDynamoDB = async (item) => {
 
 // Update an item in DynamoDB
 export const updateCalendarEntryInDynamoDB = async (item) => {
-  try {
-    const response = await fetch(`${BACKEND_URL}v1/calendar-entry/${item.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(item),
-    });
+    try {
+        const response = await fetch(`${BACKEND_URL}v1/calendar-entry/${item.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(item),
+        });
 
-    if (!response.ok) {
-      throw new Error(`Error updating Calendar Entry in DynamoDB: ${errorDetails}`);
+        if (!response.ok) {
+            throw new Error(`Error updating Calendar Entry in DynamoDB: ${errorDetails}`);
+        }
+
+        const data = await response.json();
+        return { message: "Calendar Entry updated successfully", item: data };
+    } catch (error) {
+        console.error("Error updating Calendar Entry:", error);
+        throw new Error(error.message);
     }
-
-    const data = await response.json();
-    return { message: "Calendar Entry updated successfully", item: data };
-  } catch (error) {
-    console.error("Error updating Calendar Entry:", error);
-    throw new Error(error.message);
-  }
 };
 
 // Delete an item from DynamoDB
