@@ -4,7 +4,6 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid'; // For week and day views
 import interactionPlugin from '@fullcalendar/interaction'; // For dateClick, eventClick, and selection
-import { v4 as uuidv4 } from 'uuid';  // To generate unique event IDs
 import {
     createCalendarEntryInDynamoDB,
     updateCalendarEntryInDynamoDB,
@@ -21,8 +20,8 @@ const CalendarView = () => {
     const [newEvent, setNewEvent] = useState({
         title: "",
         description: '',
-        start: "",
-        end: "",
+        dateStart: "",
+        dateEnd: "",
         createdBy: "",
     });
 
@@ -50,8 +49,8 @@ const CalendarView = () => {
             setEvents(entries.map(entry => ({
                 id: entry.calEntryID,
                 title: entry.entryTitle,
-                start: entry.dateStart,
-                end: entry.dateEnd,
+                dateStart: entry.dateStart,
+                dateEnd: entry.dateEnd,
                 allDay: true // Adjust as necessary
             })));
       } catch (error) {
@@ -73,8 +72,8 @@ const CalendarView = () => {
     const handleSelect = (selectionInfo) => {
         setNewEvent({
           title: "",
-          start: selectionInfo.startStr,
-          end: selectionInfo.endStr,
+          dateStart: selectionInfo.startStr,
+          dateEnd: selectionInfo.endStr,
         });
         setEditingEvent(null); // Reset editingEvent when creating a new event
         setShowModal(true);
@@ -87,8 +86,8 @@ const CalendarView = () => {
             setNewEvent({
                 title: event.title,
                 description: event.description || "",
-                start: event.start,
-                end: event.end,
+                dateStart: event.start,
+                dateEnd: event.end,
             });
             setEditingEvent(event.id); // Set the event ID to know we are editing
             setShowModal(true);
@@ -101,12 +100,16 @@ const CalendarView = () => {
         alert("Event title is required.");
         return;
       }
-
+      const formattedDateStart = formatDateToYYYYMMDD(newEvent.dateStart);
+      const formattedDateEnd = formatDateToYYYYMMDD(newEvent.dateEnd);
+      
       if (editingEvent) {
         // Update existing event
         const updatedEvent = {
           ...newEvent,
           id: editingEvent,
+          dateStart: formattedDateStart,
+          dateEnd: formattedDateEnd,
         };
         try {
           await updateCalendarEntryInDynamoDB(updatedEvent);
@@ -116,8 +119,8 @@ const CalendarView = () => {
                   ...event,
                   title: newEvent.title,
                   description: newEvent.description,
-                  start: newEvent.start,
-                  end: newEvent.end,
+                  dateStart: newEvent.formattedDateStart,
+                  dateEnd: newEvent.formattedDateEnd,
                 }
               : event
           );
@@ -130,8 +133,8 @@ const CalendarView = () => {
         const newCreatedEvent = {
           title: newEvent.title,
           description: newEvent.description,
-          start: newEvent.start,
-          end: newEvent.end,
+          dateStart: newEvent.formattedDateStart,
+          dateEnd: newEvent.formattedDateEnd,
         };
         try {
           await createCalendarEntryInDynamoDB(newCreatedEvent);
@@ -226,9 +229,9 @@ const CalendarView = () => {
               <input
                 className={styles.input}
                 type="datetime-local"
-                value={newEvent.start}
+                value={newEvent.dateStart}
                 onChange={(e) =>
-                  setNewEvent({ ...newEvent, start: e.target.value })
+                  setNewEvent({ ...newEvent, dateStart: e.target.value })
                 }
                 required
               />
@@ -236,9 +239,9 @@ const CalendarView = () => {
               <input
                 className={styles.input}
                 type="datetime-local"
-                value={newEvent.end}
+                value={newEvent.dateEnd}
                 onChange={(e) =>
-                  setNewEvent({ ...newEvent, end: e.target.value })
+                  setNewEvent({ ...newEvent, dateEnd: e.target.value })
                 }
                 required
               />
