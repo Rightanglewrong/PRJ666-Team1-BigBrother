@@ -100,16 +100,14 @@ const CalendarView = () => {
         alert("Event title is required.");
         return;
       }
-      const formattedDateStart = formatDateToYYYYMMDD(newEvent.dateStart);
-      const formattedDateEnd = formatDateToYYYYMMDD(newEvent.dateEnd);
       
       if (editingEvent) {
         // Update existing event
         const updatedEvent = {
           ...newEvent,
           id: editingEvent,
-          dateStart: formattedDateStart,
-          dateEnd: formattedDateEnd,
+          dateStart: dateStart,
+          dateEnd: dateEnd,
         };
         try {
           await updateCalendarEntryInDynamoDB(updatedEvent);
@@ -119,8 +117,8 @@ const CalendarView = () => {
                   ...event,
                   title: newEvent.title,
                   description: newEvent.description,
-                  dateStart: newEvent.formattedDateStart,
-                  dateEnd: newEvent.formattedDateEnd,
+                  dateStart: newEvent.dateStart,
+                  dateEnd: newEvent.dateEnd,
                 }
               : event
           );
@@ -133,8 +131,8 @@ const CalendarView = () => {
         const newCreatedEvent = {
           title: newEvent.title,
           description: newEvent.description,
-          dateStart: newEvent.formattedDateStart,
-          dateEnd: newEvent.formattedDateEnd,
+          dateStart: newEvent.dateStart,
+          dateEnd: newEvent.dateEnd,
         };
         try {
           await createCalendarEntryInDynamoDB(newCreatedEvent);
