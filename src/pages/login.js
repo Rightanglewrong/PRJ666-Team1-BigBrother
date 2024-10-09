@@ -17,7 +17,7 @@ export default function LoginPage() {
       if (result.token) {
         localStorage.setItem('token', result.token);
         // Redirect to dashboard after successful login
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       } else {
         setError('Login failed. Please check your credentials.');
       }

@@ -54,7 +54,7 @@ const NavBar = () => {
       localStorage.removeItem('token');  // Remove the token when logging out
       setIsLoggedIn(false);
       setFirstName('');
-      router.push('/');  // Redirect to home page after logout
+      window.location.href = '/';
     } catch (error) {
       console.error('Error logging out:', error);
     }

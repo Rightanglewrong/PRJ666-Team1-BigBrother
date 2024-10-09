@@ -58,7 +58,7 @@ export default function RegisterPage() {
       alert('Registration successful!');
 
       // Redirect to dashboard after successful registration
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     } catch (error) {
       console.error('Error during signup:', error.message);
       alert('Registration failed. Please try again.');
