@@ -9,6 +9,14 @@ import {retrieveCalendarEntriesByDate} from '../utils/calendarEntryAPI';
 const CalendarView = () => {
   const [events, setEvents] = useState([]);
 
+  // Format date to YYYY-MM-DD
+  const formatDateToYYYYMMDD = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+  };
+
    // Function to load calendar entries by date range
   const loadCalendarEntries = async () => {
     const startDate = new Date();
@@ -21,7 +29,7 @@ const CalendarView = () => {
     const formattedEndDate = formatDateToYYYYMMDD(endDate);
 
     try {
-      const entries = await retrieveCalendarEntriesByDate(formattedStartDate);
+      const entries = await retrieveCalendarEntriesByDate(formattedStartDate, formattedEndDate);
         setEvents(entries.map(entry => ({
           id: entry.calEntryID,
           title: entry.entryTitle,
@@ -32,14 +40,6 @@ const CalendarView = () => {
     } catch (error) {
       console.error('Error fetching calendar entries:', error);
     }
-  };
-
-  // Format date to YYYY-MM-DD
-  const formatDateToYYYYMMDD = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
   };
 
   useEffect(() => {
