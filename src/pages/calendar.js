@@ -87,8 +87,8 @@ const CalendarView = () => {
             setNewEvent({
                 entryTitle: event.entryTitle,
                 description: event.description || "",
-                dateStart: event.start,
-                dateEnd: event.end,
+                dateStart: event.dateStart,
+                dateEnd: event.dateEnd,
             });
             setEditingEvent(event.id); // Set the event ID to know we are editing
             setShowModal(true);
@@ -101,7 +101,9 @@ const CalendarView = () => {
         alert("Event title is required.");
         return;
       }
-      
+      const currentUser = getCurrentUser();
+      const createdBy = currentUser ? currentUser.userID : '';
+
       if (editingEvent) {
         // Update existing event
         const updatedEvent = {
@@ -134,7 +136,7 @@ const CalendarView = () => {
           description: newEvent.description,
           dateStart: newEvent.dateStart,
           dateEnd: newEvent.dateEnd,
-          createdBy: newEvent.createdBy
+          createdBy
         };
         try {
           await createCalendarEntryInDynamoDB(newCreatedEvent);
