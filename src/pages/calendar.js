@@ -52,8 +52,8 @@ const CalendarView = () => {
             setEvents(entries.map(entry => ({
                 id: entry.calEntryID,
                 title: entry.entryTitle,
-                start: entry.dateStart,
-                end: entry.dateEnd,
+                dateStart: entry.dateStart,
+                dateEnd: entry.dateEnd,
                 allDay: true // Adjust as necessary
             })));
       } catch (error) {
