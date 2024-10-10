@@ -90,10 +90,10 @@ const CalendarView = () => {
         const event = events.find((e) => e.id === eventClickInfo.event.id);
         if (event) {
             setNewEvent({
-                entryTitle: event.entryTitle,
+                title: event.entryTitle,
                 description: event.description || "",
-                dateStart: event.dateStart,
-                dateEnd: event.dateEnd,
+                start: event.dateStart,
+                end: event.dateEnd,
             });
             setEditingEvent(event.id); // Set the event ID to know we are editing
             setShowModal(true);
