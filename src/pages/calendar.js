@@ -36,6 +36,12 @@ const CalendarView = () => {
         return `${year}-${month}-${day}`;
     };
 
+    //Format date back to datetime-local
+    const formatDateForInput = (dateString) => {
+        const date = new Date(dateString);
+        return date.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM format
+    };
+
     // Function to load calendar entries by date range
     const loadCalendarEntries = async () => {
         const startDate = new Date();
@@ -54,6 +60,7 @@ const CalendarView = () => {
                 title: entry.entryTitle,
                 start: entry.dateStart,
                 end: entry.dateEnd,
+                description: entry.description,
                 allDay: true // Adjust as necessary
             })));
       } catch (error) {
@@ -92,8 +99,8 @@ const CalendarView = () => {
             setNewEvent({
                 entryTitle: event.title,
                 description: event.description || "",
-                dateStart: event.start,
-                dateEnd: event.end,
+                dateStart: formatDateForInput(event.start),
+                dateEnd: formatDateForInput(event.end),
             });
             setEditingEvent(event.id); // Set the event ID to know we are editing
             setShowModal(true);
@@ -114,8 +121,9 @@ const CalendarView = () => {
             const updatedEvent = {
                 ...newEvent,
                 id: editingEvent,
-                dateStart: dateStart,
-                dateEnd: dateEnd,
+                description: newEvent.description,
+                dateStart: newEvent.dateStart,
+                dateEnd: newEvent.dateEnd,
                 createdBy: createdBy,
         };
         try {
@@ -126,8 +134,8 @@ const CalendarView = () => {
                   ...event,
                   entryTitle: newEvent.entryTitle,
                   description: newEvent.description,
-                  dateStart: formatDateToYYYYMMDD(newEvent.dateStart),
-                  dateEnd: formatDateToYYYYMMDD(newEvent.dateEnd),
+                  dateStart: newEvent.dateStart,
+                  dateEnd: newEvent.dateEnd,
                 }
               : event
           );
