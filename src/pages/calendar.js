@@ -13,6 +13,7 @@ import { getCurrentUser } from '../utils/api'
 import styles from "./calendar.module.css";
 
 const CalendarView = () => {
+    
     const [events, setEvents] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false); // Delete confirmation modal
@@ -24,6 +25,8 @@ const CalendarView = () => {
         dateEnd: "",
         createdBy: "",
     });
+    const [userDetails, setUserDetails] = useState(null);
+    const [userId, setUserId] = useState(''); 
 
     // Format date to YYYY-MM-DD
     const formatDateToYYYYMMDD = (date) => {
@@ -58,13 +61,15 @@ const CalendarView = () => {
       }
   };
 
-    useEffect(() => {
-        loadCalendarEntries(); 
-        const currentUser = getCurrentUser();
-        if (currentUser) {
-            setNewEvent((prev) => ({ ...prev, createdBy: currentUser.userID }));
-        }
-    }, []);
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    setUserDetails(currentUser); 
+    if (currentUser) {
+        setUserId(currentUser.userID); 
+        setNewEvent(prev => ({ ...prev, createdBy: currentUser.userID })); // Set createdBy for new events
+    }
+    loadCalendarEntries();
+}, []);
 
 
   // Handle event creation (with date and time selection)
@@ -72,9 +77,9 @@ const CalendarView = () => {
     const handleSelect = (selectionInfo) => {
         setNewEvent({
           entryTitle: "",
+          description: "",
           dateStart: selectionInfo.startStr,
           dateEnd: selectionInfo.endStr,
-          createdBy: newEvent.createdBy,
         });
         setEditingEvent(null); // Reset editingEvent when creating a new event
         setShowModal(true);
