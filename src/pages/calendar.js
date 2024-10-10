@@ -51,7 +51,7 @@ const CalendarView = () => {
         const entries = await retrieveCalendarEntriesByDate(formattedStartDate, formattedEndDate);
             setEvents(entries.map(entry => ({
                 id: entry.calEntryID,
-                entrytitle: entry.entryTitle,
+                title: entry.entryTitle,
                 dateStart: entry.dateStart,
                 dateEnd: entry.dateEnd,
                 allDay: true // Adjust as necessary
@@ -66,7 +66,7 @@ const CalendarView = () => {
     setUserDetails(currentUser); 
     if (currentUser) {
         setUserId(currentUser.userID); 
-        setNewEvent(prev => ({ ...prev, createdBy: currentUser.userID })); // Set createdBy for new events
+        setNewEvent(prev => ({ ...prev, createdBy: userId })); // Set createdBy for new events
     }
     loadCalendarEntries();
 }, []);
