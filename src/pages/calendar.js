@@ -53,7 +53,7 @@ const CalendarView = () => {
                 id: entry.calEntryID,
                 title: entry.entryTitle,
                 start: entry.dateStart,
-                date: entry.dateEnd,
+                end: entry.dateEnd,
                 allDay: true // Adjust as necessary
             })));
       } catch (error) {
