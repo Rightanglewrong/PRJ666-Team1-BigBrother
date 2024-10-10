@@ -17,7 +17,9 @@ export default function CreateMealPlanPage() {
     alternatives: "",
   });
   const [message, setMessage] = useState("");
-  const [userDetails, setUserDetails] = useState(useState({ daycareID: "", firstName: "" , lastName: ""}))
+  const [userDetails, setUserDetails] = useState(
+    useState({ daycareID: "", firstName: "", lastName: "" })
+  );
 
   // Get the daycareID from the JWT token
   useEffect(() => {
@@ -29,7 +31,11 @@ export default function CreateMealPlanPage() {
 
     const decodedToken = jwt.decode(token);
     if (decodedToken && decodedToken.locationID) {
-      setUserDetails({ daycareID: decodedToken.locationID, firstName: decodedToken.firstName, lastName: decodedToken.lastName });
+      setUserDetails({
+        daycareID: decodedToken.locationID,
+        firstName: decodedToken.firstName,
+        lastName: decodedToken.lastName,
+      });
     } else {
       setMessage("Invalid token, no User found.");
     }
@@ -50,15 +56,19 @@ export default function CreateMealPlanPage() {
 
     // Include daycareID and createdBy in the meal plan object
     let daycareID = userDetails.daycareID;
-    let createdBy = `${userDetails.firstName} ${userDetails.lastName}` 
-    const mealPlanData = { ...mealPlan, createdBy, daycareID};
+    let createdBy = `${userDetails.firstName} ${userDetails.lastName}`;
+    const mealPlanData = { ...mealPlan, createdBy, daycareID };
 
     try {
       await createMealPlan(token, mealPlanData);
       setMessage("Meal Plan created successfully");
       router.push("/mealPlan"); // Redirect to meal plan overview after creation
     } catch (error) {
-      setMessage("An error occurred while creating the meal plan");
+      if (error.message.includes("403")) {
+        setMessage("You do not have permission to create a meal plan.");
+      } else {
+        setMessage("An error occurred while creating the meal plan");
+      }
     }
   };
 

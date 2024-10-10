@@ -15,9 +15,16 @@ export const createMealPlan = async (token, mealPlanData) => {
     console.log(response);
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Error response:", errorText);
-      throw new Error("Failed to create meal plan");
+      if (response.status == 403) {
+        let errText = "FORBIDDEN: Unauthorized for current action";
+        console.error(`Failed to create mealPlan: ${errText}`);
+        throw new Error(errText);
+      }
+      if (response.status == 500) {
+        let errText = "Server Error during mealPlan creation";
+        console.error(`Failed to create mealPlan: ${errText}`);
+        throw new Error(errText);
+      }
     }
 
     return await response.json();
@@ -39,7 +46,16 @@ export const updateMealPlan = async (token, id, updateData) => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to update meal plan");
+      if (response.status == 403) {
+        let errText = "FORBIDDEN: Unauthorized for current action";
+        console.error(`Failed to update mealPlan: ${errText}`);
+        throw new Error(errText);
+      }
+      if (response.status == 500) {
+        let errText = "Server Error during mealPlan updating";
+        console.error(`Failed to update mealPlan: ${errText}`);
+        throw new Error(errText);
+      }
     }
 
     return await response.json();

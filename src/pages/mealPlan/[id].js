@@ -30,10 +30,11 @@ export default function EditMealPlanPage() {
       const fetchMealPlan = async () => {
         try {
           const data = await getMealPlan(token, id);
+          console.log(data);
           const mealPlan = data.mealPlan.mealPlan;
           setMealPlan(mealPlan);
         } catch (error) {
-          setMessage("Error loading meal plan");
+          setMessage("An error occurred while retrieving the meal plan");
         } finally {
           setLoading(false);
         }
@@ -60,7 +61,7 @@ export default function EditMealPlanPage() {
       setMessage("Meal Plan updated successfully");
       router.push("/mealPlan");
     } catch (error) {
-      setMessage("An error occurred while updating the meal plan");
+        setMessage(`Error occurred while updating the meal plan: ${error}`);
     }
   };
 
