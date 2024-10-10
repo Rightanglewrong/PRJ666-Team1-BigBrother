@@ -111,6 +111,7 @@ const CalendarView = () => {
           id: editingEvent,
           dateStart: dateStart,
           dateEnd: dateEnd,
+          createdBy: createdBy,
         };
         try {
           await updateCalendarEntryInDynamoDB(updatedEvent);
@@ -136,7 +137,7 @@ const CalendarView = () => {
           description: newEvent.description,
           dateStart: newEvent.dateStart,
           dateEnd: newEvent.dateEnd,
-          createdBy
+          createdBy: createdBy,
         };
         try {
           await createCalendarEntryInDynamoDB(newCreatedEvent);
