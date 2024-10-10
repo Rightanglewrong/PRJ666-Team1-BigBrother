@@ -102,21 +102,21 @@ const CalendarView = () => {
 
     // Save or update event
     const handleSubmitEvent = async () => {
-      if (!newEvent.entryTitle) {
-        alert("Event title is required.");
-        return;
-      }
-      const currentUser = getCurrentUser();
-      const createdBy = currentUser ? currentUser.userID : '';
+        if (!newEvent.entryTitle) {
+            alert("Event title is required.");
+            return;
+        }
+        const currentUser = getCurrentUser();
+        const createdBy = currentUser ? currentUser.userID : '';
 
-      if (editingEvent) {
-        // Update existing event
-        const updatedEvent = {
-          ...newEvent,
-          id: editingEvent,
-          dateStart: dateStart,
-          dateEnd: dateEnd,
-          createdBy: createdBy,
+        if (editingEvent) {
+            // Update existing event
+            const updatedEvent = {
+                ...newEvent,
+                id: editingEvent,
+                dateStart: dateStart,
+                dateEnd: dateEnd,
+                createdBy: createdBy,
         };
         try {
           await updateCalendarEntryInDynamoDB(updatedEvent);
