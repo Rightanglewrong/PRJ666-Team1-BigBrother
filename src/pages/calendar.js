@@ -78,8 +78,8 @@ const CalendarView = () => {
     setUserDetails(currentUser); 
     if (currentUser) {
         setUserId(currentUser.userID); 
-        setNewEvent(prev => ({ ...prev, createdBy: userDetails.userID })); 
-        if (userDetails.accountType === 'Admin' || userDetails.accountType === 'Staff') {
+        setNewEvent(prev => ({ ...prev, createdBy: userId })); 
+        if (currentUser.accountType === 'Admin' || currentUser.accountType === 'Staff') {
             setIsAuthorized(true);
         }
     }
