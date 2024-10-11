@@ -80,7 +80,7 @@ const CalendarView = () => {
           setUserDetails(userData);
           if (userData) {
               setUserId(userData.userID);
-              setNewEvent(prev => ({ ...prev, createdBy: userData.userID }));
+              setNewEvent(prev => ({ ...prev, createdBy: userId }));
 
               if (userData.accountType === 'Admin' || userData.accountType === 'Staff') {
                   setIsAuthorized(true);
@@ -127,6 +127,7 @@ const CalendarView = () => {
                 description: event.description || "",
                 dateStart: formatDateForInput(event.start),
                 dateEnd: formatDateForInput(event.end),
+                createdBy: userDetails.userID,
             });
             setEditingEvent(event.id); // Set the event ID to know we are editing
             setShowModal(true);
@@ -185,7 +186,7 @@ const CalendarView = () => {
           description: newEvent.description,
           dateStart: newEvent.dateStart,
           dateEnd: newEvent.dateEnd,
-          createdBy: createdBy,
+          createdBy: userDetails.userID,
         };
         try {
           await createCalendarEntryInDynamoDB(newCreatedEvent);
