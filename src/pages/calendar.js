@@ -19,7 +19,7 @@ const CalendarView = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false); // Delete confirmation modal
     const [editingEvent, setEditingEvent] = useState(null); // Editing event
     const [newEvent, setNewEvent] = useState({
-        entryTitle: "",
+        entrytitle: "",
         description: '',
         dateStart: "",
         dateEnd: "",
@@ -27,8 +27,6 @@ const CalendarView = () => {
     });
     const [userDetails, setUserDetails] = useState(null);
     const [userId, setUserId] = useState(''); 
-    const [errorMessage, setErrorMessage] = useState('');
-    const [showErrorModal, setShowErrorModal] = useState(false);
 
     // Format date to YYYY-MM-DD
     const formatDateToYYYYMMDD = (date) => {
@@ -66,8 +64,6 @@ const CalendarView = () => {
                 allDay: true // Adjust as necessary
             })));
       } catch (error) {
-        setErrorMessage('Error fetching calendar entries.');
-        setShowErrorModal(true); 
         console.error('Error fetching calendar entries:', error);
       }
   };
@@ -83,18 +79,9 @@ const CalendarView = () => {
 }, []);
 
 
-  const isAuthorized = () => {
-      return userDetails?.accountType === 'Admin' || userDetails?.accountType === 'Staff';
-  };
-
   // Handle event creation (with date and time selection)
 
     const handleSelect = (selectionInfo) => {
-      if (!isAuthorized()) {
-        setErrorMessage('Unauthorized: Only admin or staff can create events.');
-        setShowErrorModal(true);
-        return;
-      }
         setNewEvent({
           entryTitle: "",
           description: "",
@@ -123,15 +110,8 @@ const CalendarView = () => {
     // Save or update event
     const handleSubmitEvent = async () => {
         if (!newEvent.entryTitle) {
-            setErrorMessage('Event title is required.');
-            setShowErrorModal(true);
+            alert("Event title is required.");
             return;
-        }
-
-        if (!isAuthorized()) {
-          setErrorMessage('Unauthorized: Only admin or staff can update events.');
-          setShowErrorModal(true);
-          return;
         }
         const currentUser = getCurrentUser();
         const createdBy = currentUser ? currentUser.userID : '';
@@ -161,8 +141,6 @@ const CalendarView = () => {
           );
           setEvents(updatedEvents);
         } catch (error) {
-          setErrorMessage('Error updating event.');
-          setShowErrorModal(true);
           console.error("Error updating event:", error);
         }
       } else {
@@ -178,8 +156,6 @@ const CalendarView = () => {
           await createCalendarEntryInDynamoDB(newCreatedEvent);
           setEvents([...events, newCreatedEvent]);
         } catch (error) {
-          setErrorMessage('Error creating new event.');
-          setShowErrorModal(true);
           console.error("Error creating new event:", error);
         }
       }
@@ -189,12 +165,6 @@ const CalendarView = () => {
 
     // Handle deleting an event with custom modal
     const handleEventDelete = () => {
-
-      if (!isAuthorized()) {
-        setErrorMessage('Unauthorized: Only admin or staff can delete events.');
-        setShowErrorModal(true);
-        return;
-      }
       setShowDeleteModal(true); // Show delete confirmation modal
     };
 
@@ -208,8 +178,6 @@ const CalendarView = () => {
         setShowModal(false);
         setEditingEvent(null); // Reset editingEvent after deletion
       } catch (error) {
-        setErrorMessage('Error deleting event.');
-        setShowErrorModal(true);
         console.error("Error deleting event:", error);
       }
     };
@@ -218,10 +186,6 @@ const CalendarView = () => {
     const handleCloseModal = () => {
       setShowModal(false);
       setEditingEvent(null); // Reset editingEvent when closing the modal
-    };
-
-    const handleCloseErrorModal = () => {
-      setShowErrorModal(false);
     };
 
     return (
@@ -347,18 +311,6 @@ const CalendarView = () => {
             </div>
           </div>
         )}
-        {/* Error Modal */}
-        {showErrorModal && (
-                <div className={styles.overlay}>
-                    <div className={styles.modal}>
-                        <h3>Error</h3>
-                        <p>{errorMessage}</p>
-                        <div className={styles.modalButtons}>
-                            <button onClick={handleCloseErrorModal}>Close</button>
-                        </div>
-                    </div>
-                </div>
-            )}
       </div>
     );
 };
