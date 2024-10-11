@@ -12,6 +12,7 @@ export default function ProgressReport() {
   const [createReportID, setCreateReportID] = useState('');
   const [createReportTitle, setCreateReportTitle] = useState(''); // New field for report title
   const [createReportContent, setCreateReportContent] = useState('');
+  const [updateChildID, setUpdateChildID] = useState('');
   const [updateReportID, setUpdateReportID] = useState('');
   const [updateReportContent, setUpdateReportContent] = useState('');
   const [retrieveReportID, setRetrieveReportID] = useState('');
@@ -159,8 +160,8 @@ export default function ProgressReport() {
         <input
           type="text"
           value={createReportID}
-          placeholder="Report ID"
-          onChange={(e) => setCreateReportID(e.target.value)}
+          placeholder="Child ID"
+          onChange={(e) => setChildID(e.target.value)}
         />
         <input
           type="text"
@@ -198,6 +199,12 @@ export default function ProgressReport() {
           value={updateReportID}
           placeholder="Report ID"
           onChange={(e) => setUpdateReportID(e.target.value)}
+        />
+        <input
+          type="text"
+          value={updateChildID}
+          placeholder="Report ID"
+          onChange={(e) => setUpdateChildID(e.target.value)}
         />
         <input
           type="text"
