@@ -106,6 +106,13 @@ const NavBar = () => {
                 Meal Plan{" "}
               </Link>
             </li>
+            <li>
+              <Link href="/progressReport" className={styles.navItem}>
+                {" "}
+                Progress Report{" "}
+              </Link>
+            </li>
+
 
             {/* Dropdown for Testing */}
             <li className={styles.navItem} onMouseEnter={toggleDropdown} onMouseLeave={toggleDropdown}>

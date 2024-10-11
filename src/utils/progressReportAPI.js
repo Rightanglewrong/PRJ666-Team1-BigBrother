@@ -2,16 +2,26 @@ const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
 // Create an Progress Report in DynamoDB
 export const createProgressReportInDynamoDB = async (item) => {
+
+  const token = localStorage.getItem('token');
+
+      if (!token) {
+          throw new Error("No token found");
+      }
+
   try {
     const response = await fetch(`${BACKEND_URL}v1/progress-report`, {
       method: "POST",
       headers: {
+        'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
       body: JSON.stringify(item),
     });
 
     if (!response.ok) {
+      const errorText = await response.text(); 
+            console.error("Error response:", errorText);
       throw new Error("Error creating Progress Report in DynamoDB");
     }
 
@@ -25,6 +35,12 @@ export const createProgressReportInDynamoDB = async (item) => {
 
 // Retrieve an Progress Report from DynamoDB
 export const retrieveProgressReportFromDynamoDB = async (item) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
+
   try {
       const response = await fetch(`${BACKEND_URL}v1/progress-report/${item.id}`, {
       method: "GET",
@@ -44,10 +60,17 @@ export const retrieveProgressReportFromDynamoDB = async (item) => {
 
 // Update an Progress Report in DynamoDB
 export const updateProgressReportInDynamoDB = async (item) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
+
   try {
     const response = await fetch(`${BACKEND_URL}v1/progress-report/${item.id}`, {
       method: "PUT",
       headers: {
+        'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
       body: JSON.stringify(item),
@@ -68,10 +91,16 @@ export const updateProgressReportInDynamoDB = async (item) => {
 
 // Delete an Progress Report from DynamoDB
 export const deleteProgressReportFromDynamoDB = async (item) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
   try {
     const response = await fetch(`${BACKEND_URL}v1/progress-report/${item.id}`, {
       method: "DELETE",
       headers: {
+        'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
     });
@@ -92,12 +121,24 @@ export const deleteProgressReportFromDynamoDB = async (item) => {
 };
 
 export const retrieveProgressReportByChildID = async (childID) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        throw new Error("No token found");
+    }
     try {
+      
       const response = await fetch(`${BACKEND_URL}v1/progress-report/child?childID=${childID}`, {
         method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`, 
+          'Content-Type': 'application/json',
+        }
       });
   
       if (!response.ok) {
+        const errorText = await response.text(); 
+        console.error("Error response:", errorText); 
         throw new Error("No Progress Report found for the Child ID");
       }
   
