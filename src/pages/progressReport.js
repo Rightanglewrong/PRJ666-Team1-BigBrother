@@ -61,7 +61,7 @@ export default function ProgressReport() {
     
     try {
       const newReport = {
-        progressReportID: createReportID,
+        childID: createReportID,
         reportTitle: createReportTitle,
         content: createReportContent,
         createdBy: userId, 
@@ -161,7 +161,7 @@ export default function ProgressReport() {
           type="text"
           value={createReportID}
           placeholder="Child ID"
-          onChange={(e) => setChildID(e.target.value)}
+          onChange={(e) => setCreateReportID(e.target.value)}
         />
         <input
           type="text"
