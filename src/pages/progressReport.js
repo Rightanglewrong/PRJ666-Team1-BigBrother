@@ -48,6 +48,7 @@ export default function ProgressReport() {
     fetchUserDetails();
   }, []);
 
+  
   // Handle creating a Progress Report in DynamoDB
   const handleCreateReport = async (e) => {
     
