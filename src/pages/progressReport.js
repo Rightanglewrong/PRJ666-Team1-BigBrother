@@ -133,7 +133,7 @@ export default function ProgressReport() {
    const handleFilterByChildID = async (e) => {
     e.preventDefault();
     try {
-      const reports = await getProgressReportsByChildId(childID);
+      const reports = await retrieveProgressReportByChildID(childID);
       setFilteredReports(reports);
       setMessage(`Found ${reports.length} progress reports for child ID: ${childID}`);
     } catch (error) {
