@@ -78,20 +78,22 @@ const CalendarView = () => {
       try {
           const userData = await getCurrentUser();
           setUserDetails(userData);
+          if (userData) {
+              setUserId(userData.userID);
+              setNewEvent(prev => ({ ...prev, createdBy: userData.userID }));
+
+              if (userData.accountType === 'Admin' || userData.accountType === 'Staff') {
+                  setIsAuthorized(true);
+              }
+          }
       } catch (error) {
           console.error('Error fetching user data:', error);
           setError('Failed to load user details. Please log in again.');
+          setShowErrorModal(true);
       }
     }
 
     fetchUserDetails();
-     {
-        setUserId(userDetails.userID); 
-        setNewEvent(prev => ({ ...prev, createdBy: userId })); 
-        if (userDetails.accountType === 'Admin' || userDetails.accountType === 'Staff') {
-            setIsAuthorized(true);
-        }
-    }
     loadCalendarEntries();
 }, []);
 
