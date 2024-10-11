@@ -100,6 +100,12 @@ const NavBar = () => {
                 Contact List{" "}
               </Link>
             </li>
+            <li>
+              <Link href="/mealPlan" className={styles.navItem}>
+                {" "}
+                Meal Plan{" "}
+              </Link>
+            </li>
 
             {/* Dropdown for Testing */}
             <li className={styles.navItem} onMouseEnter={toggleDropdown} onMouseLeave={toggleDropdown}>
