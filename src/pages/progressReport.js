@@ -23,6 +23,8 @@ export default function ProgressReport() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [childID, setChildID] = useState(''); 
+  const [filteredReports, setFilteredReports] = useState([]);
 
   // useEffect for fetching user details and setting userId and authorization
   useEffect(() => {
