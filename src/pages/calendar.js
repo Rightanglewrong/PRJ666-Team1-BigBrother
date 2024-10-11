@@ -74,12 +74,21 @@ const CalendarView = () => {
   };
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    setUserDetails(currentUser); 
-    if (currentUser) {
-        setUserId(currentUser.userID); 
+    const fetchUserDetails = async () => {
+      try {
+          const userData = await getCurrentUser();
+          setUserDetails(userData);
+      } catch (error) {
+          console.error('Error fetching user data:', error);
+          setError('Failed to load user details. Please log in again.');
+      }
+    }
+
+    fetchUserDetails();
+     {
+        setUserId(userDetails.userID); 
         setNewEvent(prev => ({ ...prev, createdBy: userId })); 
-        if (currentUser.accountType === 'Admin' || currentUser.accountType === 'Staff') {
+        if (userDetails.accountType === 'Admin' || userDetails.accountType === 'Staff') {
             setIsAuthorized(true);
         }
     }
