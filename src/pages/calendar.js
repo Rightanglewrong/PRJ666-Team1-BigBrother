@@ -112,6 +112,7 @@ const CalendarView = () => {
           description: "",
           dateStart: selectionInfo.startStr,
           dateEnd: selectionInfo.endStr,
+          createdBy: userDetails.userID,
         });
         setEditingEvent(null); // Reset editingEvent when creating a new event
         setShowModal(true);
