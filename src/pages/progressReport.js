@@ -13,7 +13,6 @@ export default function ProgressReport() {
   const [createReportChildID, setCreateReportChildID] = useState('');
   const [createReportTitle, setCreateReportTitle] = useState(''); // New field for report title
   const [createReportContent, setCreateReportContent] = useState('');
-  const [updateChildID, setUpdateChildID] = useState('');
   const [updateReportID, setUpdateReportID] = useState('');
   const [updateReportTitle, setUpdateReportTitle] = useState('');
   const [updateReportContent, setUpdateReportContent] = useState('');
@@ -103,7 +102,6 @@ export default function ProgressReport() {
  
     try {
       const updateData = {
-        childID: updateChildID,
         reportTitle: updateReportTitle,
         content: updateReportContent,
       };
@@ -202,12 +200,6 @@ export default function ProgressReport() {
           value={updateReportID}
           placeholder="Report ID"
           onChange={(e) => setUpdateReportID(e.target.value)}
-        />
-        <input
-          type="text"
-          value={updateChildID}
-          placeholder="Child ID"
-          onChange={(e) => setUpdateChildID(e.target.value)}
         />
         <input
           type="text"
