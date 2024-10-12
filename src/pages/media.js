@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { withAuth } from '@/hoc/withAuth';
 import styles from './media.module.css';
 
-export default function MediaUploadPage() {
+const MediaUploadPage = () => {
   const [child, setChild] = useState('');
   const [description, setDescription] = useState('');
 
@@ -63,3 +64,5 @@ export default function MediaUploadPage() {
     </div>
   );
 }
+
+export default withAuth(MediaUploadPage);  // Wrap the page with the HOC

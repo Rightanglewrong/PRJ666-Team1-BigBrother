@@ -10,6 +10,7 @@ import {
     deleteCalendarEntryFromDynamoDB,
     retrieveCalendarEntriesByDate} from '../utils/calendarEntryAPI';
 import { getCurrentUser } from '../utils/api'
+import { withAuth } from '@/hoc/withAuth';
 import styles from "./calendar.module.css";
 
 const CalendarView = () => {
@@ -377,4 +378,4 @@ const CalendarView = () => {
     );
 };
 
-export default CalendarView;
+export default withAuth(CalendarView);

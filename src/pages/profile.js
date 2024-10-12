@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "../utils/api"; // Use getCurrentUser instead of getUserProfile
 import { updateUserProfile } from '../utils/api';
+import { withAuth } from "@/hoc/withAuth";
 import styles from "./Profile.module.css";
 
-export default function ProfilePage() {
+const ProfilePage = () => {
   const [userID, setUserID] = useState("");
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -117,3 +118,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+export default withAuth(ProfilePage);  // Wrap the page with the HOC

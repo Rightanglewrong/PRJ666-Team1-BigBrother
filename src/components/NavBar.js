@@ -38,6 +38,8 @@ const NavBar = () => {
       const loggedIn = localStorage.getItem('userLoggedIn') === 'true';
       if (loggedIn) {
         checkUserStatus();
+      } else {
+        setIsLoggedIn(false);
       }
     };
 
@@ -52,6 +54,8 @@ const NavBar = () => {
   const handleLogout = async () => {
     try {
       localStorage.removeItem('token');  // Remove the token when logging out
+      localStorage.removeItem('userLoggedIn');
+      window.dispatchEvent(new Event('storage'));
       setIsLoggedIn(false);
       setFirstName('');
       router.push('/');  // Redirect to home page after logout
@@ -68,80 +72,43 @@ const NavBar = () => {
   return (
     <nav className={styles.nav}>
       <div className={styles.navContainer}>
+        {/* Logo */}
         <div className={styles.leftSection}>
-          <Link href="/" className={styles.logo}>
+          {/* Conditionally link based on login status */}
+          <Link href={isLoggedIn ? "/dashboard" : "/"} className={styles.logo}>
             Big Brother
           </Link>
-          <ul className={styles.navList}>
-            <li>
-              <Link href="/dashboard" className={styles.navItem}>
-                Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link href="/profile" className={styles.navItem}>
-                Profile
-              </Link>
-            </li>
-            <li>
-              <Link href="/media" className={styles.navItem}>
-                Media
-              </Link>
-            </li>
-            <li>
-              <Link href="/calendar" className={styles.navItem}>
-                {" "}
-                Calendar{" "}
-              </Link>
-            </li>
-            <li>
-              <Link href="/contactList" className={styles.navItem}>
-                {" "}
-                Contact List{" "}
-              </Link>
-            </li>
-            <li>
-              <Link href="/mealPlan" className={styles.navItem}>
-                {" "}
-                Meal Plan{" "}
-              </Link>
-            </li>
-            <li>
-              <Link href="/progressReport" className={styles.navItem}>
-                {" "}
-                Progress Report{" "}
-              </Link>
-            </li>
-
-
-            {/* Dropdown for Testing */}
-            <li className={styles.navItem} onMouseEnter={toggleDropdown} onMouseLeave={toggleDropdown}>
-              <span className={styles.dropdown}>Testing</span>
-              {dropdownOpen && (
-                <ul className={styles.dropdownMenu}>
-                  <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
-                  <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
-                </ul>
-              )}
-            </li>
-          </ul>
         </div>
 
-        
-
+        {/* Right Section */}
         <div className={styles.rightSection}>
           <ul className={styles.navList}>
             {isLoggedIn ? (
-              <>
-                <li className={styles.navItem}>Welcome, {firstName}</li>
-                <li>
-                  <button onClick={handleLogout} className={styles.button}>
-                    Logout
-                  </button>
-                </li>
-              </>
-            ) : (
-              <li className={styles.navItem}>You are not logged in</li>
+              <div className={styles.dropdown} onMouseEnter={toggleDropdown} onMouseLeave={toggleDropdown}>
+              <span className={styles.navItem}>
+              Welcome, {firstName} {dropdownOpen ? '▲' : '▼'}
+                </span>
+              {dropdownOpen && (
+                <ul className={styles.dropdownMenu}>
+                  <li><Link href="/profile" className={styles.dropdownItem}>Profile</Link></li>
+                  <li><Link href="/media" className={styles.dropdownItem}>Media</Link></li>
+                  <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
+                  <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
+                  <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
+                  <li><Link href="/progressReport" className={styles.dropdownItem}>Progress Report</Link></li>
+                  <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
+                  <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
+                  <li>
+                    <button onClick={handleLogout} className={styles.dropdownItem}>
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              )}
+            </div>
+          ) : (
+            // Message for not logged in users
+              <span className={styles.navItem}>You are not logged in</span>
             )}
           </ul>
         </div>

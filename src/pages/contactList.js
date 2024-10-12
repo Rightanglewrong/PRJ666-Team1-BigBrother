@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { withAuth } from "@/hoc/withAuth";
 import styles from "./contact.module.css";
 
 const ContactList = () => {
@@ -281,4 +282,4 @@ const ContactList = () => {
   );
 };
 
-export default ContactList;
+export default withAuth(ContactList);
