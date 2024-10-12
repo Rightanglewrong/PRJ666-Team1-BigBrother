@@ -44,6 +44,10 @@ export const retrieveProgressReportFromDynamoDB = async (item) => {
   try {
       const response = await fetch(`${BACKEND_URL}v1/progress-report/by-ID/${item.id}`, {
       method: "GET",
+      headers: {
+        'Authorization': `Bearer ${token}`, 
+        "Content-Type": "application/json",
+      },
     });
 
     if (!response.ok) {
