@@ -70,7 +70,7 @@ export default function ProgressReport() {
 
       const data = await createProgressReportInDynamoDB(newReport);
       setMessage(`Progress Report created successfully: ${JSON.stringify(data.item)}`);
-      setCreateReportID('');
+      setCreateReportChildID('');
       setCreateReportTitle(''); // Clear title input
       setCreateReportContent('');
     } catch (error) {
@@ -161,7 +161,7 @@ export default function ProgressReport() {
       <form onSubmit={handleCreateReport}>
         <input
           type="text"
-          value={createReportID}
+          value={createReportChildID}
           placeholder="Child ID"
           onChange={(e) => setCreateReportChildID(e.target.value)}
         />
