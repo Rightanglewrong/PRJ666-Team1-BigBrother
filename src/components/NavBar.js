@@ -38,6 +38,8 @@ const NavBar = () => {
       const loggedIn = localStorage.getItem('userLoggedIn') === 'true';
       if (loggedIn) {
         checkUserStatus();
+      } else {
+        setIsLoggedIn(false);
       }
     };
 
@@ -52,6 +54,8 @@ const NavBar = () => {
   const handleLogout = async () => {
     try {
       localStorage.removeItem('token');  // Remove the token when logging out
+      localStorage.removeItem('userLoggedIn');
+      window.dispatchEvent(new Event('storage'));
       setIsLoggedIn(false);
       setFirstName('');
       router.push('/');  // Redirect to home page after logout
