@@ -1,9 +1,10 @@
 // app/dashboard.js
 import { useEffect, useState } from 'react';
 import { getCurrentUser } from '../utils/api'; // Import the new API function
+import { withAuth } from '@/hoc/withAuth';
 import styles from './dashboard.module.css';
 
-export default function DashboardPage() {
+const DashboardPage = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState('');
 
@@ -47,4 +48,6 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-}
+};
+
+export default withAuth(DashboardPage);
