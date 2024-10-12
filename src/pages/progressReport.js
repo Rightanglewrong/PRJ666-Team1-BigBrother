@@ -7,6 +7,7 @@ import {
   retrieveProgressReportByChildID,
 } from '../utils/progressReportAPI'; 
 import { getCurrentUser } from '../utils/api'; // Importing the function to get current user
+import styles from "./calendar.module.css";
 
 export default function ProgressReport() {
   const [createReportChildID, setCreateReportChildID] = useState('');
