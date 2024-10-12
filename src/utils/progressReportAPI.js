@@ -42,7 +42,7 @@ export const retrieveProgressReportFromDynamoDB = async (item) => {
   }
 
   try {
-      const response = await fetch(`${BACKEND_URL}v1/progress-report/${item.id}`, {
+      const response = await fetch(`${BACKEND_URL}v1/progress-report/by-ID/${item.id}`, {
       method: "GET",
     });
 

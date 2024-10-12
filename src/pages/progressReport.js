@@ -9,11 +9,12 @@ import {
 import { getCurrentUser } from '../utils/api'; // Importing the function to get current user
 
 export default function ProgressReport() {
-  const [createReportID, setCreateReportID] = useState('');
+  const [createReportChildID, setCreateReportChildID] = useState('');
   const [createReportTitle, setCreateReportTitle] = useState(''); // New field for report title
   const [createReportContent, setCreateReportContent] = useState('');
   const [updateChildID, setUpdateChildID] = useState('');
   const [updateReportID, setUpdateReportID] = useState('');
+  const [updateReportTitle, setUpdateReportTitle] = useState('');
   const [updateReportContent, setUpdateReportContent] = useState('');
   const [retrieveReportID, setRetrieveReportID] = useState('');
   const [retrievedReport, setRetrievedReport] = useState(null);
@@ -48,7 +49,6 @@ export default function ProgressReport() {
     fetchUserDetails();
   }, []);
 
-  
   // Handle creating a Progress Report in DynamoDB
   const handleCreateReport = async (e) => {
     
@@ -62,7 +62,7 @@ export default function ProgressReport() {
     
     try {
       const newReport = {
-        childID: createReportID,
+        childID: createReportChildID,
         reportTitle: createReportTitle,
         content: createReportContent,
         createdBy: userId, 
@@ -102,7 +102,8 @@ export default function ProgressReport() {
  
     try {
       const updateData = {
-        id: updateReportID,
+        childID: updateReportID,
+        reportTitle: updateReportTitle,
         content: updateReportContent,
       };
 
@@ -162,7 +163,7 @@ export default function ProgressReport() {
           type="text"
           value={createReportID}
           placeholder="Child ID"
-          onChange={(e) => setCreateReportID(e.target.value)}
+          onChange={(e) => setCreateReportChildID(e.target.value)}
         />
         <input
           type="text"
@@ -197,16 +198,17 @@ export default function ProgressReport() {
       <form onSubmit={handleUpdateReport}>
         <input
           type="text"
-          value={updateReportID}
-          placeholder="Report ID"
-          onChange={(e) => setUpdateReportID(e.target.value)}
+          value={updateChildID}
+          placeholder="Child ID"
+          onChange={(e) => setUpdateChildID(e.target.value)}
         />
         <input
           type="text"
-          value={updateChildID}
-          placeholder="Report ID"
-          onChange={(e) => setUpdateChildID(e.target.value)}
+          value={updateReportTitle}
+          placeholder="Report Title"
+          onChange={(e) => setUpdateReportTitle(e.target.value)}
         />
+
         <input
           type="text"
           value={updateReportContent}
