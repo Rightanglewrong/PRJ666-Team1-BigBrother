@@ -103,12 +103,12 @@ export default function ProgressReport() {
  
     try {
       const updateData = {
-        childID: updateReportID,
+        childID: updateChildID,
         reportTitle: updateReportTitle,
         content: updateReportContent,
       };
 
-      const data = await updateProgressReportInDynamoDB(updateData);
+      const data = await updateProgressReportInDynamoDB(updateReportID, updateData);
       setMessage(`Progress Report updated successfully: ${JSON.stringify(data.item)}`);
       setUpdateReportID('');
       setUpdateReportContent('');
@@ -197,6 +197,12 @@ export default function ProgressReport() {
       {/* Update Progress Report */}
       <h3>Update Progress Report</h3>
       <form onSubmit={handleUpdateReport}>
+      <input
+          type="text"
+          value={updateReportID}
+          placeholder="Report ID"
+          onChange={(e) => setUpdateReportID(e.target.value)}
+        />
         <input
           type="text"
           value={updateChildID}

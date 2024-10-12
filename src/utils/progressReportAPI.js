@@ -63,7 +63,7 @@ export const retrieveProgressReportFromDynamoDB = async (item) => {
 };
 
 // Update an Progress Report in DynamoDB
-export const updateProgressReportInDynamoDB = async (item) => {
+export const updateProgressReportInDynamoDB = async (id, updateData) => {
   const token = localStorage.getItem('token');
 
   if (!token) {
@@ -71,13 +71,13 @@ export const updateProgressReportInDynamoDB = async (item) => {
   }
 
   try {
-    const response = await fetch(`${BACKEND_URL}v1/progress-report/${item.id}`, {
+    const response = await fetch(`${BACKEND_URL}v1/progress-report/${id}`, {
       method: "PUT",
       headers: {
         'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(item),
+      body: JSON.stringify(updateData),
     });
 
     if (!response.ok) {
