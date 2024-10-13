@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { createMealPlan } from "../../utils/mealPlanAPI";
-import jwt from "jsonwebtoken";
+import { getCurrentUser } from "@/utils/api";
 
 export default function CreateMealPlanPage() {
   const router = useRouter();
@@ -29,16 +29,20 @@ export default function CreateMealPlanPage() {
       return router.push("/login");
     }
 
-    const decodedToken = jwt.decode(token);
-    if (decodedToken && decodedToken.locationID) {
-      setUserDetails({
-        daycareID: decodedToken.locationID,
-        firstName: decodedToken.firstName,
-        lastName: decodedToken.lastName,
-      });
-    } else {
-      setMessage("Invalid token, no User found.");
+    async function fetchProfile() {
+      try {
+        const userDetails = await getCurrentUser();
+        setUserDetails({
+          daycareID: userDetails.locationID,
+          firstName: userDetails.firstName,
+          lastName: userDetails.lastName,
+        });
+      } catch (error) {
+        setMessage(error.message);
+        setMealPlan(null);
+      }
     }
+    fetchProfile();
   }, [router]);
 
   const handleInputChange = (e) => {
@@ -56,7 +60,9 @@ export default function CreateMealPlanPage() {
 
     // Include daycareID and createdBy in the meal plan object
     let daycareID = userDetails.daycareID;
-    let createdBy = `${userDetails.firstName} ${userDetails.lastName}`;
+    let fName = userDetails.firstName;
+    let lName = userDetails.lastName;
+    let createdBy = `${fName} ${lName}`;
     const mealPlanData = { ...mealPlan, createdBy, daycareID };
 
     try {
