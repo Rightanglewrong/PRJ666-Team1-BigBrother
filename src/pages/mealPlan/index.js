@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getLatestMealPlan } from "../../utils/mealPlanAPI";
+import { getLatestMealPlan } from "@/utils/mealPlanAPI";
 import { getCurrentUser } from "@/utils/api";
 
 export default function MealPlanIndex() {
