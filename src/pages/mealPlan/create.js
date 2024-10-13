@@ -38,7 +38,7 @@ export default function CreateMealPlanPage() {
           lastName: userDetails.lastName,
         });
       } catch (error) {
-        setMessage(error.message);
+        setMessage(`Error fetching user details: ${error.message}`);
         setMealPlan(null);
       }
     }
