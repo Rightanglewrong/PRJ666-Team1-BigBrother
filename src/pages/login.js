@@ -19,7 +19,7 @@ export default function LoginPage() {
         localStorage.setItem('userLoggedIn', 'true');
         window.dispatchEvent(new Event('storage'));  // Trigger the storage event manually
         // Redirect to dashboard after successful login
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       } else {
         setError('Login failed. Please check your credentials.');
       }

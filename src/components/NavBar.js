@@ -58,7 +58,7 @@ const NavBar = () => {
       window.dispatchEvent(new Event('storage'));
       setIsLoggedIn(false);
       setFirstName('');
-      router.push('/');  // Redirect to home page after logout
+      window.location.href = '/';
     } catch (error) {
       console.error('Error logging out:', error);
     }
