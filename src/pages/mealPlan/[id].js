@@ -61,7 +61,7 @@ export default function EditMealPlanPage() {
       setMessage("Meal Plan updated successfully");
       router.push("/mealPlan");
     } catch (error) {
-        setMessage(`Error occurred while updating the meal plan: ${error}`);
+      setMessage(`Error occurred while updating the meal plan: ${error}`);
     }
   };
 

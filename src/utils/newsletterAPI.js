@@ -1,8 +1,8 @@
-// src/utils/mealPlanAPI.js
+// src/utils/newsletterAPI.js
 const BACKEND_URL =
-  "https://big-brother-be-3d6ad173758c.herokuapp.com/v1/meal-plan";
+  "https://big-brother-be-3d6ad173758c.herokuapp.com/v1/newsletter";
 
-export const createMealPlan = async (token, mealPlanData) => {
+export const createNewsletter = async (token, newsletterData) => {
   try {
     const response = await fetch(`${BACKEND_URL}`, {
       method: "POST",
@@ -10,30 +10,30 @@ export const createMealPlan = async (token, mealPlanData) => {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(mealPlanData),
+      body: JSON.stringify(newsletterData),
     });
 
     if (!response.ok) {
       if (response.status == 403) {
         let errText = "FORBIDDEN: Unauthorized for current action";
-        console.error(`Failed to create mealPlan: ${errText}`);
+        console.error(`Failed to create Newsletter: ${errText}`);
         throw new Error(errText);
       }
       if (response.status == 500) {
-        let errText = "Server Error during mealPlan creation";
-        console.error(`Failed to create mealPlan: ${errText}`);
+        let errText = "Server Error during  Newsletter creation";
+        console.error(`Failed to create Newsletter: ${errText}`);
         throw new Error(errText);
       }
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating meal plan:", error);
+    console.error("Error creating newsletter:", error);
     throw error;
   }
 };
 
-export const updateMealPlan = async (token, id, updateData) => {
+export const updateNewsletter = async (token, id, updateData) => {
   try {
     const response = await fetch(`${BACKEND_URL}/${id}`, {
       method: "PUT",
@@ -47,24 +47,24 @@ export const updateMealPlan = async (token, id, updateData) => {
     if (!response.ok) {
       if (response.status == 403) {
         let errText = "FORBIDDEN: Unauthorized for current action";
-        console.error(`Failed to update mealPlan: ${errText}`);
+        console.error(`Failed to update Newsletter: ${errText}`);
         throw new Error(errText);
       }
       if (response.status == 500) {
-        let errText = "Server Error during mealPlan updating";
-        console.error(`Failed to update mealPlan: ${errText}`);
+        let errText = "Server Error during Newsletter updating";
+        console.error(`Failed to update Newsletter: ${errText}`);
         throw new Error(errText);
       }
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error updating meal plan:", error);
+    console.error("Error updating newsletter:", error);
     throw error;
   }
 };
 
-export const getMealPlan = async (token, id) => {
+export const getNewsletter = async (token, id) => {
   try {
     const response = await fetch(`${BACKEND_URL}/${id}`, {
       method: "GET",
@@ -74,18 +74,18 @@ export const getMealPlan = async (token, id) => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to retrieve meal plan");
+      throw new Error("Failed to retrieve newsletter");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error retrieving meal plan:", error);
+    console.error("Error retrieving newsletter:", error);
     throw error;
   }
 };
 
-export const getLatestMealPlan = async (token, daycareID) => {
-  const response = await fetch(`${BACKEND_URL}/latest/${daycareID}`, {
+export const getAllNewsletters = async (token, daycareID) => {
+  const response = await fetch(`${BACKEND_URL}/location/${daycareID}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -94,14 +94,19 @@ export const getLatestMealPlan = async (token, daycareID) => {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch the latest meal plan");
+    // throw new Error("Failed to fetch the all newsletters");
+    if (response.status === 404) {
+      throw new Error(`${response.status}: No Newsletters currently`);
+    } else {
+      throw new Error(`Failed to fetch the all newsletters`);
+    }
   }
 
   const data = await response.json();
-  return data.mealPlan;
+  return data.newsletters;
 };
 
-export const deleteMealPlan = async (token, id) => {
+export const deleteNewsletter = async (token, id) => {
   try {
     const response = await fetch(`${BACKEND_URL}/${id}`, {
       method: "DELETE",
@@ -111,12 +116,12 @@ export const deleteMealPlan = async (token, id) => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to delete meal plan");
+      throw new Error("Failed to delete newsletter");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error deleting meal plan:", error);
+    console.error("Error deleting newsletter:", error);
     throw error;
   }
 };

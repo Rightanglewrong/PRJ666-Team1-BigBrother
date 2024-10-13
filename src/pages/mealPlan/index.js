@@ -1,30 +1,31 @@
 // pages/mealPlan/index.js
 
-import jwt from "jsonwebtoken";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getLatestMealPlan } from "../../utils/mealPlanAPI";
+import { getLatestMealPlan } from "@/utils/mealPlanAPI";
+import { getCurrentUser } from "@/utils/api";
 
 export default function MealPlanIndex() {
   const [mealPlan, setMealPlan] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
   const [message, setMessage] = useState("");
 
   // Fetch the latest meal plan
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const decodedToken = jwt.decode(token);
-    const daycareID = decodedToken.locationID;
+    async function fetchUserAndLatestMealPlan() {
+      try {
+        const userDetails = await getCurrentUser();
+        const daycareID = userDetails.locationID;
 
-    getLatestMealPlan(token, daycareID)
-      .then((data) => {
-        setMealPlan(data);
+        const mealPlanData = await getLatestMealPlan(token, daycareID)
+        setMealPlan(mealPlanData);
         setMessage("");
-      })
-      .catch((error) => {
+      } catch (error) {
         setMessage(error.message || "Error fetching the latest meal plan.");
         setMealPlan(null);
-      });
+      }
+    }
+    fetchUserAndLatestMealPlan();
   }, []);
 
   return (

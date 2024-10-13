@@ -70,6 +70,7 @@
 /* Dropdown menu styling */
 .dropdownMenu {
   display: block;
+  top: 100%;
   position: absolute;
   background: linear-gradient(90deg, #f52ad3f4, #25dcfce4);
   min-width: 160px;
