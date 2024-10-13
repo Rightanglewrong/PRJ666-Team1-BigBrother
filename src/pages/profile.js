@@ -1,31 +1,33 @@
-import { useState, useEffect } from 'react';
-import { getCurrentUser } from '../utils/api'; // Use getCurrentUser instead of getUserProfile
-import styles from './Profile.module.css';
+import { useState, useEffect } from "react";
+import { getCurrentUser } from "../utils/api"; // Use getCurrentUser instead of getUserProfile
+import { updateUserProfile } from '../utils/api';
+import { withAuth } from "@/hoc/withAuth";
+import styles from "./Profile.module.css";
 
-export default function ProfilePage() {
-  const [userID, setUserID] = useState('');
-  const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [locationID, setLocationID] = useState('');
-  const [accountType, setAccountType] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+const ProfilePage = () => {
+  const [userID, setUserID] = useState("");
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [locationID, setLocationID] = useState("");
+  const [accountType, setAccountType] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // Fetch user profile data when the component mounts
   useEffect(() => {
     async function fetchProfile() {
       try {
         const userProfile = await getCurrentUser(); // Fetch user data using getCurrentUser
-        setUserID(userProfile.userID);     // Set userID
-        setEmail(userProfile.email);       // Set email
+        setUserID(userProfile.userID); // Set userID
+        setEmail(userProfile.email); // Set email
         setFirstName(userProfile.firstName); // Set first name
         setLastName(userProfile.lastName); // Set last name
         setLocationID(userProfile.locationID); // Set location ID
         setAccountType(userProfile.accountType); // Set account type
       } catch (err) {
-        console.error('Failed to fetch profile', err);
-        setError('Failed to load profile');
+        console.error("Failed to fetch profile", err);
+        setError("Failed to load profile");
       }
     }
 
@@ -40,15 +42,15 @@ export default function ProfilePage() {
       firstName,
       lastName,
       locationID,
-      accountType
+      accountType,
     };
 
     try {
       await updateUserProfile(updatedData); // Assume this sends updated data to backend
-      setSuccess('Profile updated successfully');
+      setSuccess("Profile updated successfully");
     } catch (err) {
-      console.error('Failed to update profile', err);
-      setError('Failed to update profile');
+      console.error("Failed to update profile", err);
+      setError("Failed to update profile");
     }
   };
 
@@ -60,21 +62,11 @@ export default function ProfilePage() {
       <form className={styles.form} onSubmit={handleUpdate}>
         {/* UserID - Uneditable */}
         <label className={styles.label}>User ID</label>
-        <input
-          className={styles.input}
-          type="text"
-          value={userID}
-          disabled
-        />
+        <input className={styles.input} type="text" value={userID} disabled />
 
         {/* Email - Uneditable */}
         <label className={styles.label}>Email</label>
-        <input
-          className={styles.input}
-          type="email"
-          value={email}
-          disabled
-        />
+        <input className={styles.input} type="email" value={email} disabled />
 
         {/* First Name */}
         <label className={styles.label}>First Name</label>
@@ -94,7 +86,6 @@ export default function ProfilePage() {
           onChange={(e) => setLastName(e.target.value)}
         />
 
-
         {/* Location ID */}
         <label className={styles.label}>Location ID</label>
         <input
@@ -106,16 +97,26 @@ export default function ProfilePage() {
 
         {/* Account Type */}
         <label className={styles.label}>Account Type</label>
-        <input
+        <select
           className={styles.input}
-          type="text"
+          id="accountType"
+          name="accountType"
           value={accountType}
           onChange={(e) => setAccountType(e.target.value)}
-        />
+          required
+        >
+          <option value="Parent">Parent</option>
+          <option value="Staff">Staff</option>
+          <option value="Admin">Admin</option>
+        </select>
 
         {/* Submit Button */}
-        <button className={styles.button} type="submit">Update Info</button>
+        <button className={styles.button} type="submit">
+          Update Info
+        </button>
       </form>
     </div>
   );
 }
+
+export default withAuth(ProfilePage);  // Wrap the page with the HOC

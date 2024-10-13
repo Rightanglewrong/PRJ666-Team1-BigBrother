@@ -16,6 +16,8 @@ export default function LoginPage() {
       const result = await login(email, password);  // Call login function from utils/api.js
       if (result.token) {
         localStorage.setItem('token', result.token);
+        localStorage.setItem('userLoggedIn', 'true');
+        window.dispatchEvent(new Event('storage'));  // Trigger the storage event manually
         // Redirect to dashboard after successful login
         window.location.href = '/dashboard';
       } else {
