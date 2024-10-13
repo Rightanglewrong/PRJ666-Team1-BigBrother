@@ -75,7 +75,7 @@ const NavBar = () => {
         {/* Logo */}
         <div className={styles.leftSection}>
           {/* Conditionally link based on login status */}
-          <Link href={isLoggedIn ? "/dashboard" : "/"} className={styles.logo}>
+          <Link href={isLoggedIn ? "/homepage/HomePage" : "/"} className={styles.logo}>
             Big Brother
           </Link>
         </div>
