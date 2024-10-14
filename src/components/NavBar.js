@@ -1,4 +1,4 @@
-"use client";
+'use client'; // Ensure this is a Client Component
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { getCurrentUser } from '../utils/api';
 const NavBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [firstName, setFirstName] = useState(''); 
+  const [accountType, setAccountType] = useState(''); // Track account type (e.g., parent)
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
 
@@ -21,6 +22,7 @@ const NavBar = () => {
         if (token) {
           const userDetails = await getCurrentUser(); 
           setFirstName(userDetails.firstName);
+          setAccountType(userDetails.accountType); // Set account type (e.g., parent)
           setIsLoggedIn(true);
         } else {
           setIsLoggedIn(false);
@@ -85,30 +87,41 @@ const NavBar = () => {
           <ul className={styles.navList}>
             {isLoggedIn ? (
               <div className={styles.dropdown} onMouseEnter={toggleDropdown} onMouseLeave={toggleDropdown}>
-              <span className={styles.navItem}>
-              Welcome, {firstName} {dropdownOpen ? '▲' : '▼'}
+                <span className={styles.navItem}>
+                  Welcome, {firstName} {dropdownOpen ? '▲' : '▼'}
                 </span>
-              {dropdownOpen && (
-                <ul className={styles.dropdownMenu}>
-                  <li><Link href="/profile" className={styles.dropdownItem}>Profile</Link></li>
-                  {/* <li><Link href="/media" className={styles.dropdownItem}>Media</Link></li> */}
-                  <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
-                  <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
-                  <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
-                  <li><Link href="/progressReport" className={styles.dropdownItem}>Progress Report</Link></li>
-                  <li><Link href="/newsletter" className={styles.dropdownItem}>Newsletter</Link></li>
-                  <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
-                  <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
-                  <li>
-                    <button onClick={handleLogout} className={styles.dropdownItem}>
-                      Logout
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </div>
-          ) : (
-            // Message for not logged in users
+                {dropdownOpen && (
+                  <ul className={styles.dropdownMenu}>
+                    <li><Link href="/profile" className={styles.dropdownItem}>Profile</Link></li>
+                    
+                    {/* Conditionally render items based on account type */}
+                    {accountType === 'Parent' && (
+                      <>
+                        <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
+                        <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
+                      </>
+                    )}
+
+                    {accountType !== 'Parent' && (
+                      <>
+                        <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
+                        <li><Link href="/progressReport" className={styles.dropdownItem}>Progress Report</Link></li>
+                        <li><Link href="/newsletter" className={styles.dropdownItem}>Newsletter</Link></li>
+                        <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
+                        <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
+                      </>
+                    )}
+
+                    <li>
+                      <button onClick={handleLogout} className={styles.dropdownItem}>
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </div>
+            ) : (
+              // Message for not logged in users
               <span className={styles.navItem}>You are not logged in</span>
             )}
           </ul>
