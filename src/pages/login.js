@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link'; // Import Link from next/link
 import { login } from '../utils/api'; 
 import styles from './login.module.css';
 
@@ -8,6 +9,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    // Check if a token is present in localStorage and redirect to dashboard if so
+    const token = localStorage.getItem('token');
+    if (token) {
+      router.push('/dashboard');
+    }
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,7 +68,13 @@ export default function LoginPage() {
       </form>
 
       <br />
-      <a href="/forgot-password" className={styles['footer-link']}>Forgot password?</a>
+      <Link href="/forgot-password" className={styles['footer-link']}>
+        Forgot password?
+      </Link>
+      <br />
+      <Link href="/register" className={styles['footer-link']}>
+        Register Now!
+      </Link>
     </div>
   );
 }
