@@ -1,8 +1,21 @@
+'use client'; // This marks the component as a Client Component
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation'; // Correct import from next/navigation
 import Link from 'next/link';
 import styles from './page.module.css';
 
 export default function Home() {
- 
+  const router = useRouter(); // using useRouter from next/navigation
+
+  useEffect(() => {
+    const token = localStorage.getItem('token'); 
+
+    if (token) {
+      router.push('/dashboard'); // Redirect to dashboard if token is present
+    }
+  }, [router]);
+
   return (
     <div className={styles.container}>
       <div className={styles.inner}>

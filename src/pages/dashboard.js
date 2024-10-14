@@ -1,12 +1,16 @@
 // app/dashboard.js
+'use client'; // Ensure this is a Client Component
+
 import { useEffect, useState } from 'react';
-import { getCurrentUser } from '../utils/api'; // Import the new API function
+import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
+import { getCurrentUser } from '../utils/api'; // Import the API function
 import { withAuth } from '@/hoc/withAuth';
 import styles from './dashboard.module.css';
 
 const DashboardPage = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState('');
+  const router = useRouter(); // Initialize the router
 
   // Fetch user details on component mount
   useEffect(() => {
@@ -17,11 +21,17 @@ const DashboardPage = () => {
       } catch (error) {
         console.error('Error fetching user data:', error);
         setError('Failed to load user details. Please log in again.');
+
+        // Remove any stored token from localStorage
+        localStorage.removeItem('token');
+
+        // Redirect to login page if an error occurs
+        router.push('/login');
       }
     };
 
     fetchUserDetails();
-  }, []);
+  }, [router]);
 
   return (
     <div className={styles.dashboardContainer}>
