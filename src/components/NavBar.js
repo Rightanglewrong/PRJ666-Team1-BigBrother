@@ -95,7 +95,7 @@ const NavBar = () => {
                     <li><Link href="/profile" className={styles.dropdownItem}>Profile</Link></li>
                     
                     {/* Conditionally render items based on account type */}
-                    {accountType === ('Admin' || 'Staff') && (
+                    {accountType !== 'Admin' || accountType !== 'Staff' && (
                       <>
                         <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
                         <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
@@ -107,7 +107,7 @@ const NavBar = () => {
                       </>
                     )}
 
-                    {accountType !== ('Admin' || 'Staff') && (
+                    {accountType !== 'Admin' || accountType !== 'Staff' && (
                       <>
                         <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
                         <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
