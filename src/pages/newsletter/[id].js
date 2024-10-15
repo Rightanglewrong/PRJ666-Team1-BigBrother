@@ -8,6 +8,7 @@ import {
   deleteNewsletter,
 } from "@/utils/newsletterAPI";
 import { getCurrentUser } from "@/utils/api";
+import { sendEmailsToUsers } from "@/utils/emailAPI";
 
 export default function NewsletterDetailPage() {
   const router = useRouter();
@@ -22,6 +23,11 @@ export default function NewsletterDetailPage() {
     lastName: "",
   });
   const [loading, setLoading] = useState(true);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [selectedAccountTypes, setSelectedAccountTypes] = useState([]);
+
+  // Define account type options
+  const accountTypeOptions = ["Admin", "Staff", "Parent"];
 
   // Fetch newsletter details and user info on component mount
   useEffect(() => {
@@ -61,6 +67,16 @@ export default function NewsletterDetailPage() {
     setNewsletter((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle account type selection
+  const handleAccountTypeChange = (e) => {
+    const { value, checked } = e.target;
+    setSelectedAccountTypes((prevSelected) =>
+      checked
+        ? [...prevSelected, value]
+        : prevSelected.filter((accountType) => accountType !== value)
+    );
+  };
+
   // Return to main list of newsletters
   const backToList = () => {
     return router.push("/newsletter");
@@ -84,6 +100,34 @@ export default function NewsletterDetailPage() {
       setEditMode(false);
     } catch (error) {
       setMessage("Error updating newsletter");
+    }
+  };
+
+  // Handle sending the newsletter via email
+  const sendNewsletterViaEmail = async () => {
+    setSendingEmail(true); // Set email sending state
+    const token = localStorage.getItem("token");
+    const subject = newsletter.title;
+    const content = newsletter.content;
+
+    try {
+      // Send emails to the selected account types
+      for (const accountType of selectedAccountTypes) {
+        console.log(accountType)
+        console.log(userDetails.locationID)
+        await sendEmailsToUsers(
+          token,
+          accountType,
+          userDetails.locationID,
+          subject,
+          content
+        );
+      }
+      setMessage("Newsletter emailed successfully to selected users.");
+    } catch (error) {
+      setMessage("Error sending newsletter via email.");
+    } finally {
+      setSendingEmail(false); // Reset the email sending state
     }
   };
 
@@ -169,6 +213,35 @@ export default function NewsletterDetailPage() {
               <br></br>
               {userDetails.accountType === "Admin" && (
                 <button onClick={() => deleteNewsletterBtn()}>Delete</button>
+              )}
+              <br></br>
+              {/* Account type selection for sending emails */}
+              <div>
+                <h3>Select Account Types to Email</h3>
+                {accountTypeOptions.map((accountType) => (
+                  <label key={accountType}>
+                    <input
+                      type="checkbox"
+                      value={accountType}
+                      onChange={handleAccountTypeChange}
+                    />
+                    {accountType}
+                  </label>
+                ))}
+              </div>
+
+              {/* Send Newsletter via Email */}
+              {(userDetails.accountType === "Admin" ||
+                userDetails.accountType === "Staff") && (
+                <>
+                  <button
+                    onClick={sendNewsletterViaEmail}
+                    disabled={sendingEmail || selectedAccountTypes.length === 0}
+                  >
+                    {sendingEmail ? "Sending..." : "Email Newsletter"}
+                  </button>
+                  <br />
+                </>
               )}
               <br></br>
               <button onClick={() => backToList()}>Back</button>

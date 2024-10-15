@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { signup } from '../utils/api';
+import Link from 'next/link'; // Import Link from next/link
 import styles from './register.module.css';
 
 export default function RegisterPage() {
@@ -58,7 +59,7 @@ export default function RegisterPage() {
       alert('Registration successful!');
 
       // Redirect to dashboard after successful registration
-      router.push('/login');
+      window.location.href = '/dashboard'; 
     } catch (error) {
       console.error('Error during signup:', error.message);
       alert('Registration failed. Please try again.');
@@ -156,6 +157,9 @@ export default function RegisterPage() {
         />
 
         <button type="submit" className={styles.button}>Sign Up</button>
+        <Link href="/login" className={styles['footer-link']}>
+        Already have an account?
+      </Link>
       </form>
     </div>
   );
