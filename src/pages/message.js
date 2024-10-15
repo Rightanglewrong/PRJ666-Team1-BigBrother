@@ -13,9 +13,14 @@ import styles from "./calendar.module.css";
 export default function Message() {
   const [messageTitle, setMessageTitle] = useState('');
   const [messageContent, setMessageContent] = useState('');
+  const [updateTitle, setUpdateTitle] = useState('');
+  const [updateContent, setUpdateContent] = useState('');
   const [senderID, setSenderID] = useState('');
   const [receiverID, setReceiverID] = useState('');
-  const [messageID, setMessageID] = useState('');
+  const [retrieveMessageID, setRetrieveMessageID] = useState('');
+  const [updateMessageID, setUpdateMessageID] = useState('');
+  const [deleteMessageID, setDeleteMessageID] = useState('');
+
   const [retrievedMessage, setRetrievedMessage] = useState(null);
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [userId, setUserId] = useState('');
@@ -181,9 +186,9 @@ export default function Message() {
       <h3>Retrieve Message</h3>
       <input
         type="text"
-        value={messageID}
+        value={retrieveMessageID}
         placeholder="Message ID"
-        onChange={(e) => setMessageID(e.target.value)}
+        onChange={(e) => setRetrieveMessageID(e.target.value)}
       />
       <button onClick={handleRetrieveMessage} disabled={!messageID}>
         Retrieve Message
@@ -195,21 +200,21 @@ export default function Message() {
       <form onSubmit={handleUpdateMessage}>
         <input
           type="text"
-          value={messageID}
+          value={updateMessageID}
           placeholder="Message ID"
-          onChange={(e) => setMessageID(e.target.value)}
+          onChange={(e) => setUpdateMessageID(e.target.value)}
         />
         <input
           type="text"
-          value={messageTitle}
+          value={updateTitle}
           placeholder="New Message Title"
-          onChange={(e) => setMessageTitle(e.target.value)}
+          onChange={(e) => setUpdateTitle(e.target.value)}
         />
         <input
           type="text"
-          value={messageContent}
+          value={updateContent}
           placeholder="New Message Content"
-          onChange={(e) => setMessageContent(e.target.value)}
+          onChange={(e) => setUpdateContent(e.target.value)}
         />
         <button type="submit" disabled={!messageID}>Update Message</button>
       </form>
@@ -218,11 +223,11 @@ export default function Message() {
       <h3>Delete Message</h3>
       <input
         type="text"
-        value={messageID}
+        value={deleteMessageID}
         placeholder="Message ID"
-        onChange={(e) => setMessageID(e.target.value)}
+        onChange={(e) => setDeleteMessageID(e.target.value)}
       />
-      <button onClick={handleDeleteMessage} disabled={!messageID}>
+      <button onClick={handleDeleteMessage} disabled={!deleteMessageID}>
         Delete Message
       </button>
 
@@ -231,9 +236,21 @@ export default function Message() {
       <form onSubmit={handleFilterMessagesByReceiver}>
         <input
           type="text"
-          value={userId}
-          placeholder="User ID"
-          onChange={(e) => setUserId(e.target.value)}
+          value={receiverID}
+          placeholder="Receiver ID"
+          onChange={(e) => setReceiverID(e.target.value)}
+        />
+        <button type="submit">Filter Messages</button>
+      </form>
+
+      {/* Filter Messages by Sender */}
+      <h3>Filter Messages by Sender</h3>
+      <form onSubmit={handleFilterMessagesBySender}>
+        <input
+          type="text"
+          value={senderID}
+          placeholder="Sender ID"
+          onChange={(e) => setSenderID(e.target.value)}
         />
         <button type="submit">Filter Messages</button>
       </form>
