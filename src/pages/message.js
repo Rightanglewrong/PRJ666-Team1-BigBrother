@@ -4,8 +4,8 @@ import {
   retrieveMessageFromDynamoDB,
   updateMessageInDynamoDB,
   deleteMessageFromDynamoDB,
-  retrieveMessagesByReceiver,
-  retrieveMessagesBySender,
+  retrieveMessageByReceiverID,
+  retrieveMessageBySenderID,
 } from '../utils/messageAPI';
 import { getCurrentUser } from '../utils/api';
 import styles from "./calendar.module.css";
@@ -125,9 +125,20 @@ export default function Message() {
   const handleFilterMessagesByReceiver = async (e) => {
     e.preventDefault();
     try {
-      const messages = await retrieveMessagesByReceiver(userId);
+      const messages = await retrieveMessageByReceiverID(userId);
       setFilteredMessages(messages);
       setMessage(`Found ${messages.length} messages for receiver ID: ${userId}`);
+    } catch (error) {
+      setMessage(`Error fetching messages: ${error.message}`);
+    }
+  };
+
+  const handleFilterMessagesBySender = async (e) => {
+    e.preventDefault();
+    try {
+      const messages = await retrieveMessageBySenderID(userId);
+      setFilteredMessages(messages);
+      setMessage(`Found ${messages.length} messages for sender ID: ${userId}`);
     } catch (error) {
       setMessage(`Error fetching messages: ${error.message}`);
     }
