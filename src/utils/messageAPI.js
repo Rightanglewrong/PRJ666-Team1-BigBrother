@@ -31,7 +31,7 @@ export const createMessageInDynamoDB = async (item) => {
 };
 
 // Retrieve an Message from DynamoDB
-export const retrieveMessageFromDynamoDB = async ({id}) => {
+export const retrieveMessageFromDynamoDB = async (messageID) => {
   const token = localStorage.getItem('token');
 
   if (!token) {
@@ -39,7 +39,7 @@ export const retrieveMessageFromDynamoDB = async ({id}) => {
   }
 
   try {
-      const response = await fetch(`${BACKEND_URL}v1/message/by-ID/${id}`, {
+      const response = await fetch(`${BACKEND_URL}v1/message/by-ID/?messageID${messageID}`, {
       method: "GET",
       headers: {
         'Authorization': `Bearer ${token}`, 

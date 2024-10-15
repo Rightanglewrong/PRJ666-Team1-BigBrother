@@ -69,7 +69,7 @@ export default function Message() {
   const handleRetrieveMessage = async (e) => {
     e.preventDefault();
     try {
-      const data = await retrieveMessageFromDynamoDB({ id: retrieveMessageID});
+      const data = await retrieveMessageFromDynamoDB(retrieveMessageID);
       setRetrievedMessage(data);
       setMessage('Message retrieved successfully');
       setRetrieveMessageID('');
@@ -84,7 +84,7 @@ export default function Message() {
     try {
       const data = await markMessageAsDeletedByReceiver(deleteReceiverMessageID);
       setMessage('Message deleted successfully');
-      setDeleteMessageID('');
+      setDeleteReceiverMessageID('');
     } catch (error) {
       setMessage(`Error deleting message: ${error.message}`);
     }
@@ -182,8 +182,8 @@ export default function Message() {
         Delete Message
       </button>
 
-        {/* Delete Message */}
-        <h3>Delete Message</h3>
+        {/* Delete for Sender Message */}
+        <h3>Delete For Sender</h3>
       <input
         type="text"
         value={deleteSenderMessageID}
