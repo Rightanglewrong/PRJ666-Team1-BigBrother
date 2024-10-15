@@ -13,6 +13,7 @@ import styles from "./calendar.module.css";
 export default function Message() {
   const [messageTitle, setMessageTitle] = useState('');
   const [messageContent, setMessageContent] = useState('');
+  const [createReceiverID, setCreateReceiverID] = useState('');
   const [updateTitle, setUpdateTitle] = useState('');
   const [updateContent, setUpdateContent] = useState('');
   const [senderID, setSenderID] = useState('');
@@ -175,9 +176,9 @@ export default function Message() {
         />
         <input
           type="text"
-          value={receiverID}
+          value={createReceiverID}
           placeholder="Receiver ID"
-          onChange={(e) => setReceiverID(e.target.value)}
+          onChange={(e) => setCreateReceiverID(e.target.value)}
         />
         <button type="submit">Create Message</button>
       </form>
