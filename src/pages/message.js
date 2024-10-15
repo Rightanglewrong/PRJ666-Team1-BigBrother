@@ -70,8 +70,14 @@ export default function Message() {
     e.preventDefault();
     try {
       const data = await retrieveMessageFromDynamoDB(retrieveMessageID);
-      setRetrievedMessage(data.item);
-      setMessage(`Message retrieved successfully: ${JSON.stringify(data.item)}`);      setRetrieveMessageID('');
+      if (data.item) {
+        setRetrievedMessage(data.item);
+        setMessage(`Message retrieved successfully: ${JSON.stringify(data.item, null, 2)}`); 
+      } else {
+        setMessage("No message found with the provided ID."); 
+      }
+      
+      setRetrieveMessageID('');
     } catch (error) {
       setMessage(`Error retrieving message: ${error.message}`);
     }
@@ -81,7 +87,12 @@ export default function Message() {
     e.preventDefault();
 
     try {
-      const data = await markMessageAsDeletedByReceiver(deleteReceiverMessageID);
+      const existingMessageData = await retrieveMessageFromDynamoDB(deleteReceiverMessageID);
+      if (!existingMessageData.item) {
+        setMessage("Message ID does not exist."); // Notify if the message ID is invalid
+        return;
+      }
+      await markMessageAsDeletedByReceiver(deleteReceiverMessageID);
       setMessage('Message deleted successfully');
       setDeleteReceiverMessageID('');
     } catch (error) {
@@ -91,9 +102,14 @@ export default function Message() {
 
   const handleDeleteSenderMessage = async (e) => {
     e.preventDefault();
-
     try {
-      const data = await markMessageAsDeletedBySender(deleteSenderMessageID);
+      const existingMessageData = await retrieveMessageFromDynamoDB(deleteSenderMessageID);
+
+      if (!existingMessageData.item) {
+          setMessage("Message ID does not exist."); 
+      return;
+    }
+      await markMessageAsDeletedBySender(deleteSenderMessageID);
       setMessage('Message deleted successfully');
       setDeleteSenderMessageID('');
     } catch (error) {
@@ -107,6 +123,7 @@ export default function Message() {
       const messages = await retrieveMessageByReceiverID(filterReceiverID);
       setFilteredMessages(messages);
       setMessage(`Found ${messages.length} messages for receiver ID: ${filterReceiverID}`);
+      setFilterReceiverID('');
     } catch (error) {
       setMessage(`Error fetching messages: ${error.message}`);
     }
@@ -118,6 +135,7 @@ export default function Message() {
       const messages = await retrieveMessageBySenderID(senderID);
       setFilteredMessages(messages);
       setMessage(`Found ${messages.length} messages for sender ID: ${senderID}`);
+      setSenderID('');
     } catch (error) {
       setMessage(`Error fetching messages: ${error.message}`);
     }
