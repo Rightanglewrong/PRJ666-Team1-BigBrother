@@ -52,7 +52,7 @@ export const retrieveMessageFromDynamoDB = async (messageID) => {
     }
 
     const data = await response.json();
-    return data; 
+    return { message: "Message retrieved successfully", item: data };
   } catch (error) {
     console.error("Error retrieving Message:", error);
     throw new Error(error.message);
