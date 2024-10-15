@@ -96,7 +96,7 @@ export default function Message() {
     try {
       const data = await markMessageAsDeletedBySender(deleteSenderMessageID);
       setMessage('Message deleted successfully');
-      setDeleteMessageID('');
+      setDeleteSenderMessageID('');
     } catch (error) {
       setMessage(`Error deleting message: ${error.message}`);
     }

@@ -39,7 +39,7 @@ export const retrieveMessageFromDynamoDB = async (messageID) => {
   }
 
   try {
-      const response = await fetch(`${BACKEND_URL}v1/message/by-ID/?messageID${messageID}`, {
+      const response = await fetch(`${BACKEND_URL}v1/message/by-ID?messageID=${messageID}`, {
       method: "GET",
       headers: {
         'Authorization': `Bearer ${token}`, 
