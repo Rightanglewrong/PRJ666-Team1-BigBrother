@@ -18,7 +18,6 @@ export default function Message() {
   const [receiverID, setReceiverID] = useState('');
   const [retrieveMessageID, setRetrieveMessageID] = useState('');
   const [deleteMessageID, setDeleteMessageID] = useState('');
-
   const [retrievedMessage, setRetrievedMessage] = useState(null);
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [userId, setUserId] = useState('');
@@ -103,9 +102,9 @@ export default function Message() {
   const handleFilterMessagesBySender = async (e) => {
     e.preventDefault();
     try {
-      const messages = await retrieveMessageBySenderID(userId);
+      const messages = await retrieveMessageBySenderID(senderID);
       setFilteredMessages(messages);
-      setMessage(`Found ${messages.length} messages for sender ID: ${userId}`);
+      setMessage(`Found ${messages.length} messages for sender ID: ${senderID}`);
     } catch (error) {
       setMessage(`Error fetching messages: ${error.message}`);
     }
