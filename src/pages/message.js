@@ -70,7 +70,7 @@ export default function Message() {
     e.preventDefault();
     try {
       const data = await retrieveMessageFromDynamoDB(retrieveMessageID);
-      setRetrievedMessage(data);
+      setRetrievedMessage(data.item);
       setMessage(`Message retrieved successfully: ${JSON.stringify(data.item)}`);      setRetrieveMessageID('');
     } catch (error) {
       setMessage(`Error retrieving message: ${error.message}`);
