@@ -59,16 +59,19 @@ export const retrieveMessageFromDynamoDB = async (item) => {
   }
 };
 
-// Delete an Message from DynamoDB
-export const deleteMessageFromDynamoDB = async (item) => {
+// Update sender deletion in DynamoDB
+export const markMessageAsDeletedBySender = async (item) => {
   const token = localStorage.getItem('token');
 
   if (!token) {
-      throw new Error("No token found");
+    throw new Error("No token found");
   }
+
+  const url = `${BACKEND_URL}v1/message/sender/${item.messageID}`;
+
   try {
-    const response = await fetch(`${BACKEND_URL}v1/message/${item.messageID}`, {
-      method: "DELETE",
+    const response = await fetch(url, {
+      method: "PUT",
       headers: {
         'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
@@ -76,19 +79,50 @@ export const deleteMessageFromDynamoDB = async (item) => {
     });
 
     if (!response.ok) {
-        const errorDetails = await response.text(); 
-        throw new Error('Error deleting Message from DynamoDB: ${errorDetails}');
+      const errorDetails = await response.text(); 
+      throw new Error(`Error marking message as deleted by sender in DynamoDB: ${errorDetails}`);
     }
 
     const data = await response.json();
-    return { message: "Message deleted successfully", data };
+    return { message: "Message marked as deleted by sender successfully", data };
   } catch (error) {
-    console.error("Error deleting Message:", error);
+    console.error("Error marking message as deleted by sender:", error);
     throw new Error(error.message);
   }
-
-  
 };
+
+// Update Receiver deletion in DynamoDB
+export const markMessageAsDeletedByReceiver = async (item) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error("No token found");
+  }
+
+  const url = `${BACKEND_URL}v1/message/receiver/${item.messageID}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        'Authorization': `Bearer ${token}`, 
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorDetails = await response.text(); 
+      throw new Error(`Error marking message as deleted by receiver in DynamoDB: ${errorDetails}`);
+    }
+
+    const data = await response.json();
+    return { message: "Message marked as deleted by receiver successfully", data };
+  } catch (error) {
+    console.error("Error marking message as deleted by receiver:", error);
+    throw new Error(error.message);
+  }
+};
+
 
 export const retrieveMessageByReceiverID = async (receiverID) => {
 

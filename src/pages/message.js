@@ -5,6 +5,8 @@ import {
   deleteMessageFromDynamoDB,
   retrieveMessageByReceiverID,
   retrieveMessageBySenderID,
+  markMessageAsDeletedByReceiver,
+  markMessageAsDeletedBySender,
 } from '../utils/messageAPI';
 import { getCurrentUser } from '../utils/api';
 import styles from "./calendar.module.css";
@@ -15,9 +17,9 @@ export default function Message() {
   const [createReceiverID, setCreateReceiverID] = useState('');
   const [senderID, setSenderID] = useState('');
   const [filterReceiverID, setFilterReceiverID] = useState('');
-  const [receiverID, setReceiverID] = useState('');
   const [retrieveMessageID, setRetrieveMessageID] = useState('');
-  const [deleteMessageID, setDeleteMessageID] = useState('');
+  const [deleteReceiverMessageID, setDeleteReceiverMessageID] = useState('');
+  const [deleteSenderMessageID, setDeleteSenderMessageID] = useState('');
   const [retrievedMessage, setRetrievedMessage] = useState(null);
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [userId, setUserId] = useState('');
@@ -70,17 +72,29 @@ export default function Message() {
       const data = await retrieveMessageFromDynamoDB({ id: retrieveMessageID});
       setRetrievedMessage(data);
       setMessage('Message retrieved successfully');
-      setReceiverID('');
+      setRetrieveMessageID('');
     } catch (error) {
       setMessage(`Error retrieving message: ${error.message}`);
     }
   };
 
-  const handleDeleteMessage = async (e) => {
+  const handleDeleteReceiverMessage = async (e) => {
     e.preventDefault();
 
     try {
-      const data = await deleteMessageFromDynamoDB(deleteMessageID);
+      const data = await markMessageAsDeletedByReceiver(deleteMessageID);
+      setMessage('Message deleted successfully');
+      setDeleteMessageID('');
+    } catch (error) {
+      setMessage(`Error deleting message: ${error.message}`);
+    }
+  };
+
+  const handleDeleteSenderMessage = async (e) => {
+    e.preventDefault();
+
+    try {
+      const data = await markMessageAsDeletedBySender(deleteMessageID);
       setMessage('Message deleted successfully');
       setDeleteMessageID('');
     } catch (error) {
@@ -156,15 +170,27 @@ export default function Message() {
       </button>
       {retrievedMessage && <p>Retrieved Message: {JSON.stringify(retrievedMessage)}</p>}
 
-      {/* Delete Message */}
-      <h3>Delete Message</h3>
+      {/* Delete For Receiver Message */}
+      <h3>Delete For Receiver</h3>
       <input
         type="text"
-        value={deleteMessageID}
+        value={deleteReceiverMessageID}
         placeholder="Message ID"
-        onChange={(e) => setDeleteMessageID(e.target.value)}
+        onChange={(e) => setDeleteReceiverMessageID(e.target.value)}
       />
-      <button onClick={handleDeleteMessage} disabled={!deleteMessageID}>
+      <button onClick={handleDeleteReceiverMessage} disabled={!deleteReceiverMessageID}>
+        Delete Message
+      </button>
+
+        {/* Delete Message */}
+        <h3>Delete Message</h3>
+      <input
+        type="text"
+        value={deleteSenderMessageID}
+        placeholder="Message ID"
+        onChange={(e) => setDeleteSenderMessageID(e.target.value)}
+      />
+      <button onClick={handleDeleteSenderMessage} disabled={!deleteSenderMessageID}>
         Delete Message
       </button>
 
