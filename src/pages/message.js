@@ -57,7 +57,7 @@ export default function Message() {
       };
 
       const data = await createMessageInDynamoDB(newMessage);
-      setMessage(`Message created successfully: ${JSON.stringify(data.message)}`);
+      setMessage(`Message created successfully: ${JSON.stringify(data.item)}`);
       setMessageTitle('');
       setMessageContent('');
       setCreateReceiverID('');
@@ -71,8 +71,7 @@ export default function Message() {
     try {
       const data = await retrieveMessageFromDynamoDB(retrieveMessageID);
       setRetrievedMessage(data);
-      setMessage('Message retrieved successfully');
-      setRetrieveMessageID('');
+      setMessage(`Message retrieved successfully: ${JSON.stringify(data.item)}`);      setRetrieveMessageID('');
     } catch (error) {
       setMessage(`Error retrieving message: ${error.message}`);
     }
