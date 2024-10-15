@@ -39,7 +39,7 @@ export const retrieveMessageFromDynamoDB = async (item) => {
   }
 
   try {
-      const response = await fetch(`${BACKEND_URL}v1/message/by-ID/${item.id}`, {
+      const response = await fetch(`${BACKEND_URL}v1/message/by-ID/${item.messageID}`, {
       method: "GET",
       headers: {
         'Authorization': `Bearer ${token}`, 
@@ -67,7 +67,7 @@ export const deleteMessageFromDynamoDB = async (item) => {
       throw new Error("No token found");
   }
   try {
-    const response = await fetch(`${BACKEND_URL}v1/message/${item.id}`, {
+    const response = await fetch(`${BACKEND_URL}v1/message/${item.messageID}`, {
       method: "DELETE",
       headers: {
         'Authorization': `Bearer ${token}`, 
