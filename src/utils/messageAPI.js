@@ -67,15 +67,17 @@ export const markMessageAsDeletedBySender = async (item) => {
     throw new Error("No token found");
   }
 
-  const url = `${BACKEND_URL}v1/message/sender/${item.messageID}`;
-
   try {
-    const response = await fetch(url, {
+   
+    const response = await fetch(`${BACKEND_URL}v1/message/sender/${item.messageID}`, {
       method: "PUT",
       headers: {
         'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        senderDeleted: true,  
+      })
     });
 
     if (!response.ok) {
@@ -99,15 +101,17 @@ export const markMessageAsDeletedByReceiver = async (item) => {
     throw new Error("No token found");
   }
 
-  const url = `${BACKEND_URL}v1/message/receiver/${item.messageID}`;
-
   try {
-    const response = await fetch(url, {
+    const response = await fetch(`${BACKEND_URL}v1/message/receiver/${item.messageID}`, {
       method: "PUT",
       headers: {
         'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        receiverDeleted: true,  
+      })
+
     });
 
     if (!response.ok) {

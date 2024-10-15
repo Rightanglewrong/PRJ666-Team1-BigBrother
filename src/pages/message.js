@@ -89,7 +89,7 @@ export default function Message() {
     try {
       const existingMessageData = await retrieveMessageFromDynamoDB(deleteReceiverMessageID);
       if (!existingMessageData.item) {
-        setMessage("Message ID does not exist."); // Notify if the message ID is invalid
+        setMessage("Message ID does not exist."); 
         return;
       }
       await markMessageAsDeletedByReceiver(deleteReceiverMessageID);
