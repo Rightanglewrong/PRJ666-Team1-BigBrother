@@ -96,6 +96,7 @@ const NavBar = () => {
                     <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
                     {/* Conditionally render items based on account type */}
                     {accountType !== 'Admin' || accountType !== 'Staff' && (
+
                       <>
                         <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
                         <li><Link href="/progressReport" className={styles.dropdownItem}>Progress Report</Link></li>
