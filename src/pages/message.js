@@ -77,36 +77,12 @@ export default function Message() {
   const handleRetrieveMessage = async (e) => {
     e.preventDefault();
     try {
-      const data = await retrieveMessageFromDynamoDB(retrieveMessageID);
+      const data = await retrieveMessageFromDynamoDB({ id: retrieveMessageID});
       setRetrievedMessage(data);
       setMessage('Message retrieved successfully');
-      setMessageID('');
+      setReceiverID('');
     } catch (error) {
       setMessage(`Error retrieving message: ${error.message}`);
-    }
-  };
-
-  const handleUpdateMessage = async (e) => {
-    e.preventDefault();
-    if (!isAuthorized) {
-      setErrorMessage('Unauthorized: Only admin or staff can update messages.');
-      setShowErrorModal(true);
-      return;
-    }
-
-    try {
-      const updateData = {
-        title: messageTitle,
-        content: messageContent,
-      };
-
-      const data = await updateMessageInDynamoDB(updateMessageID, updateData);
-      setMessage(`Message updated successfully: ${JSON.stringify(data.updatedAttributes)}`);
-      setMessageID('');
-      setMessageTitle('');
-      setMessageContent('');
-    } catch (error) {
-      setMessage(`Error updating message: ${error.message}`);
     }
   };
 
@@ -121,7 +97,7 @@ export default function Message() {
     try {
       const data = await deleteMessageFromDynamoDB(deleteMessageID);
       setMessage('Message deleted successfully');
-      setMessageID('');
+      setDeleteMessageID('');
     } catch (error) {
       setMessage(`Error deleting message: ${error.message}`);
     }
@@ -194,30 +170,6 @@ export default function Message() {
         Retrieve Message
       </button>
       {retrievedMessage && <p>Retrieved Message: {JSON.stringify(retrievedMessage)}</p>}
-
-      {/* Update Message */}
-      <h3>Update Message</h3>
-      <form onSubmit={handleUpdateMessage}>
-        <input
-          type="text"
-          value={updateMessageID}
-          placeholder="Message ID"
-          onChange={(e) => setUpdateMessageID(e.target.value)}
-        />
-        <input
-          type="text"
-          value={updateTitle}
-          placeholder="New Message Title"
-          onChange={(e) => setUpdateTitle(e.target.value)}
-        />
-        <input
-          type="text"
-          value={updateContent}
-          placeholder="New Message Content"
-          onChange={(e) => setUpdateContent(e.target.value)}
-        />
-        <button type="submit" disabled={!updateMessageID}>Update Message</button>
-      </form>
 
       {/* Delete Message */}
       <h3>Delete Message</h3>
