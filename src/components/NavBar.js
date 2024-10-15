@@ -93,9 +93,11 @@ const NavBar = () => {
                 {dropdownOpen && (
                   <ul className={styles.dropdownMenu}>
                     <li><Link href="/profile" className={styles.dropdownItem}>Profile</Link></li>
+                    <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
+                    <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
                     
-                    {/* Conditionally render items based on account type */}
-                    {accountType !== 'Admin' || accountType !== 'Staff' && (
+
+                    {(accountType === 'Admin' || accountType === 'Staff') && (
                       <>
                         <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
                         <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
@@ -104,13 +106,6 @@ const NavBar = () => {
                         <li><Link href="/newsletter" className={styles.dropdownItem}>Newsletter</Link></li>
                         <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
                         <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
-                      </>
-                    )}
-
-                    {accountType !== 'Admin' || accountType !== 'Staff' && (
-                      <>
-                        <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
-                        <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
                       </>
                     )}
 
