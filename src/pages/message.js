@@ -30,7 +30,6 @@ export default function Message() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
 
-  // Fetch user details and set userId and authorization
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
