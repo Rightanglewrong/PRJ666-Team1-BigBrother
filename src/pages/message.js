@@ -82,7 +82,7 @@ export default function Message() {
     e.preventDefault();
 
     try {
-      const data = await markMessageAsDeletedByReceiver(deleteMessageID);
+      const data = await markMessageAsDeletedByReceiver(deleteReceiverMessageID);
       setMessage('Message deleted successfully');
       setDeleteMessageID('');
     } catch (error) {
@@ -94,7 +94,7 @@ export default function Message() {
     e.preventDefault();
 
     try {
-      const data = await markMessageAsDeletedBySender(deleteMessageID);
+      const data = await markMessageAsDeletedBySender(deleteSenderMessageID);
       setMessage('Message deleted successfully');
       setDeleteMessageID('');
     } catch (error) {
