@@ -60,7 +60,7 @@ export const retrieveMessageFromDynamoDB = async (messageID) => {
 };
 
 // Update sender deletion in DynamoDB
-export const markMessageAsDeletedBySender = async (item) => {
+export const markMessageAsDeletedBySender = async (messageID) => {
   const token = localStorage.getItem('token');
 
   if (!token) {
@@ -69,7 +69,7 @@ export const markMessageAsDeletedBySender = async (item) => {
 
   try {
    
-    const response = await fetch(`${BACKEND_URL}v1/message/sender/${item.messageID}`, {
+    const response = await fetch(`${BACKEND_URL}v1/message/sender?messageID=${messageID}`, {
       method: "PUT",
       headers: {
         'Authorization': `Bearer ${token}`, 
@@ -94,7 +94,7 @@ export const markMessageAsDeletedBySender = async (item) => {
 };
 
 // Update Receiver deletion in DynamoDB
-export const markMessageAsDeletedByReceiver = async (item) => {
+export const markMessageAsDeletedByReceiver = async (messageID) => {
   const token = localStorage.getItem('token');
 
   if (!token) {
@@ -102,7 +102,7 @@ export const markMessageAsDeletedByReceiver = async (item) => {
   }
 
   try {
-    const response = await fetch(`${BACKEND_URL}v1/message/receiver/${item.messageID}`, {
+    const response = await fetch(`${BACKEND_URL}v1/message/receiver?messageID=${messageID}`, {
       method: "PUT",
       headers: {
         'Authorization': `Bearer ${token}`, 
