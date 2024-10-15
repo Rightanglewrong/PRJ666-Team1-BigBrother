@@ -2,10 +2,17 @@ const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
 
 // Create an Message in DynamoDB
 export const createMessageInDynamoDB = async (item) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
+
   try {
     const response = await fetch(`${BACKEND_URL}v1/message`, {
       method: "POST",
       headers: {
+        'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
       body: JSON.stringify(item),
@@ -25,9 +32,19 @@ export const createMessageInDynamoDB = async (item) => {
 
 // Retrieve an Message from DynamoDB
 export const retrieveMessageFromDynamoDB = async (item) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
+
   try {
-      const response = await fetch(`${BACKEND_URL}v1/message/${item.id}`, {
+      const response = await fetch(`${BACKEND_URL}v1/message/by-ID/${item.id}`, {
       method: "GET",
+      headers: {
+        'Authorization': `Bearer ${token}`, 
+        "Content-Type": "application/json",
+      },
     });
 
     if (!response.ok) {
@@ -42,36 +59,18 @@ export const retrieveMessageFromDynamoDB = async (item) => {
   }
 };
 
-// Update an Message in DynamoDB
-export const updateMessageInDynamoDB = async (item) => {
-  try {
-    const response = await fetch(`${BACKEND_URL}v1/message/${item.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(item),
-    });
-
-    if (!response.ok) {
-        const errorDetails = await response.text(); 
-        throw new Error(`Error updating Message in DynamoDB: ${errorDetails}`);
-    }
-
-    const data = await response.json();
-    return { message: "Message updated successfully", item: data };
-  } catch (error) {
-    console.error("Error updating Message:", error);
-    throw new Error(error.message);
-  }
-};
-
 // Delete an Message from DynamoDB
 export const deleteMessageFromDynamoDB = async (item) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
   try {
     const response = await fetch(`${BACKEND_URL}v1/message/${item.id}`, {
       method: "DELETE",
       headers: {
+        'Authorization': `Bearer ${token}`, 
         "Content-Type": "application/json",
       },
     });
@@ -92,9 +91,19 @@ export const deleteMessageFromDynamoDB = async (item) => {
 };
 
 export const retrieveMessageByReceiverID = async (receiverID) => {
+
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
     try {
       const response = await fetch(`${BACKEND_URL}v1/message/receiver?receiverID=${receiverID}`, {
         method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`, 
+          'Content-Type': 'application/json',
+        }
       });
   
       if (!response.ok) {
@@ -107,4 +116,32 @@ export const retrieveMessageByReceiverID = async (receiverID) => {
       console.error("Error retrieving Messages for the Receiver:", error);
       throw new Error(error.message);
     }
+};
+
+export const retrieveMessageBySenderID = async (senderID) => {
+
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
+  try {
+    const response = await fetch(`${BACKEND_URL}v1/message/sender?senderID=${senderID}`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${token}`, 
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("No Messages found for the Sender");
+    }
+
+    const data = await response.json();
+    return data.entries; 
+  } catch (error) {
+    console.error("Error retrieving Messages for the Sender:", error);
+    throw new Error(error.message);
+  }
 };
