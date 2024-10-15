@@ -190,7 +190,7 @@ export default function Message() {
         placeholder="Message ID"
         onChange={(e) => setRetrieveMessageID(e.target.value)}
       />
-      <button onClick={handleRetrieveMessage} disabled={!messageID}>
+      <button onClick={handleRetrieveMessage} disabled={!retrieveMessageID}>
         Retrieve Message
       </button>
       {retrievedMessage && <p>Retrieved Message: {JSON.stringify(retrievedMessage)}</p>}
@@ -216,7 +216,7 @@ export default function Message() {
           placeholder="New Message Content"
           onChange={(e) => setUpdateContent(e.target.value)}
         />
-        <button type="submit" disabled={!messageID}>Update Message</button>
+        <button type="submit" disabled={!updateMessageID}>Update Message</button>
       </form>
 
       {/* Delete Message */}
