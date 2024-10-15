@@ -78,7 +78,7 @@ export default function Message() {
   const handleRetrieveMessage = async (e) => {
     e.preventDefault();
     try {
-      const data = await retrieveMessageFromDynamoDB(messageID);
+      const data = await retrieveMessageFromDynamoDB(retrieveMessageID);
       setRetrievedMessage(data);
       setMessage('Message retrieved successfully');
       setMessageID('');
@@ -101,7 +101,7 @@ export default function Message() {
         content: messageContent,
       };
 
-      const data = await updateMessageInDynamoDB(messageID, updateData);
+      const data = await updateMessageInDynamoDB(updateMessageID, updateData);
       setMessage(`Message updated successfully: ${JSON.stringify(data.updatedAttributes)}`);
       setMessageID('');
       setMessageTitle('');
@@ -120,7 +120,7 @@ export default function Message() {
     }
 
     try {
-      const data = await deleteMessageFromDynamoDB(messageID);
+      const data = await deleteMessageFromDynamoDB(deleteMessageID);
       setMessage('Message deleted successfully');
       setMessageID('');
     } catch (error) {
