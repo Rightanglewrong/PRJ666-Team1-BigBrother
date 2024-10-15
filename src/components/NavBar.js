@@ -106,7 +106,6 @@ const NavBar = () => {
                       <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
                     </>
                   )}
-                    <li><Link href="/contact" className={styles.dropdownItem}>Contact List</Link></li>
                     <li>
                       <button onClick={handleLogout} className={styles.dropdownItem}>
                         Logout

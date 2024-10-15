@@ -8,13 +8,14 @@ import { getCurrentUser } from "@/utils/api";
 export default function MealPlanIndex() {
   const [mealPlan, setMealPlan] = useState(null);
   const [message, setMessage] = useState("");
-
+  const [user, setUser] = useState(null);
   // Fetch the latest meal plan
   useEffect(() => {
     const token = localStorage.getItem("token");
     async function fetchUserAndLatestMealPlan() {
       try {
         const userDetails = await getCurrentUser();
+        setUser(user); // Set the user details
         const daycareID = userDetails.locationID;
 
         const mealPlanData = await getLatestMealPlan(token, daycareID)
@@ -65,9 +66,11 @@ export default function MealPlanIndex() {
         <p>No meal plan found.</p>
       )}
 
-      <Link href="/mealPlan/create">
-        <button>Create New Meal Plan</button>
-      </Link>
+      {user && (user.accountType === "Admin" || user.accountType === "Staff") && (
+        <Link href="/mealPlan/create">
+          <button>Create New Meal Plan</button>
+        </Link>
+      )}
     </div>
   );
 }
