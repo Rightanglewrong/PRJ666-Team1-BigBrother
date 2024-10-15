@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   createMessageInDynamoDB,
   retrieveMessageFromDynamoDB,
-  updateMessageInDynamoDB,
   deleteMessageFromDynamoDB,
   retrieveMessageByReceiverID,
   retrieveMessageBySenderID,
@@ -15,6 +14,7 @@ export default function Message() {
   const [messageContent, setMessageContent] = useState('');
   const [createReceiverID, setCreateReceiverID] = useState('');
   const [senderID, setSenderID] = useState('');
+  const [filterReceiverID, setFilterReceiverID] = useState('');
   const [receiverID, setReceiverID] = useState('');
   const [retrieveMessageID, setRetrieveMessageID] = useState('');
   const [deleteMessageID, setDeleteMessageID] = useState('');
@@ -91,9 +91,9 @@ export default function Message() {
   const handleFilterMessagesByReceiver = async (e) => {
     e.preventDefault();
     try {
-      const messages = await retrieveMessageByReceiverID(userId);
+      const messages = await retrieveMessageByReceiverID(filterReceiverID);
       setFilteredMessages(messages);
-      setMessage(`Found ${messages.length} messages for receiver ID: ${userId}`);
+      setMessage(`Found ${messages.length} messages for receiver ID: ${filterReceiverID}`);
     } catch (error) {
       setMessage(`Error fetching messages: ${error.message}`);
     }
@@ -173,9 +173,9 @@ export default function Message() {
       <form onSubmit={handleFilterMessagesByReceiver}>
         <input
           type="text"
-          value={receiverID}
+          value={filterReceiverID}
           placeholder="Receiver ID"
-          onChange={(e) => setReceiverID(e.target.value)}
+          onChange={(e) => setFilterReceiverID(e.target.value)}
         />
         <button type="submit">Filter Messages</button>
       </form>
