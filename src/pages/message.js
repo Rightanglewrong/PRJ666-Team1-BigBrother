@@ -14,12 +14,9 @@ export default function Message() {
   const [messageTitle, setMessageTitle] = useState('');
   const [messageContent, setMessageContent] = useState('');
   const [createReceiverID, setCreateReceiverID] = useState('');
-  const [updateTitle, setUpdateTitle] = useState('');
-  const [updateContent, setUpdateContent] = useState('');
   const [senderID, setSenderID] = useState('');
   const [receiverID, setReceiverID] = useState('');
   const [retrieveMessageID, setRetrieveMessageID] = useState('');
-  const [updateMessageID, setUpdateMessageID] = useState('');
   const [deleteMessageID, setDeleteMessageID] = useState('');
 
   const [retrievedMessage, setRetrievedMessage] = useState(null);
@@ -50,25 +47,19 @@ export default function Message() {
 
   const handleCreateMessage = async (e) => {
     e.preventDefault();
-    if (!isAuthorized) {
-      setErrorMessage('Unauthorized: Only admin or staff can create messages.');
-      setShowErrorModal(true);
-      return;
-    }
-
     try {
       const newMessage = {
         title: messageTitle,
         content: messageContent,
         sender: userId,
-        receiver: receiverID,
+        receiver: createReceiverID,
       };
 
       const data = await createMessageInDynamoDB(newMessage);
       setMessage(`Message created successfully: ${JSON.stringify(data.message)}`);
       setMessageTitle('');
       setMessageContent('');
-      setReceiverID('');
+      setCreateReceiverID('');
     } catch (error) {
       setMessage(`Error creating message: ${error.message}`);
     }
@@ -88,11 +79,6 @@ export default function Message() {
 
   const handleDeleteMessage = async (e) => {
     e.preventDefault();
-    if (!isAuthorized) {
-      setErrorMessage('Unauthorized: Only admin or staff can delete messages.');
-      setShowErrorModal(true);
-      return;
-    }
 
     try {
       const data = await deleteMessageFromDynamoDB(deleteMessageID);
