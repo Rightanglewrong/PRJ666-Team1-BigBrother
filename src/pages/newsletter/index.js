@@ -10,6 +10,7 @@ export default function NewsletterIndex() {
   const [newsletters, setNewsletters] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null); // State to store user details
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -21,6 +22,8 @@ export default function NewsletterIndex() {
     async function fetchNewsletters() {
       try {
         const user = await getCurrentUser(token);
+        setUser(user); // Set the user details
+
         const newsletters = await getAllNewsletters(token, user.locationID);
         // Sort newsletters by `createdAt` in descending order (newest first)
         const sortedNewsletters = newsletters.sort(
@@ -29,7 +32,7 @@ export default function NewsletterIndex() {
         setNewsletters(sortedNewsletters);
         setLoading(false);
       } catch (error) {
-        if (error.message == "404: No Newsletters currently") {
+        if (error.message === "404: No Newsletters currently") {
           setMessage("");
         } else {
           setMessage(`${error}`);
@@ -71,11 +74,14 @@ export default function NewsletterIndex() {
           <p className={styles.noNewsletters}>No newsletters found.</p>
         )}
         <br></br>
+
+        {user && (user.accountType === "Admin" || user.accountType === "Staff") && (
         <Link href="/newsletter/create">
           <button className={`${styles.button} ${styles.createButton}`}>
             Create New Newsletter
           </button>
         </Link>
+        )}
       </div>
     </div>
   );

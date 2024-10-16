@@ -28,19 +28,15 @@ export default function ProgressReport() {
   const [childID, setChildID] = useState("");
   const [filteredReports, setFilteredReports] = useState([]);
 
-  // useEffect for fetching user details and setting userId and authorization
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const userData = await getCurrentUser();
         setUserDetails(userData);
         if (userData) {
-          setUserId(userData.userID); // Set the current user's ID
-          if (
-            userData.accountType === "Admin" ||
-            userData.accountType === "Staff"
-          ) {
-            setIsAuthorized(true); // Set authorization based on account type
+          setUserId(userData.userID);
+          if (userData.accountType === 'Admin' || userData.accountType === 'Staff') {
+            setIsAuthorized(true); 
           }
         }
       } catch (error) {
@@ -72,12 +68,10 @@ export default function ProgressReport() {
       };
 
       const data = await createProgressReportInDynamoDB(newReport);
-      setMessage(
-        `Progress Report created successfully: ${JSON.stringify(data.item)}`
-      );
-      setCreateReportChildID("");
-      setCreateReportTitle(""); // Clear title input
-      setCreateReportContent("");
+      setMessage(`Progress Report created successfully: ${JSON.stringify(data.item)}`);
+      setCreateReportChildID('');
+      setCreateReportTitle(''); 
+      setCreateReportContent('');
     } catch (error) {
       setMessage(`Error creating Progress Report: ${error.message}`);
     }
