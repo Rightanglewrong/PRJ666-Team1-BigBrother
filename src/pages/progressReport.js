@@ -6,12 +6,12 @@ import {
   deleteProgressReportFromDynamoDB,
   retrieveProgressReportByChildID,
 } from '../utils/progressReportAPI'; 
-import { getCurrentUser } from '../utils/api'; // Importing the function to get current user
+import { getCurrentUser } from '../utils/api'; 
 import styles from "./calendar.module.css";
 
 export default function ProgressReport() {
   const [createReportChildID, setCreateReportChildID] = useState('');
-  const [createReportTitle, setCreateReportTitle] = useState(''); // New field for report title
+  const [createReportTitle, setCreateReportTitle] = useState(''); 
   const [createReportContent, setCreateReportContent] = useState('');
   const [updateReportID, setUpdateReportID] = useState('');
   const [updateReportTitle, setUpdateReportTitle] = useState('');
@@ -28,16 +28,15 @@ export default function ProgressReport() {
   const [childID, setChildID] = useState(''); 
   const [filteredReports, setFilteredReports] = useState([]);
 
-  // useEffect for fetching user details and setting userId and authorization
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const userData = await getCurrentUser();
         setUserDetails(userData);
         if (userData) {
-          setUserId(userData.userID); // Set the current user's ID
+          setUserId(userData.userID);
           if (userData.accountType === 'Admin' || userData.accountType === 'Staff') {
-            setIsAuthorized(true); // Set authorization based on account type
+            setIsAuthorized(true); 
           }
         }
       } catch (error) {
@@ -71,7 +70,7 @@ export default function ProgressReport() {
       const data = await createProgressReportInDynamoDB(newReport);
       setMessage(`Progress Report created successfully: ${JSON.stringify(data.item)}`);
       setCreateReportChildID('');
-      setCreateReportTitle(''); // Clear title input
+      setCreateReportTitle(''); 
       setCreateReportContent('');
     } catch (error) {
       setMessage(`Error creating Progress Report: ${error.message}`);
