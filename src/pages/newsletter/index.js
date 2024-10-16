@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getCurrentUser } from "@/utils/api";
 import { getAllNewsletters } from "@/utils/newsletterAPI";
+import styles from "./Newsletter.module.css";
 
 export default function NewsletterIndex() {
   const [newsletters, setNewsletters] = useState([]);
@@ -45,31 +46,37 @@ export default function NewsletterIndex() {
   }
 
   return (
-    <div>
-      <h1>Newsletters</h1>
-      {message && <p>{message}</p>}
+    <div className={styles.pageWrapper}>
+      <div className={styles.container}>
+        <h1 className={styles.h1style}>Newsletters</h1>
+        {message && <p className={styles.message}>{message}</p>}
 
-      {newsletters.length > 0 ? (
-        newsletters.map((newsletter) => (
-          <div key={newsletter.newsletterID}>
-            <h3>{newsletter.title}</h3>
-            <p>{newsletter.content}</p>
-            <p>{newsletter.createdAt}</p>
-            <div>
-              <Link href={`/newsletter/${newsletter.newsletterID}`}>
-                <button>Expand</button>
-              </Link>
+        {newsletters.length > 0 ? (
+          newsletters.map((newsletter) => (
+            <div key={newsletter.newsletterID} className={styles.newsletter}>
+              <h3>{newsletter.title}</h3>
+              <p>{newsletter.content}</p>
+              <p className={styles.newsletterDate}>{newsletter.createdAt}</p>
+              <div className={styles.buttonGroup}>
+                <Link href={`/newsletter/${newsletter.newsletterID}`}>
+                  <button className={`${styles.button} ${styles.expandButton}`}>
+                    Expand
+                  </button>
+                </Link>
+              </div>
+              <br></br>
             </div>
-            <br></br>
-          </div>
-        ))
-      ) : (
-        <p>No newsletters found.</p>
-      )}
-      <br></br>
-      <Link href="/newsletter/create">
-        <button>Create New Newsletter</button>
-      </Link>
+          ))
+        ) : (
+          <p className={styles.noNewsletters}>No newsletters found.</p>
+        )}
+        <br></br>
+        <Link href="/newsletter/create">
+          <button className={`${styles.button} ${styles.createButton}`}>
+            Create New Newsletter
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }

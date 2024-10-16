@@ -107,7 +107,7 @@ const NavBar = () => {
                     </>
                   )}
                     <li>
-                      <button onClick={handleLogout} className={styles.dropdownItem}>
+                      <button onClick={handleLogout} className={styles.logoutButton}>
                         Logout
                       </button>
                     </li>

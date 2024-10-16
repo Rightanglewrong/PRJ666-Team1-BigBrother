@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getLatestMealPlan } from "@/utils/mealPlanAPI";
 import { getCurrentUser } from "@/utils/api";
+import styles from "./MealPlan.module.css";
 
 export default function MealPlanIndex() {
   const [mealPlan, setMealPlan] = useState(null);
@@ -17,7 +18,7 @@ export default function MealPlanIndex() {
         const userDetails = await getCurrentUser();
         const daycareID = userDetails.locationID;
 
-        const mealPlanData = await getLatestMealPlan(token, daycareID)
+        const mealPlanData = await getLatestMealPlan(token, daycareID);
         setMealPlan(mealPlanData);
         setMessage("");
       } catch (error) {
@@ -29,45 +30,52 @@ export default function MealPlanIndex() {
   }, []);
 
   return (
-    <div>
-      <h1>Current Meal Plan</h1>
-      {message && <p>{message}</p>}
+    <div className={styles.pageWrapper}>
+      <div className={styles.container}>
+        <h1 className={styles.h1style}>Current Meal Plan</h1>
+        {message && <p className={styles.message}>{message}</p>}
 
-      {mealPlan ? (
-        <div>
-          <p>
-            <strong>Start Date:</strong> {mealPlan.startDate}
-          </p>
-          <p>
-            <strong>End Date:</strong> {mealPlan.endDate}
-          </p>
-          <p>
-            <strong>Breakfast:</strong> {mealPlan.breakfast}
-          </p>
-          <p>
-            <strong>Lunch:</strong> {mealPlan.lunch}
-          </p>
-          <p>
-            <strong>Snack:</strong> {mealPlan.snack}
-          </p>
-          <p>
-            <strong>Allergens:</strong> {mealPlan.allergens}
-          </p>
-          <p>
-            <strong>Alternatives:</strong> {mealPlan.alternatives}
-          </p>
+        {mealPlan ? (
+          <div className={styles.mealPlanDetails}>
+            <p>
+              <strong>Start Date:</strong> {mealPlan.startDate}
+            </p>
+            <p>
+              <strong>End Date:</strong> {mealPlan.endDate}
+            </p>
+            <p>
+              <strong>Breakfast:</strong> {mealPlan.breakfast}
+            </p>
+            <p>
+              <strong>Lunch:</strong> {mealPlan.lunch}
+            </p>
+            <p>
+              <strong>Snack:</strong> {mealPlan.snack}
+            </p>
+            <p>
+              <strong>Allergens:</strong> {mealPlan.allergens}
+            </p>
+            <p>
+              <strong>Alternatives:</strong> {mealPlan.alternatives}
+            </p>
 
-          <Link href={`/mealPlan/${mealPlan.mealPlanID}`}>
-            <button>Edit Meal Plan</button>
-          </Link>
-        </div>
-      ) : (
-        <p>No meal plan found.</p>
-      )}
-
-      <Link href="/mealPlan/create">
-        <button>Create New Meal Plan</button>
-      </Link>
+            <div className={styles.buttonGroup}>
+              <Link href={`/mealPlan/${mealPlan.mealPlanID}`}>
+                <button className={`${styles.button} ${styles.editButton}`}>
+                  Edit Meal Plan
+                </button>
+              </Link>
+              <Link href="/mealPlan/create">
+                <button className={`${styles.button} ${styles.createButton}`}>
+                  Create New Meal Plan
+                </button>
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <p className={styles.noMealPlan}>No meal plan found.</p>
+        )}
+      </div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   updateFileInS3, 
   deleteFileFromS3 
 } from '../utils/api';
+import styles from "./crudTester.module.css";
 
 export default function CrudTest() {
   const [file, setFile] = useState(null);
@@ -67,7 +68,8 @@ export default function CrudTest() {
   };
 
   return (
-    <div>
+    <div className={styles.pageWrapper}>
+      <div className={styles.container}>
       <h1>S3 CRUD Test Page</h1>
       <p>{message}</p>
 
@@ -125,6 +127,7 @@ export default function CrudTest() {
           </a>
         </div>
       )}
+    </div>
     </div>
   );
 }
