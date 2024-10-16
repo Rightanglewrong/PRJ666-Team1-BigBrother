@@ -59,6 +59,10 @@ const CalendarView = () => {
 
       try {
         const entries = await retrieveCalendarEntriesByDate(formattedStartDate, formattedEndDate);
+        if (entries.length === 0) {
+          setErrorMessage('No events found.');
+          setShowErrorModal(false); // No need to show the error modal for empty entries
+        } else {
             setEvents(entries.map(entry => ({
                 id: entry.calEntryID,
                 title: entry.entryTitle,
@@ -67,6 +71,8 @@ const CalendarView = () => {
                 description: entry.description,
                 allDay: true // Adjust as necessary
             })));
+            setErrorMessage('');
+          }
       } catch (error) {
         setErrorMessage('Error fetching calendar entries.');
         setShowErrorModal(true); 
@@ -98,10 +104,7 @@ const CalendarView = () => {
     loadCalendarEntries();
 }, []);
 
-
-
   // Handle event creation (with date and time selection)
-
     const handleSelect = (selectionInfo) => {
       if (!isAuthorized) {
         setErrorMessage('Unauthorized: Only admin or staff can create events.');
@@ -112,7 +115,7 @@ const CalendarView = () => {
           entryTitle: "",
           description: "",
           dateStart: selectionInfo.startStr,
-          dateEnd: selectionInfo.endStr,
+          dateEnd: selectionInfo.startStr,
           createdBy: userDetails.userID,
         });
         setEditingEvent(null); // Reset editingEvent when creating a new event
@@ -148,8 +151,8 @@ const CalendarView = () => {
           setShowErrorModal(true);
           return;
         }
-        const currentUser = getCurrentUser();
-        const createdBy = currentUser ? currentUser.userID : '';
+        const currentUser = await getCurrentUser();
+        const createdBy = currentUser ? currentUser.userID : userDetails.userID;
 
         if (editingEvent) {
             // Update existing event
@@ -161,6 +164,7 @@ const CalendarView = () => {
                 dateEnd: newEvent.dateEnd,
                 createdBy: createdBy,
         };
+
         try {
           await updateCalendarEntryInDynamoDB(updatedEvent);
           const updatedEvents = events.map((event) =>
@@ -279,8 +283,7 @@ const CalendarView = () => {
                 }
                 required
               />
-              
-              
+               
               <label>Description</label>
               <input
                 className={styles.input}
@@ -288,28 +291,6 @@ const CalendarView = () => {
                 value={newEvent.description}
                 onChange={(e) =>
                   setNewEvent({ ...newEvent, description: e.target.value })
-                }
-                required
-              />
-
-              {/* Event Start and End Time */}
-              <label>Start Time:</label>
-              <input
-                className={styles.input}
-                type="datetime-local"
-                value={newEvent.dateStart}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, dateStart: e.target.value })
-                }
-                required
-              />
-              <label>End Time:</label>
-              <input
-                className={styles.input}
-                type="datetime-local"
-                value={newEvent.dateEnd}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, dateEnd: e.target.value })
                 }
                 required
               />
@@ -363,7 +344,7 @@ const CalendarView = () => {
           </div>
         )}
         {/* Error Modal */}
-        {showErrorModal && (
+        {showErrorModal && errorMessage !== 'No events found.' && (
                 <div className={styles.overlay}>
                     <div className={styles.modal}>
                         <h3>Error</h3>
