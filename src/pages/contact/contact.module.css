@@ -30,6 +30,9 @@
 }
 
 .contactItem {
+  display: flex;
+  justify-content: space-between; /* Push the buttons to the right */
+  align-items: center; /* Vertically align content */
   background-color: #f9f9f9;
   margin-bottom: 20px;
   padding: 20px;
@@ -41,6 +44,42 @@
 .contactItem:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.contactInfo {
+  flex-grow: 1; /* Take up available space for the contact info */
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 10px; /* Add space between the buttons */
+}
+
+.editButton, .deleteButton {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.editButton {
+  background-color: #3498db;
+  color: white;
+}
+
+.editButton:hover {
+  background-color: #2980b9;
+}
+
+.deleteButton {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #c0392b;
 }
 
 .editForm input {
@@ -67,7 +106,12 @@
   margin-bottom: 20px;
 }
 
-.saveButton, .editButton, .deleteButton, .cancelButton {
+.otherMessage {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.saveButton, .cancelButton {
   padding: 10px 20px;
   margin-right: 10px;
   border: none;
@@ -84,24 +128,6 @@
 
 .saveButton:hover {
   background-color: #27ae60;
-}
-
-.editButton {
-  background-color: #3498db;
-  color: white;
-}
-
-.editButton:hover {
-  background-color: #2980b9;
-}
-
-.deleteButton {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.deleteButton:hover {
-  background-color: #c0392b;
 }
 
 .cancelButton {

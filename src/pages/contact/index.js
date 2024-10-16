@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { addContact, fetchContacts } from "@/utils/contactApi"; // Adjust the import path if necessary
-import { getCurrentUser } from "@/utils/api"; // Adjust the import path if necessary
+import {
+  addContact,
+  fetchContacts,
+  updateContact,
+  deleteContact,
+} from "@/utils/contactApi";
+import { getCurrentUser } from "@/utils/api";
 import styles from "./contact.module.css";
 
 const ContactList = () => {
@@ -13,6 +18,7 @@ const ContactList = () => {
     relationship: "",
     address: "",
   });
+  const [editingContact, setEditingContact] = useState(null); // Track contact being edited
   const [message, setMessage] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
@@ -33,12 +39,12 @@ const ContactList = () => {
   // Function to save a new contact
   const handleSaveContact = async () => {
     try {
-      const currentUser = await getCurrentUser();  // Fetch the current user
+      const currentUser = await getCurrentUser(); // Fetch the current user
       if (!currentUser || !currentUser.userID) {
         setMessage("User ID is missing.");
         return;
       }
-  
+
       const newContactData = {
         userID: currentUser.userID, // Include the userID
         firstName: newContact.firstName,
@@ -47,14 +53,21 @@ const ContactList = () => {
         relationship: newContact.relationship,
         address: newContact.address,
       };
-  
-      await addContact(newContactData);
-      setMessage("Contact added successfully!");
-  
+
+      if (editingContact) {
+        // Update existing contact
+        await updateContact(editingContact.contactID, newContactData);
+        setMessage("Contact updated successfully!");
+      } else {
+        // Add new contact
+        await addContact(newContactData);
+        setMessage("Contact added successfully!");
+      }
+
       // Optionally refresh the contacts list
       const updatedContacts = await fetchContacts(currentUser.userID);
       setContacts(updatedContacts);
-  
+
       // Reset form after successful add
       setNewContact({
         contactID: null,
@@ -64,11 +77,35 @@ const ContactList = () => {
         relationship: "",
         address: "",
       });
+      setEditingContact(null);
       setIsAdding(false);
     } catch (error) {
-      setMessage(`Error adding contact: ${error.message}`);  // Display readable error
+      setMessage(`Error adding/updating contact: ${error.message}`); // Display readable error
     }
-  };  
+  };
+
+  // Function to edit a contact
+  const handleEditClick = (contact) => {
+    setNewContact(contact); // Load the selected contact into the form
+    setEditingContact(contact); // Track the contact being edited
+    setIsAdding(true); // Show the form
+  };
+
+  // Function to delete a contact
+  const handleDeleteContact = async (contactID) => {
+    try {
+      await deleteContact(contactID);
+
+      // Remove the contact from the state after successful deletion
+      setContacts((prevContacts) =>
+        prevContacts.filter((c) => c.contactID !== contactID)
+      );
+
+      setMessage("Contact deleted successfully!");
+    } catch (error) {
+      setMessage(`Error deleting contact: ${error.message}`);
+    }
+  };
 
   // Function to handle input changes
   const handleInputChange = (e) => {
@@ -79,23 +116,38 @@ const ContactList = () => {
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
         <h2 className={styles.h2Custom}>Contacts</h2>
-        {message && <p>{message}</p>}
+        {message && <p className={styles.message}>{message}</p>}
 
         <ul className={styles.ulCustom}>
           {contacts.length > 0 ? (
             contacts.map((contact) => (
               <li key={contact.contactID} className={styles.contactItem}>
-                <div>
-                  <h3>{contact.firstName} {contact.lastName}</h3>
+                <div className={styles.contactInfo}>
+                  <h3>
+                    {contact.firstName} {contact.lastName}
+                  </h3>
                   <p>Phone: {contact.phoneNumber}</p>
-                  <p>Email: {contact.email}</p>
                   <p>Relationship: {contact.relationship}</p>
                   <p>Address: {contact.address}</p>
+                  </div>
+                  <div className={styles.buttonContainer}>
+                  <button
+                    className={styles.editButton}
+                    onClick={() => handleEditClick(contact)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() => handleDeleteContact(contact.contactID)}
+                  >
+                    Remove
+                  </button>
                 </div>
               </li>
             ))
           ) : (
-            <p>No contacts available</p>
+            <p className={styles.otherMessage}>You can add contacts by selecting the Add Contact button</p>
           )}
         </ul>
 
@@ -139,12 +191,26 @@ const ContactList = () => {
               onChange={handleInputChange}
               placeholder="Address"
             />
-            <button onClick={handleSaveContact}>Save</button>
-            <button onClick={() => setIsAdding(false)}>Cancel</button>
+            <button className={styles.saveButton} onClick={handleSaveContact}>
+              Save
+            </button>
+            <button
+              className={styles.cancelButton}
+              onClick={() => setIsAdding(false)}
+            >
+              Cancel
+            </button>
           </div>
         )}
 
-        {!isAdding && <button onClick={() => setIsAdding(true)}>Add Contact</button>}
+        {!isAdding && (
+          <button
+            className={styles.addButton}
+            onClick={() => setIsAdding(true)}
+          >
+            Add Contact
+          </button>
+        )}
       </div>
     </div>
   );

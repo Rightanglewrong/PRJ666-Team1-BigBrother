@@ -13,7 +13,7 @@ export const fetchContacts = async (userID) => {
     });
 
     if (!response.ok) {
-      throw new Error(`No contacts found for the specified user (ID: ${userID}).`);
+      throw new Error(`No contacts available.`);
     }
 
     const data = await response.json();
@@ -68,12 +68,12 @@ export const addContact = async (newContact) => {
 
 
 // Update an existing contact
-export const updateContact = async (token, contactID, updatedContact) => {
+export const updateContact = async (contactID, updatedContact) => {
   try {
     const response = await fetch(`${BACKEND_URL}/contacts/${contactID}`, {
       method: "PUT",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(updatedContact),
@@ -83,7 +83,8 @@ export const updateContact = async (token, contactID, updatedContact) => {
       throw new Error("Failed to update contact");
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data.updatedContact;
   } catch (error) {
     console.error("Error updating contact:", error);
     throw error;
@@ -91,20 +92,24 @@ export const updateContact = async (token, contactID, updatedContact) => {
 };
 
 // Delete a contact
-export const deleteContact = async (token, contactID) => {
+export const deleteContact = async (contactID) => {
   try {
     const response = await fetch(`${BACKEND_URL}/contacts/${contactID}`, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
 
+    const data = await response.json(); // Parse the response body
+
     if (!response.ok) {
-      throw new Error("Failed to delete contact");
+      // Check if the server provides an error message and throw that for better feedback
+      const errorMessage = data.error?.message || "Failed to delete contact";
+      throw new Error(errorMessage);
     }
 
-    return await response.json();
+    return { success: true };
   } catch (error) {
     console.error("Error deleting contact:", error);
     throw error;
