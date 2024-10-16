@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
-import { getCurrentUser } from '../utils/api'; // Import the API function
-import Image from 'next/image'; // Import Image component from next/image
+import { getCurrentUser } from '../../utils/api'; // Import the API function
 import Link from "next/link";
 import styles from "./HomePage.module.css";
 
@@ -14,7 +13,7 @@ const HomePage = () => {
   useEffect(() => {
     const validateToken = async () => {
       try {
-        // Attempt to get user data
+        // Attempt to get user data (this will validate the token)
         await getCurrentUser();
       } catch (error) {
         console.error('Invalid token:', error);
@@ -45,12 +44,10 @@ const HomePage = () => {
           <Link href="/dashboard" className={styles.gridItem}>
             <div className={styles.calendar}>
               <h2>DashBoard</h2>
-              {/* Use Image component instead of img */}
-              <Image
+              {/* Embed image for calendar */}
+              <img
                 src="https://cdn-icons-png.flaticon.com/512/11068/11068821.png"
                 alt="DashBoard Icon"
-                width={128}
-                height={128}
                 className={styles.calendarIcon}
               />
             </div>
@@ -60,12 +57,10 @@ const HomePage = () => {
           <Link href="/mealPlan" className={styles.gridItem}>
             <div className={styles.calendar}>
               <h2>Meal Plan</h2>
-              {/* Use Image component instead of img */}
-              <Image
+              {/* Embed image for calendar */}
+              <img
                 src="https://cdn-icons-png.flaticon.com/512/2224/2224109.png"
                 alt="Meal Plan Icon"
-                width={128}
-                height={128}
                 className={styles.calendarIcon}
               />
             </div>
@@ -75,12 +70,10 @@ const HomePage = () => {
           <Link href="/calendar" className={styles.gridItem}>
             <div className={styles.calendar}>
               <h2>Event Calendar</h2>
-              {/* Use Image component instead of img */}
-              <Image
+              {/* Embed image for calendar */}
+              <img
                 src="https://static-00.iconduck.com/assets.00/calendar-icon-1995x2048-tot17508.png"
                 alt="Event Calendar Icon"
-                width={128}
-                height={128}
                 className={styles.calendarIcon}
               />
             </div>
@@ -90,12 +83,10 @@ const HomePage = () => {
           <Link href="/newsletter" className={styles.gridItem}>
             <div className={styles.news}>
               <h2>News or Update</h2>
-              {/* Use Image component instead of img */}
-              <Image
+              {/* Add dynamic news or static content */}
+              <img
                 src="https://cdn-icons-png.flaticon.com/512/7305/7305498.png"
                 alt="News Icon"
-                width={128}
-                height={128}
                 className={styles.calendarIcon}
               />
             </div>
