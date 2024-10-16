@@ -259,7 +259,7 @@ const CalendarView = () => {
             selectable={true}
             select={handleSelect}
             eventClick={handleEventClick}
-            editable={true}
+            editable={false}
             droppable={true}
             height={700} // Set your desired calendar height
             aspectRatio={1.5} // Adjust aspect ratio
