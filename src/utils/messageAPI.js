@@ -68,7 +68,6 @@ export const markMessageAsDeletedBySender = async (messageID) => {
   }
 
   try {
-   
     const response = await fetch(`${BACKEND_URL}v1/message/sender/${messageID}`, {
       method: "PUT",
       headers: {

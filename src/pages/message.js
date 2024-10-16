@@ -72,7 +72,7 @@ export default function Message() {
       const data = await retrieveMessageFromDynamoDB(retrieveMessageID);
       if (data.item) {
         setRetrievedMessage(data.item);
-        setMessage(`Message retrieved successfully: ${JSON.stringify(data.item, null, 2)}`); 
+        setMessage(`Message retrieved successfully: ${JSON.stringify(data.item)}`); 
       } else {
         setMessage("No message found with the provided ID."); 
       }
