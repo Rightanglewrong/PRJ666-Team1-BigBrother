@@ -77,7 +77,7 @@ const NavBar = () => {
         {/* Logo */}
         <div className={styles.leftSection}>
           {/* Conditionally link based on login status */}
-          <Link href={isLoggedIn ? "/dashboard" : "/"} className={styles.logo}>
+          <Link href={isLoggedIn ? "/homepage/HomePage" : "/"} className={styles.logo}>
             Big Brother
           </Link>
         </div>
@@ -92,29 +92,20 @@ const NavBar = () => {
                 </span>
                 {dropdownOpen && (
                   <ul className={styles.dropdownMenu}>
-                    <li><Link href="/profile" className={styles.dropdownItem}>Profile</Link></li>
-                    
-                    {/* Conditionally render items based on account type */}
-                    {accountType !== 'Admin' || accountType !== 'Staff' && (
-                      <>
-                        <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
-                        <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
-                        <li><Link href="/message" className={styles.dropdownItem}>Messages</Link></li>
-                        <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
-                        <li><Link href="/progressReport" className={styles.dropdownItem}>Progress Report</Link></li>
-                        <li><Link href="/newsletter" className={styles.dropdownItem}>Newsletter</Link></li>
-                        <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
-                        <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
-                      </>
-                    )}
+                  <li><Link href="/profile" className={styles.dropdownItem}>Profile</Link></li>
+                  <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
+                  <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
+                  <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
+                  <li><Link href="/progressReport" className={styles.dropdownItem}>Progress Report</Link></li>
+                  <li><Link href="/newsletter" className={styles.dropdownItem}>Newsletter</Link></li>
 
-                    {accountType !== 'Admin' || accountType !== 'Staff' && (
-                      <>
-                        <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
-                        <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
-                      </>
-                    )}
 
+                  {(accountType === 'Admin' || accountType === 'Staff') && (
+                    <>
+                      <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
+                      <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
+                    </>
+                  )}
                     <li>
                       <button onClick={handleLogout} className={styles.dropdownItem}>
                         Logout
