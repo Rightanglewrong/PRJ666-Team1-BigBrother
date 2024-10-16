@@ -98,6 +98,7 @@ const NavBar = () => {
                   <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
                   <li><Link href="/progressReport" className={styles.dropdownItem}>Progress Report</Link></li>
                   <li><Link href="/newsletter" className={styles.dropdownItem}>Newsletter</Link></li>
+                  <li><Link href="/message" className={styles.dropdownItem}>Messages</Link></li>
 
 
                   {(accountType === 'Admin' || accountType === 'Staff') && (
