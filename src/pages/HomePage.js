@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
-import { getCurrentUser } from '../../utils/api'; // Import the API function
+import { getCurrentUser } from '../utils/api'; // Import the API function
 import Link from "next/link";
 import styles from "./HomePage.module.css";
 
