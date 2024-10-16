@@ -12,7 +12,7 @@ export default function Home() {
     const token = localStorage.getItem('token'); 
 
     if (token) {
-      router.push('/dashboard'); // Redirect to dashboard if token is present
+      router.push('/homepage/HomePage'); // Redirect to homepage if token is present
     }
   }, [router]);
 

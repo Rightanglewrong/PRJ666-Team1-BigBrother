@@ -94,7 +94,7 @@ const NavBar = () => {
                   <ul className={styles.dropdownMenu}>
                   <li><Link href="/profile" className={styles.dropdownItem}>Profile</Link></li>
                   <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
-                  <li><Link href="/contactList" className={styles.dropdownItem}>Contact List</Link></li>
+                  <li><Link href="/contact" className={styles.dropdownItem}>Contact List</Link></li>
                   <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
                   <li><Link href="/progressReport" className={styles.dropdownItem}>Progress Report</Link></li>
                   <li><Link href="/newsletter" className={styles.dropdownItem}>Newsletter</Link></li>
@@ -107,7 +107,7 @@ const NavBar = () => {
                     </>
                   )}
                     <li>
-                      <button onClick={handleLogout} className={styles.dropdownItem}>
+                      <button onClick={handleLogout} className={styles.logoutButton}>
                         Logout
                       </button>
                     </li>

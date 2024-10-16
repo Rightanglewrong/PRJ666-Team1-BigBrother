@@ -115,3 +115,18 @@
   transform: translateY(-2px);
   color: #ff7d7d; /* Yellow */
 }
+
+/* Logout button redesign */
+.logoutButton {
+  background: linear-gradient(90deg, #ff5f6d, #ffc371); /* Similar gradient for consistency */
+  border: none;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 70px;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  background: linear-gradient(90deg, #ff512f, #f09819); /* Darker gradient for hover effect */
+}
