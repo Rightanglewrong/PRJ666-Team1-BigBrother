@@ -111,7 +111,6 @@ export const markMessageAsDeletedByReceiver = async (messageID) => {
       body: JSON.stringify({
         receiverDeleted: true,  
       })
-
     });
 
     if (!response.ok) {
