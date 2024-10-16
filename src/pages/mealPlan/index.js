@@ -22,17 +22,19 @@ export default function MealPlanIndex() {
     async function fetchUserAndLatestMealPlan() {
       try {
         const userDetails = await getCurrentUser();
-        console.log(userDetails.accountType);
+
         setUser({
           accountType: userDetails.accountType,
           email: userDetails.email,
           firstName: userDetails.firstName,
           lastName: userDetails.lastName,
           locationID: userDetails.locationID,
-        }); // Set the user details
-        const daycareID = userDetails.locationID;
+        });
 
-        const mealPlanData = await getLatestMealPlan(token, daycareID);
+        const mealPlanData = await getLatestMealPlan(
+          token,
+          userDetails.locationID
+        );
         setMealPlan(mealPlanData);
         setMessage("");
       } catch (error) {
@@ -41,7 +43,6 @@ export default function MealPlanIndex() {
       }
     }
     fetchUserAndLatestMealPlan();
-    console.log(user);
   }, []);
 
   return (
