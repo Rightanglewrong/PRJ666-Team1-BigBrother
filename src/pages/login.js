@@ -14,7 +14,7 @@ export default function LoginPage() {
     // Check if a token is present in localStorage and redirect to dashboard if so
     const token = localStorage.getItem('token');
     if (token) {
-      router.push('/dashboard');
+      router.push('/HomePage');
     }
   }, [router]);
 
@@ -28,7 +28,7 @@ export default function LoginPage() {
         localStorage.setItem('userLoggedIn', 'true');
         window.dispatchEvent(new Event('storage'));  // Trigger the storage event manually
         // Redirect to homepage after successful login
-        window.location.href = '/homepage/HomePage';
+        window.location.href = '/HomePage';
       } else {
         setError('Login failed. Please check your credentials.');
       }
