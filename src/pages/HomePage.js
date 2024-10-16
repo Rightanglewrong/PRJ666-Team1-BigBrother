@@ -1,7 +1,39 @@
-import styles from "./HomePage.module.css";
+'use client'; // Ensure this is a Client Component
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
+import { getCurrentUser } from '../utils/api'; // Import the API function
 import Link from "next/link";
+import styles from "./HomePage.module.css";
 
 const HomePage = () => {
+  const [error, setError] = useState('');
+  const router = useRouter(); // Initialize the router
+
+  useEffect(() => {
+    const validateToken = async () => {
+      try {
+        // Attempt to get user data (this will validate the token)
+        await getCurrentUser();
+      } catch (error) {
+        console.error('Invalid token:', error);
+        setError('Session expired, please log in again.');
+
+        // Remove the invalid token
+        localStorage.removeItem('token');
+
+        // Redirect to login page
+        router.push('/login');
+      }
+    };
+
+    validateToken();
+  }, [router]);
+
+  if (error) {
+    return <p className={styles.error}>{error}</p>;
+  }
+
   return (
     <div className={styles.homeContainer}>
       <div className={styles.floatingCard}>
@@ -50,7 +82,7 @@ const HomePage = () => {
           {/* News or Update Section */}
           <Link href="/newsletter" className={styles.gridItem}>
             <div className={styles.news}>
-              <h2>Newsletter</h2>
+              <h2>News or Update</h2>
               {/* Add dynamic news or static content */}
               <img
                 src="https://cdn-icons-png.flaticon.com/512/7305/7305498.png"

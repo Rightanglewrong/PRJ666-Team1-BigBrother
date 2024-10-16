@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { signup } from '../utils/api';
 import Link from 'next/link'; // Import Link from next/link
@@ -15,7 +15,16 @@ export default function RegisterPage() {
   const [emailError, setEmailError] = useState(''); // State for email error message
   const [accountTypeError, setAccountTypeError] = useState(''); // State for account type error message
   const router = useRouter();
-  
+
+  useEffect(() => {
+    const token = localStorage.getItem('token'); // Check if token exists
+    if (token) {
+      localStorage.removeItem('token'); // Remove token from localStorage
+      window.location.reload(); // Reload the page
+    }
+  }, []);
+
+
   const validatePassword = (password) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$]).{6,}$/;
     return passwordRegex.test(password);
@@ -52,7 +61,7 @@ export default function RegisterPage() {
       return;
     }
 
-    const signupData = { firstName, lastName, email,  locationID, accountType, password };
+    const signupData = { firstName, lastName, email, locationID, accountType, password };
 
     try {
       await signup(signupData);
@@ -158,8 +167,8 @@ export default function RegisterPage() {
 
         <button type="submit" className={styles.button}>Sign Up</button>
         <Link href="/login" className={styles['footer-link']}>
-        Already have an account?
-      </Link>
+          Already have an account?
+        </Link>
       </form>
     </div>
   );
