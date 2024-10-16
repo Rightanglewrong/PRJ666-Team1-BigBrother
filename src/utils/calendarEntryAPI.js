@@ -127,6 +127,10 @@ export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
             }
         });
   
+        if (response.status === 404) {
+            return [];  // Return an empty array if no events are found
+          }
+
         if (!response.ok) {
           const errorText = await response.text(); 
           console.error("Error response:", errorText); 
@@ -134,7 +138,7 @@ export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
         }
   
       const data = await response.json();
-      return data.entries; 
+      return data.entries || [];
     } catch (error) {
       console.error("Error retrieving calendar entries by date:", error);
       throw new Error(error.message);

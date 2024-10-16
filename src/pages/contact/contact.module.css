@@ -1,0 +1,184 @@
+.pageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 800px;
+  width: 100%;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.h2Custom {
+  text-align: center;
+  color: #2c3e50;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.ulCustom {
+  list-style-type: none;
+  padding: 0;
+}
+
+.contactItem {
+  display: flex;
+  justify-content: space-between; /* Push the buttons to the right */
+  align-items: center; /* Vertically align content */
+  background-color: #f9f9f9;
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.contactItem:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.contactInfo {
+  flex-grow: 1; /* Take up available space for the contact info */
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 10px; /* Add space between the buttons */
+}
+
+.editButton, .deleteButton {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.editButton {
+  background-color: #3498db;
+  color: white;
+}
+
+.editButton:hover {
+  background-color: #2980b9;
+}
+
+.deleteButton {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #c0392b;
+}
+
+.editForm input {
+  display: block;
+  margin-bottom: 15px;
+  padding: 12px;
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.editForm input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+}
+
+.message {
+  color: #27ae60;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.otherMessage {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.saveButton, .cancelButton {
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.saveButton {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.saveButton:hover {
+  background-color: #27ae60;
+}
+
+.cancelButton {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.cancelButton:hover {
+  background-color: #7f8c8d;
+}
+
+/* Add Contact Button Styling */
+.addButton {
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding for button */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Adjust the font size */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-top: 20px; /* Add some space above the button */
+  transition: background-color 0.3s ease; /* Smooth background transition */
+}
+
+.addButton:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+.addButton:focus {
+  outline: none; /* Remove focus outline */
+  box-shadow: 0 0 0 3px rgba(0, 128, 0, 0.5); /* Add focus shadow */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 800px) {
+  .container {
+      max-width: 90vw; /* Adjust width for smaller screens */
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+      padding: 20px;
+  }
+
+  .h2Custom {
+      font-size: 2rem;
+  }
+
+  .saveButton, .editButton, .deleteButton, .cancelButton {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+  }
+}

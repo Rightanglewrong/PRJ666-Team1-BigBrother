@@ -27,8 +27,8 @@ export default function LoginPage() {
         localStorage.setItem('token', result.token);
         localStorage.setItem('userLoggedIn', 'true');
         window.dispatchEvent(new Event('storage'));  // Trigger the storage event manually
-        // Redirect to dashboard after successful login
-        window.location.href = '/dashboard';
+        // Redirect to homepage after successful login
+        window.location.href = '/homepage/HomePage';
       } else {
         setError('Login failed. Please check your credentials.');
       }

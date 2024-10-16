@@ -104,6 +104,7 @@ const ProfilePage = () => {
           value={accountType}
           onChange={(e) => setAccountType(e.target.value)}
           required
+          disabled
         >
           <option value="Parent">Parent</option>
           <option value="Staff">Staff</option>

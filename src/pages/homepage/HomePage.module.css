@@ -6,6 +6,7 @@
     background-color: #f0f4f8;
     padding: 20px;
     box-sizing: border-box;
+    animation: fadeIn 0.5s ease-in-out;
   }
   
   .floatingCard {
@@ -95,5 +96,16 @@
   
   .footerLink:hover {
     color: #0056b3;
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
