@@ -1,7 +1,40 @@
-import styles from "./HomePage.module.css";
+'use client'; // Ensure this is a Client Component
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
+import { getCurrentUser } from '../utils/api'; // Import the API function
+import Image from 'next/image'; // Import Image component from next/image
 import Link from "next/link";
+import styles from "./HomePage.module.css";
 
 const HomePage = () => {
+  const [error, setError] = useState('');
+  const router = useRouter(); // Initialize the router
+
+  useEffect(() => {
+    const validateToken = async () => {
+      try {
+        // Attempt to get user data
+        await getCurrentUser();
+      } catch (error) {
+        console.error('Invalid token:', error);
+        setError('Session expired, please log in again.');
+
+        // Remove the invalid token
+        localStorage.removeItem('token');
+
+        // Redirect to login page
+        router.push('/login');
+      }
+    };
+
+    validateToken();
+  }, [router]);
+
+  if (error) {
+    return <p className={styles.error}>{error}</p>;
+  }
+
   return (
     <div className={styles.homeContainer}>
       <div className={styles.floatingCard}>
@@ -12,10 +45,12 @@ const HomePage = () => {
           <Link href="/dashboard" className={styles.gridItem}>
             <div className={styles.calendar}>
               <h2>DashBoard</h2>
-              {/* Embed image for calendar */}
-              <img
+              {/* Use Image component instead of img */}
+              <Image
                 src="https://cdn-icons-png.flaticon.com/512/11068/11068821.png"
                 alt="DashBoard Icon"
+                width={128}
+                height={128}
                 className={styles.calendarIcon}
               />
             </div>
@@ -25,10 +60,12 @@ const HomePage = () => {
           <Link href="/mealPlan" className={styles.gridItem}>
             <div className={styles.calendar}>
               <h2>Meal Plan</h2>
-              {/* Embed image for calendar */}
-              <img
+              {/* Use Image component instead of img */}
+              <Image
                 src="https://cdn-icons-png.flaticon.com/512/2224/2224109.png"
                 alt="Meal Plan Icon"
+                width={128}
+                height={128}
                 className={styles.calendarIcon}
               />
             </div>
@@ -38,10 +75,12 @@ const HomePage = () => {
           <Link href="/calendar" className={styles.gridItem}>
             <div className={styles.calendar}>
               <h2>Event Calendar</h2>
-              {/* Embed image for calendar */}
-              <img
+              {/* Use Image component instead of img */}
+              <Image
                 src="https://static-00.iconduck.com/assets.00/calendar-icon-1995x2048-tot17508.png"
                 alt="Event Calendar Icon"
+                width={128}
+                height={128}
                 className={styles.calendarIcon}
               />
             </div>
@@ -51,10 +90,12 @@ const HomePage = () => {
           <Link href="/newsletter" className={styles.gridItem}>
             <div className={styles.news}>
               <h2>News or Update</h2>
-              {/* Add dynamic news or static content */}
-              <img
+              {/* Use Image component instead of img */}
+              <Image
                 src="https://cdn-icons-png.flaticon.com/512/7305/7305498.png"
                 alt="News Icon"
+                width={128}
+                height={128}
                 className={styles.calendarIcon}
               />
             </div>
