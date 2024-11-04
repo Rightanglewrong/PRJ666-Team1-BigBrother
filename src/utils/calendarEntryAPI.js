@@ -1,4 +1,5 @@
 const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/";
+import jwtDecode from 'jwt-decode'; 
 
 // Create an item in DynamoDB
 export const createCalendarEntryInDynamoDB = async (item) => {
@@ -112,14 +113,14 @@ export const deleteCalendarEntryFromDynamoDB = async (item) => {
   }  
 };
 
-export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
+export const retrieveCalendarEntriesByDate = async (startDate, endDate, locationID) => {
     const token = localStorage.getItem('token');
 
     if (!token) {
         throw new Error("No token found");
     }
     try {
-        const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?dateStart=${startDate}&dateEnd=${endDate}`, {
+        const response = await fetch(`${BACKEND_URL}v1/calendar-entry/by-date?dateStart=${startDate}&dateEnd=${endDate}&locationID=${locationID}`, {
             method: "GET", 
             headers: {
               'Authorization': `Bearer ${token}`, 
@@ -128,7 +129,7 @@ export const retrieveCalendarEntriesByDate = async (startDate, endDate) => {
         });
   
         if (response.status === 404) {
-            return [];  // Return an empty array if no events are found
+            return [];  
           }
 
         if (!response.ok) {
