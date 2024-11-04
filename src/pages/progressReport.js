@@ -37,11 +37,19 @@ export default function ProgressReport() {
           setUserId(userData.userID);
           if (userData.accountType === 'Admin' || userData.accountType === 'Staff') {
             setIsAuthorized(true); 
+            const locationReports = await getProgressReportsByLocation(userData.locationID);
+            setAllReports(locationReports);
+          } else if (userData.accountType === 'Parent') {
+            const relationshipData = await getRelationshipByID(userData.userID);
+            const childReports = await Promise.all(
+              relationshipData.childIDs.map((id) => retrieveProgressReportByChildID(id))
+            );
+            setFilteredReports(childReports.flat());
           }
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setError("Failed to load user details. Please log in again.");
+        setErrorMessage("Failed to load user details. Please log in again.");
       }
     };
 

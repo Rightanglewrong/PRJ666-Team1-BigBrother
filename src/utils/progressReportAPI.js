@@ -153,3 +153,33 @@ export const retrieveProgressReportByChildID = async (childID) => {
       throw new Error(error.message);
     }
 };
+
+export const retrieveProgressReportByLocationID = async (locationID) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
+  try {
+    
+    const response = await fetch(`${BACKEND_URL}v1/progress-report/location?locationID=${locationID}`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${token}`, 
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text(); 
+      console.error("Error response:", errorText); 
+      throw new Error(errorText || "No Progress Report found for the Location ID");
+    }
+
+    const data = await response.json();
+    return data.entries; 
+  } catch (error) {
+    console.error("Error retrieving Progress Report for the Location ID:", error);
+    throw new Error(error.message);
+  }
+};
