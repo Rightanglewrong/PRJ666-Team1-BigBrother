@@ -100,6 +100,7 @@ const CalendarView = () => {
           setIsAuthorized(
             userData.accountType === "Admin" || userData.accountType === "Staff"
           );
+          await loadCalendarEntries();
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -109,7 +110,6 @@ const CalendarView = () => {
     };
 
     fetchUserDetails();
-    loadCalendarEntries();
   }, []);
 
   // Handle event creation (with date and time selection)
