@@ -84,7 +84,7 @@ const CalendarView = () => {
     startDate.setFullYear(startDate.getFullYear() - 1); // Start date: 1 year ago
     const endDate = new Date();
     endDate.setFullYear(endDate.getFullYear() + 1); // End date: 1 year from now
-    locationIdentification = userData.locationID;
+    const locationIdentification = userData.locationID;
 
     try {
       const entries = await retrieveCalendarEntriesByDate(
