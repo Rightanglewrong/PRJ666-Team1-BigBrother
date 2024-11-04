@@ -7,6 +7,7 @@ import {
   getRelationshipByChildID,
   getRelationshipByParentID
 } from '../utils/api';
+import styles from "./crudTester.module.css";
 
 export default function RelationshipCrudTest() {
   const [relationship, setRelationship] = useState({});
