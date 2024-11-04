@@ -11,9 +11,13 @@ import styles from "./crudTester.module.css";
 
 export default function RelationshipCrudTest() {
   const [relationship, setRelationship] = useState({});
-  const [relationshipId, setRelationshipId] = useState('');
+  const [retrievedID, setRetrievedID] = useState('');
+  const [updateID, setUpdateID] = useState('');
+  const [deleteID, setDeleteID] = useState('');
   const [childID, setChildID] = useState('');
   const [parentID, setParentID] = useState('');
+  const [childRelation, setChildRelation] = useState('');
+  const [parentRelation, setParentRelation] = useState('');
   const [message, setMessage] = useState('');
   const [fetchedRelationship, setFetchedRelationship] = useState(null);
 
@@ -32,7 +36,7 @@ export default function RelationshipCrudTest() {
   // Handle retrieving a relationship by ID
   const handleGetRelationship = async () => {
     try {
-      const data = await getRelationshipFromDynamoDB({ id: relationshipId });
+      const data = await getRelationshipFromDynamoDB({ id: retrievedID });
       setFetchedRelationship(data);
       setMessage("Relationship retrieved successfully");
     } catch (error) {
@@ -44,7 +48,7 @@ export default function RelationshipCrudTest() {
   const handleUpdateRelationship = async (e) => {
     e.preventDefault();
     try {
-      const response = await updateRelationshipInDynamoDB(relationshipId, relationship);
+      const response = await updateRelationshipInDynamoDB(updateID, relationship);
       setMessage(response.message);
       setFetchedRelationship(response.item);
     } catch (error) {
@@ -55,7 +59,7 @@ export default function RelationshipCrudTest() {
   // Handle deleting a relationship
   const handleDeleteRelationship = async () => {
     try {
-      const response = await deleteRelationshipFromDynamoDB({ id: relationshipId });
+      const response = await deleteRelationshipFromDynamoDB({ id: deleteID });
       setMessage(response.message);
       setFetchedRelationship(null);
     } catch (error) {
@@ -99,19 +103,21 @@ export default function RelationshipCrudTest() {
         </form>
 
         <h2>Get Relationship by ID</h2>
-        <input type="text" placeholder="Relationship ID" value={relationshipId} onChange={(e) => setRelationshipId(e.target.value)} />
+        <input type="text" placeholder="Relationship ID" value={retrievedID} onChange={(e) => setRetrievedID(e.target.value)} />
         <button onClick={handleGetRelationship}>Get Relationship</button>
 
         <h2>Update Relationship</h2>
         <form onSubmit={handleUpdateRelationship}>
-          <input type="text" placeholder="Relationship ID" value={relationshipId} onChange={(e) => setRelationshipId(e.target.value)} />
+          <input type="text" placeholder="Relationship ID" value={updateID} onChange={(e) => setUpdateID(e.target.value)} />
           <input type="text" placeholder="New Child ID" onChange={(e) => setRelationship({ ...relationship, childID: e.target.value })} />
           <input type="text" placeholder="New Parent ID" onChange={(e) => setRelationship({ ...relationship, parentID: e.target.value })} />
+          <input type="text" placeholder="New Child Relation" onChange={(e) => setChildRelation(e.target.value)} />
+          <input type="text" placeholder="New Parent Relation" onChange={(e) => setParentRelation(e.target.value)} />
           <button type="submit">Update Relationship</button>
         </form>
 
         <h2>Delete Relationship</h2>
-        <input type="text" placeholder="Relationship ID" value={relationshipId} onChange={(e) => setRelationshipId(e.target.value)} />
+        <input type="text" placeholder="Relationship ID" value={deleteID} onChange={(e) => setDeleteID(e.target.value)} />
         <button onClick={handleDeleteRelationship}>Delete Relationship</button>
 
         <h2>Get Relationships by Child ID</h2>
