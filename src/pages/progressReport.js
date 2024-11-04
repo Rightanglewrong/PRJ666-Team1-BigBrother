@@ -27,6 +27,8 @@ export default function ProgressReport() {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [childID, setChildID] = useState("");
   const [filteredReports, setFilteredReports] = useState([]);
+  const [allReports, setAllReports] = useState([]);
+
 
   useEffect(() => {
     const fetchUserDetails = async () => {
