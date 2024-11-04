@@ -174,8 +174,36 @@ export default function ProgressReport() {
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
-        <h1 className={styles.h1Style}>Progress Report CRUD Test Page</h1>
+        <h1 className={styles.h1Style}>Progress Reports</h1>
         <p className={styles.message}>{message}</p>
+
+        {/* Display reports based on user role */}
+        {isAuthorized ? (
+          <>
+            <h3>All Progress Reports by Location</h3>
+            <ul>
+              {allReports.map((report) => (
+                <li key={report.progressReportID}>
+                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                  (Created by: {report.createdBy})
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            <h3>Filtered Progress Reports for Child</h3>
+            <ul>
+              {filteredReports.map((report) => (
+                <li key={report.progressReportID}>
+                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                  (Created by: {report.createdBy})
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
 
         {/* Create Progress Report */}
         <h3>Create Progress Report</h3>
