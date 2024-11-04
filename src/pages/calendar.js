@@ -28,6 +28,7 @@ const CalendarView = () => {
   });
   const [userDetails, setUserDetails] = useState(null);
   const [userId, setUserId] = useState("");
+  const [locationID, setLocationId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -61,7 +62,7 @@ const CalendarView = () => {
       const entries = await retrieveCalendarEntriesByDate(
         formatDateToYYYYMMDD(startDate),
         formatDateToYYYYMMDD(endDate),
-        userDetails.locationID,
+        locationID,
 
       );
 
@@ -94,7 +95,8 @@ const CalendarView = () => {
         setUserDetails(userData);
         if (userData) {
           setUserId(userData.userID);
-          setNewEvent((prev) => ({ ...prev, createdBy: userId, locationID: userData.locationID }));
+          setLocationId(userData.locationID);
+          setNewEvent((prev) => ({ ...prev, createdBy: userId, locationID: locationID }));
           setIsAuthorized(
             userData.accountType === "Admin" || userData.accountType === "Staff"
           );
