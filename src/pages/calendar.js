@@ -32,6 +32,7 @@ const CalendarView = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -82,12 +83,13 @@ const CalendarView = () => {
     startDate.setFullYear(startDate.getFullYear() - 1); // Start date: 1 year ago
     const endDate = new Date();
     endDate.setFullYear(endDate.getFullYear() + 1); // End date: 1 year from now
+    locationIdentification = userData.locationID;
 
     try {
       const entries = await retrieveCalendarEntriesByDate(
         formatDateToYYYYMMDD(startDate),
         formatDateToYYYYMMDD(endDate),
-        locationId,
+        locationIdentification
 
       );
 
