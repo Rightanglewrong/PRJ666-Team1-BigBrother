@@ -26,7 +26,7 @@ export default function RelationshipCrudTest() {
   // Handle creating a relationship
   const handleCreateRelationship = async (e) => {
     e.preventDefault();
-    if (!relationship.childID || !relationship.parentID || !createChildRelation || !createChildRelation) {
+    if (!relationship.childID || !relationship.parentID || !createChildRelation || !createParentRelation) {
       setMessage("Child ID, Parent ID, Child Relation, and Parent Relation are required.");
       return;
     }
@@ -57,11 +57,12 @@ export default function RelationshipCrudTest() {
   const handleUpdateRelationship = async (e) => {
     e.preventDefault();
     try {
-      const updatedRelationship = {
-        ...relationship,
-        updateChildRelation,
-        updateParentRelation,
-      };
+        const updatedRelationship = {
+          childID: relationship.childID, 
+          parentID: relationship.parentID, 
+          childRelation: updateChildRelation, 
+          parentRelation: updateParentRelation,
+        };
       const response = await updateRelationshipInDynamoDB(updateID, updatedRelationship);
       setMessage(response.message);
       setFetchedRelationship(response.item);
