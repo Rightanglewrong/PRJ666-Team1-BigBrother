@@ -11,23 +11,32 @@ import styles from "./crudTester.module.css";
 
 export default function RelationshipCrudTest() {
   const [relationship, setRelationship] = useState({});
+  const [createChildRelation, setCreateChildRelation] = useState('');
+  const [createParentRelation, setCreateParentRelation] = useState('');
   const [retrievedID, setRetrievedID] = useState('');
   const [updateID, setUpdateID] = useState('');
   const [deleteID, setDeleteID] = useState('');
   const [childID, setChildID] = useState('');
   const [parentID, setParentID] = useState('');
-  const [childRelation, setChildRelation] = useState('');
-  const [parentRelation, setParentRelation] = useState('');
+  const [updateChildRelation, setUpdateChildRelation] = useState('');
+  const [updateParentRelation, setUpdateParentRelation] = useState('');
   const [message, setMessage] = useState('');
   const [fetchedRelationship, setFetchedRelationship] = useState(null);
 
   // Handle creating a relationship
   const handleCreateRelationship = async (e) => {
     e.preventDefault();
+    if (!relationship.childID || !relationship.parentID || !childRelation || !parentRelation) {
+      setMessage("Child ID, Parent ID, Child Relation, and Parent Relation are required.");
+      return;
+    }
     try {
-      const response = await createRelationshipInDynamoDB(relationship);
+      const response = await createRelationshipInDynamoDB({ ...relationship, createChildRelation, createParentRelation });
       setMessage(response.message);
       setFetchedRelationship(response.item);
+      setRelationship({});
+      setCreateChildRelation('');
+      setCreateParentRelation('');
     } catch (error) {
       setMessage(error.message);
     }
@@ -48,7 +57,12 @@ export default function RelationshipCrudTest() {
   const handleUpdateRelationship = async (e) => {
     e.preventDefault();
     try {
-      const response = await updateRelationshipInDynamoDB(updateID, relationship);
+      const updatedRelationship = {
+        ...relationship,
+        updateChildRelation,
+        updateParentRelation,
+      };
+      const response = await updateRelationshipInDynamoDB(updateID, updatedRelationship);
       setMessage(response.message);
       setFetchedRelationship(response.item);
     } catch (error) {
@@ -99,6 +113,8 @@ export default function RelationshipCrudTest() {
         <form onSubmit={handleCreateRelationship}>
           <input type="text" placeholder="Child ID" onChange={(e) => setRelationship({ ...relationship, childID: e.target.value })} />
           <input type="text" placeholder="Parent ID" onChange={(e) => setRelationship({ ...relationship, parentID: e.target.value })} />
+          <input type="text" placeholder="Child Relation" onChange={(e) => setCreateChildRelation(e.target.value)} />
+          <input type="text" placeholder="Parent Relation" onChange={(e) => setCreateParentRelation(e.target.value)} />
           <button type="submit">Create Relationship</button>
         </form>
 
@@ -111,8 +127,8 @@ export default function RelationshipCrudTest() {
           <input type="text" placeholder="Relationship ID" value={updateID} onChange={(e) => setUpdateID(e.target.value)} />
           <input type="text" placeholder="New Child ID" onChange={(e) => setRelationship({ ...relationship, childID: e.target.value })} />
           <input type="text" placeholder="New Parent ID" onChange={(e) => setRelationship({ ...relationship, parentID: e.target.value })} />
-          <input type="text" placeholder="New Child Relation" onChange={(e) => setChildRelation(e.target.value)} />
-          <input type="text" placeholder="New Parent Relation" onChange={(e) => setParentRelation(e.target.value)} />
+          <input type="text" placeholder="New Child Relation" onChange={(e) => setUpdateChildRelation(e.target.value)} />
+          <input type="text" placeholder="New Parent Relation" onChange={(e) => setUpdateParentRelation(e.target.value)} />
           <button type="submit">Update Relationship</button>
         </form>
 
