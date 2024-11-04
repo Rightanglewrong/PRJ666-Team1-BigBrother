@@ -28,10 +28,34 @@ const CalendarView = () => {
   });
   const [userDetails, setUserDetails] = useState(null);
   const [userId, setUserId] = useState("");
-  const [locationID, setLocationId] = useState("");
+  const [locationId, setLocationId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userData = await getCurrentUser();
+        setUserDetails(userData);
+        if (userData) {
+          setUserId(userData.userID);
+          setLocationId(userData.locationID);
+          setNewEvent((prev) => ({ ...prev, createdBy: userId, locationID: locationId }));
+          setIsAuthorized(
+            userData.accountType === "Admin" || userData.accountType === "Staff"
+          );
+          await loadCalendarEntries();
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setErrorMessage("Failed to load user details. Please log in again.");
+        setShowErrorModal(true);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
 
   // Format date to YYYY-MM-DD
   const formatDateToYYYYMMDD = (date) => {
@@ -51,6 +75,7 @@ const CalendarView = () => {
     return formatDateToYYYYMMDD(date);
   };
 
+
   // Function to load calendar entries by date range
   const loadCalendarEntries = async () => {
     const startDate = new Date();
@@ -62,7 +87,7 @@ const CalendarView = () => {
       const entries = await retrieveCalendarEntriesByDate(
         formatDateToYYYYMMDD(startDate),
         formatDateToYYYYMMDD(endDate),
-        locationID,
+        locationId,
 
       );
 
@@ -88,29 +113,7 @@ const CalendarView = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const userData = await getCurrentUser();
-        setUserDetails(userData);
-        if (userData) {
-          setUserId(userData.userID);
-          setLocationId(userData.locationID);
-          setNewEvent((prev) => ({ ...prev, createdBy: userId, locationID: locationID }));
-          setIsAuthorized(
-            userData.accountType === "Admin" || userData.accountType === "Staff"
-          );
-          await loadCalendarEntries();
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setErrorMessage("Failed to load user details. Please log in again.");
-        setShowErrorModal(true);
-      }
-    };
 
-    fetchUserDetails();
-  }, []);
 
   // Handle event creation (with date and time selection)
   const handleSelect = (selectionInfo) => {
