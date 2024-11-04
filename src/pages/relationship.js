@@ -26,7 +26,7 @@ export default function RelationshipCrudTest() {
   // Handle creating a relationship
   const handleCreateRelationship = async (e) => {
     e.preventDefault();
-    if (!relationship.childID || !relationship.parentID || !childRelation || !parentRelation) {
+    if (!relationship.childID || !relationship.parentID || !createChildRelation || !createChildRelation) {
       setMessage("Child ID, Parent ID, Child Relation, and Parent Relation are required.");
       return;
     }
