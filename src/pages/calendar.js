@@ -79,6 +79,7 @@ const CalendarView = () => {
 
   // Function to load calendar entries by date range
   const loadCalendarEntries = async () => {
+    userData = getCurrentUser();
     const startDate = new Date();
     startDate.setFullYear(startDate.getFullYear() - 1); // Start date: 1 year ago
     const endDate = new Date();
