@@ -156,22 +156,26 @@ const NavBar = () => {
               {/* Divider line before Logout */}
               <Divider sx={{ my: 1, backgroundColor: "white" }} />
 
-                <MenuItem
-                  onClick={handleLogout}
-                  sx={{
-                    color: "white",
-                    cursor: "pointer",
-                    textAlign: "center",
-                    transition: "all 0.3s ease", // Smooth transition for hover effect
-                    "&:hover": {
-                      background: "linear-gradient(90deg, #ff512f, #f09819)",
-                      boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)", // Enhanced shadow on hover
-                      transform: "scale(1.05)", // Slight scale-up effect on hover
-                    },
-                  }}
-                >
-                  Logout
-                </MenuItem>
+              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                <Link href="/examplePage">Example Page</Link>
+              </MenuItem>
+
+              <MenuItem
+                onClick={handleLogout}
+                sx={{
+                  color: "white",
+                  cursor: "pointer",
+                  textAlign: "center",
+                  transition: "all 0.3s ease", // Smooth transition for hover effect
+                  "&:hover": {
+                    background: "linear-gradient(90deg, #ff512f, #f09819)",
+                    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)", // Enhanced shadow on hover
+                    transform: "scale(1.05)", // Slight scale-up effect on hover
+                  },
+                }}
+              >
+                Logout
+              </MenuItem>
             </Menu>
           </>
         ) : (
