@@ -60,6 +60,13 @@ const HomePage = () => {
               <h2>Relationship</h2>
             </div>
           </Link>
+
+          {/* Relationships */}
+          <Link href="/child" className={styles.gridItem}>
+            <div className={styles.calendar}>
+              <h2>Children</h2>
+            </div>
+          </Link>
         </div>
       </div>
     </div>
