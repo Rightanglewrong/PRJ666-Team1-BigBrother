@@ -133,9 +133,6 @@ const NavBar = () => {
                 <Link href="/mealPlan">Meal Plan</Link>
               </MenuItem>
               <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
-                <Link href="/progressReport">Progress Report</Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
                 <Link href="/newsletter">Newsletter</Link>
               </MenuItem>
               <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
@@ -149,6 +146,9 @@ const NavBar = () => {
                   </MenuItem>
                   <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
                     <Link href="/dynamoCrudTester">Dynamo CRUD Testing</Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                    <Link href="/executiveServices" className={styles.dropdownItem}>Executive Services</Link>
                   </MenuItem>
                 </>
               )}

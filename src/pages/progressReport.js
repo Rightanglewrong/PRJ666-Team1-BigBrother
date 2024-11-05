@@ -5,7 +5,9 @@ import {
   updateProgressReportInDynamoDB,
   deleteProgressReportFromDynamoDB,
   retrieveProgressReportByChildID,
+  retrieveProgressReportByLocationID
 } from "../utils/progressReportAPI";
+import {getRelationshipByParentID} from "../utils/relationshipAPI"
 import { getCurrentUser } from "../utils/api"; // Importing the function to get current user
 import styles from "./progressReport.module.css";
 
@@ -27,6 +29,8 @@ export default function ProgressReport() {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [childID, setChildID] = useState("");
   const [filteredReports, setFilteredReports] = useState([]);
+  const [allReports, setAllReports] = useState([]);
+
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -37,11 +41,26 @@ export default function ProgressReport() {
           setUserId(userData.userID);
           if (userData.accountType === 'Admin' || userData.accountType === 'Staff') {
             setIsAuthorized(true); 
+            const locationReports = await retrieveProgressReportByLocationID(userData.locationID);
+            setAllReports(locationReports);
+          } else if (userData.accountType === 'Parent') {
+            const relationshipData = await getRelationshipByParentID(userData.userID);
+            const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
+            
+            const childReportsResults = await Promise.allSettled(
+              uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
+            );
+  
+            const childReports = childReportsResults
+              .filter(result => result.status === 'fulfilled')
+              .flatMap(result => result.value);
+  
+            setFilteredReports(childReports);
           }
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setError("Failed to load user details. Please log in again.");
+        setErrorMessage("Failed to load user details. Please log in again.");
       }
     };
 
@@ -166,8 +185,36 @@ export default function ProgressReport() {
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
-        <h1 className={styles.h1Style}>Progress Report CRUD Test Page</h1>
+        <h1 className={styles.h1Style}>Progress Reports</h1>
         <p className={styles.message}>{message}</p>
+
+        {/* Display reports based on user role */}
+        {isAuthorized ? (
+          <>
+            <h3>All Progress Reports by Location</h3>
+            <ul>
+              {allReports.map((report) => (
+                <li key={report.progressReportID}>
+                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                  (Created by: {report.createdBy})
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            <h3>Filtered Progress Reports for Child</h3>
+            <ul>
+              {filteredReports.map((report) => (
+                <li key={report.progressReportID}>
+                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                  (Created by: {report.createdBy})
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
 
         {/* Create Progress Report */}
         <h3>Create Progress Report</h3>
