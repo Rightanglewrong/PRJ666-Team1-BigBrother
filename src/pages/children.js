@@ -103,7 +103,6 @@ export default function ChildCrudTest() {
         <form onSubmit={handleCreateChild}>
           <input type="text" placeholder="First Name" onChange={(e) => setChildData({ ...childData, firstName: e.target.value })} />
           <input type="text" placeholder="Last Name" onChange={(e) => setChildData({ ...childData, lastName: e.target.value })} />
-          <input type="number" placeholder="Age" onChange={(e) => setChildData({ ...childData, age: e.target.value })} />
           <input type="text" placeholder="Class ID" onChange={(e) => setChildData({ ...childData, classID: e.target.value })} />
           <button type="submit">Create Child Profile</button>
         </form>
