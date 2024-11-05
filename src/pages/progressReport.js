@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   createProgressReportInDynamoDB,
-  retrieveProgressReportFromDynamoDB,
   updateProgressReportInDynamoDB,
   deleteProgressReportFromDynamoDB,
   retrieveProgressReportByChildID,
@@ -12,14 +11,13 @@ import { getCurrentUser } from "../utils/api"; // Importing the function to get 
 import styles from "./progressReport.module.css";
 
 export default function ProgressReport() {
+  const [childID, setChildID] = useState("");
   const [createReportChildID, setCreateReportChildID] = useState("");
   const [createReportTitle, setCreateReportTitle] = useState(""); // New field for report title
   const [createReportContent, setCreateReportContent] = useState("");
   const [updateReportID, setUpdateReportID] = useState("");
   const [updateReportTitle, setUpdateReportTitle] = useState("");
   const [updateReportContent, setUpdateReportContent] = useState("");
-  const [retrieveReportID, setRetrieveReportID] = useState("");
-  const [retrievedReport, setRetrievedReport] = useState(null);
   const [deleteReportID, setDeleteReportID] = useState("");
   const [message, setMessage] = useState("");
   const [userDetails, setUserDetails] = useState(null);
@@ -90,21 +88,6 @@ export default function ProgressReport() {
       setCreateReportContent('');
     } catch (error) {
       setMessage(`Error creating Progress Report: ${error.message}`);
-    }
-  };
-
-  // Handle retrieving a Progress Report from DynamoDB
-  const handleRetrieveReport = async (e) => {
-    e.preventDefault();
-    try {
-      const data = await retrieveProgressReportFromDynamoDB({
-        id: retrieveReportID,
-      });
-      setRetrievedReport(data);
-      setMessage("Progress Report retrieved successfully");
-      setRetrieveReportID("");
-    } catch (error) {
-      setMessage(`Error retrieving Progress Report: ${error.message}`);
     }
   };
 
@@ -179,6 +162,11 @@ export default function ProgressReport() {
     setShowErrorModal(false);
   };
 
+  const handleChildClick = (childID) => {
+    setSelectedChildID(childID);
+    setChildID(childID); 
+  };
+  
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
@@ -259,20 +247,7 @@ export default function ProgressReport() {
           <button type="submit">Create Report</button>
         </form>
 
-        {/* Retrieve Progress Report */}
-        <h3>Retrieve Progress Report</h3>
-        <input
-          type="text"
-          value={retrieveReportID}
-          placeholder="Report ID"
-          onChange={(e) => setRetrieveReportID(e.target.value)}
-        />
-        <button onClick={handleRetrieveReport} disabled={!retrieveReportID}>
-          Retrieve Report
-        </button>
-        {retrievedReport && (
-          <p>Retrieved Report: {JSON.stringify(retrievedReport)}</p>
-        )}
+
 
         {/* Update Progress Report */}
         <h3>Update Progress Report</h3>
