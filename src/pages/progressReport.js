@@ -166,7 +166,7 @@ export default function ProgressReport() {
     setSelectedChildID(childID);
     setChildID(childID); 
   };
-  
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
@@ -184,46 +184,8 @@ export default function ProgressReport() {
                 </li>
               ))}
             </ul>
-          </>
-        ) : (
-          <>
-            {!selectedChildID ? (
-              <div>
-                <h3>Select a Child Profile</h3>
-                <ul>
-                  {childProfiles.map((child) => (
-                    <li key={child.childID}>
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleChildClick(child.childID);
-                        }}
-                      >
-                        {child.firstName}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <div>
-                <h3>Progress Reports for Selected Child</h3>
-                <ul>
-                  {filteredReports.map((report) => (
-                    <li key={report.progressReportID}>
-                      <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                      (Created by: {report.createdBy})
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </>
-        )}
 
-
-        {/* Create Progress Report */}
+             {/* Create Progress Report */}
         <h3>Create Progress Report</h3>
         <form onSubmit={handleCreateReport}>
           <input
@@ -313,7 +275,44 @@ export default function ProgressReport() {
             </ul>
           </div>
         )}
-
+          </>
+        ) : (
+          <>
+            {!selectedChildID ? (
+              <div>
+                <h3>Select a Child Profile</h3>
+                <ul>
+                  {childProfiles.map((child) => (
+                    <li key={child.childID}>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleChildClick(child.childID);
+                        }}
+                      >
+                        {child.firstName}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div>
+                <h3>Progress Reports for Selected Child</h3>
+                <ul>
+                  {filteredReports.map((report) => (
+                    <li key={report.progressReportID}>
+                      <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                      (Created by: {report.createdBy})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
+        )}
+      
         {showErrorModal && (
           <div className={styles.overlay}>
             <div className={styles.modal}>
