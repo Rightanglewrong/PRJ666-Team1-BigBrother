@@ -8,12 +8,13 @@ import {
   retrieveProgressReportByLocationID
 } from "../utils/progressReportAPI";
 import {getRelationshipByParentID} from "../utils/relationshipAPI"
-import { getCurrentUser } from "../utils/api"; // Importing the function to get current user
+import {retrieveChildProfileByID} from "../utils/childAPI"
+import { getCurrentUser } from "../utils/api"; 
 import styles from "./progressReport.module.css";
 
 export default function ProgressReport() {
   const [createReportChildID, setCreateReportChildID] = useState("");
-  const [createReportTitle, setCreateReportTitle] = useState(""); // New field for report title
+  const [createReportTitle, setCreateReportTitle] = useState(""); 
   const [createReportContent, setCreateReportContent] = useState("");
   const [updateReportID, setUpdateReportID] = useState("");
   const [updateReportTitle, setUpdateReportTitle] = useState("");
@@ -46,17 +47,22 @@ export default function ProgressReport() {
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
-            
-            const childReportsResults = await Promise.allSettled(
-              uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
-            );
-  
-            const childReports = childReportsResults
-              .filter(result => result.status === 'fulfilled')
-              .flatMap(result => result.value);
-  
+          
+            const childReports = [];
+          
+            for (const childID of uniqueChildIDs) {
+              const childProfile = await retrieveChildProfileByID(childID);
+              console.log("Child Profile:", childProfile); 
+          
+              const reportsResult = await retrieveProgressReportByChildID(childID);
+          
+              if (reportsResult) {
+                childReports.push(...reportsResult); 
+              }
+            }
             setFilteredReports(childReports);
           }
+          
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
