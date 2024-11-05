@@ -7,6 +7,7 @@ import {
   retrieveProgressReportByChildID,
   retrieveProgressReportByLocationID
 } from "../utils/progressReportAPI";
+import { retrieveChildProfileByID } from "@/utils/childAPI";
 import {getRelationshipByParentID} from "../utils/relationshipAPI"
 import { getCurrentUser } from "../utils/api"; // Importing the function to get current user
 import styles from "./progressReport.module.css";
@@ -47,11 +48,15 @@ export default function ProgressReport() {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
             
-            const childReportsResults = await Promise.allSettled(
-              uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
+            const childDataResults = await Promise.allSettled(
+              uniqueChildIDs.map(async (childID) => {
+                const profile = await retrieveChildProfileByID(childID);
+                const reports = await retrieveProgressReportByChildID(childID);
+                return { profile, reports };
+              })
             );
   
-            const childReports = childReportsResults
+            const childReports = childDataResults
               .filter(result => result.status === 'fulfilled')
               .flatMap(result => result.value);
   
