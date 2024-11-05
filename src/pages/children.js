@@ -104,6 +104,7 @@ export default function ChildCrudTest() {
           <input type="text" placeholder="First Name" onChange={(e) => setChildData({ ...childData, firstName: e.target.value })} />
           <input type="text" placeholder="Last Name" onChange={(e) => setChildData({ ...childData, lastName: e.target.value })} />
           <input type="text" placeholder="Class ID" onChange={(e) => setChildData({ ...childData, classID: e.target.value })} />
+          <input type="text" placeholder="Location ID" onChange={(e) => setChildData({ ...childData, locationID: e.target.value })} />
           <button type="submit">Create Child Profile</button>
         </form>
 
@@ -117,6 +118,7 @@ export default function ChildCrudTest() {
           <input type="text" placeholder="New First Name" onChange={(e) => setChildData({ ...childData, firstName: e.target.value })} />
           <input type="text" placeholder="New Last Name" onChange={(e) => setChildData({ ...childData, lastName: e.target.value })} />
           <input type="text" placeholder="New Class ID" onChange={(e) => setChildData({ ...childData, classID: e.target.value })} />
+          <input type="text" placeholder="New Location ID" onChange={(e) => setChildData({ ...childData, locationID: e.target.value })} />
           <button type="submit">Update Child Profile</button>
         </form>
 
