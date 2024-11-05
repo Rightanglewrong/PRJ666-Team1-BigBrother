@@ -31,7 +31,7 @@ export default function ProgressReport() {
   const [childID, setChildID] = useState("");
   const [filteredReports, setFilteredReports] = useState([]);
   const [allReports, setAllReports] = useState([]);
-  
+
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -193,6 +193,34 @@ export default function ProgressReport() {
         <h1 className={styles.h1Style}>Progress Reports</h1>
         <p className={styles.message}>{message}</p>
 
+        {/* Display reports based on user role */}
+        {isAuthorized ? (
+          <>
+            <h3>All Progress Reports by Location</h3>
+            <ul>
+              {allReports.map((report) => (
+                <li key={report.progressReportID}>
+                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                  (Created by: {report.createdBy})
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            <h3>Filtered Progress Reports for Child</h3>
+            <ul>
+              {filteredReports.map((report) => (
+                <li key={report.progressReportID}>
+                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                  (Created by: {report.createdBy})
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+
         {/* Create Progress Report */}
         <h3>Create Progress Report</h3>
         <form onSubmit={handleCreateReport}>
@@ -296,32 +324,7 @@ export default function ProgressReport() {
             </ul>
           </div>
         )}
-        {/* Display reports based on user role */}
-        {isAuthorized ? (
-          <>
-            <h3>All Progress Reports by Location</h3>
-            <ul>
-              {allReports.map((report) => (
-                <li key={report.progressReportID}>
-                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                  (Created by: {report.createdBy})
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <>
-            <h3>Filtered Progress Reports for Child</h3>
-            <ul>
-              {filteredReports.map((report) => (
-                <li key={report.progressReportID}>
-                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                  (Created by: {report.createdBy})
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+
         {showErrorModal && (
           <div className={styles.overlay}>
             <div className={styles.modal}>
