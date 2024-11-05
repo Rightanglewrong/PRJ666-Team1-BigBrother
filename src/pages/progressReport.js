@@ -31,7 +31,7 @@ export default function ProgressReport() {
   const [childID, setChildID] = useState("");
   const [filteredReports, setFilteredReports] = useState([]);
   const [allReports, setAllReports] = useState([]);
-  const [childNames, setChildNames] = useState({});
+  
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -52,12 +52,7 @@ export default function ProgressReport() {
               uniqueChildIDs.map(async (childID) => {
                 const profile = await retrieveChildProfileByID(childID);
                 const reports = await retrieveProgressReportByChildID(childID);
-
-                setChildNames((prevNames) => ({
-                  ...prevNames,
-                  [childID]: profile.name 
-                }));
-                return { childID, reports };
+                return { profile, reports };
               })
             );
   
@@ -320,8 +315,8 @@ export default function ProgressReport() {
             <ul>
               {filteredReports.map((report) => (
                 <li key={report.progressReportID}>
-                  <strong>{report.reportTitle}</strong>: {report.content} (Created by: {report.createdBy}) 
-                  {childNames[report.childID] && (<> - Child: {childNames[report.childID]}</>)}
+                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                  (Created by: {report.createdBy})
                 </li>
               ))}
             </ul>
