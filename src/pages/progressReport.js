@@ -8,13 +8,12 @@ import {
   retrieveProgressReportByLocationID
 } from "../utils/progressReportAPI";
 import {getRelationshipByParentID} from "../utils/relationshipAPI"
-import {retrieveChildProfileByID} from "../utils/childAPI"
-import { getCurrentUser } from "../utils/api"; 
+import { getCurrentUser } from "../utils/api"; // Importing the function to get current user
 import styles from "./progressReport.module.css";
 
 export default function ProgressReport() {
   const [createReportChildID, setCreateReportChildID] = useState("");
-  const [createReportTitle, setCreateReportTitle] = useState(""); 
+  const [createReportTitle, setCreateReportTitle] = useState(""); // New field for report title
   const [createReportContent, setCreateReportContent] = useState("");
   const [updateReportID, setUpdateReportID] = useState("");
   const [updateReportTitle, setUpdateReportTitle] = useState("");
@@ -47,23 +46,17 @@ export default function ProgressReport() {
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
-          
-            const childReports = [];
-          
-            for (const childID of uniqueChildIDs) {
-              const childProfile = await retrieveChildProfileByID(childID);
-              const childData = { profile: childProfile, reports: [] };
-          
-              const reportsResult = await retrieveProgressReportByChildID(childID);
-          
-              if (reportsResult && reportsResult.length > 0) {
-                childData.reports = reportsResult; // Add reports if available
-              }
-              childReports.push(childData);
-            }
+            
+            const childReportsResults = await Promise.allSettled(
+              uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
+            );
+  
+            const childReports = childReportsResults
+              .filter(result => result.status === 'fulfilled')
+              .flatMap(result => result.value);
+  
             setFilteredReports(childReports);
           }
-          
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
