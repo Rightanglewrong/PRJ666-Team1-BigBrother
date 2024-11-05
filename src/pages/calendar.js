@@ -24,12 +24,39 @@ const CalendarView = () => {
     dateStart: "",
     dateEnd: "",
     createdBy: "",
+    locationID: "",
   });
   const [userDetails, setUserDetails] = useState(null);
   const [userId, setUserId] = useState("");
+  const [locationId, setLocationId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userData = await getCurrentUser();
+        setUserDetails(userData);
+        if (userData) {
+          setUserId(userData.userID);
+          setLocationId(userData.locationID);
+          setNewEvent((prev) => ({ ...prev, createdBy: userId, locationID: locationId }));
+          setIsAuthorized(
+            userData.accountType === "Admin" || userData.accountType === "Staff"
+          );
+          await loadCalendarEntries();
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setErrorMessage("Failed to load user details. Please log in again.");
+        setShowErrorModal(true);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
 
   // Format date to YYYY-MM-DD
   const formatDateToYYYYMMDD = (date) => {
@@ -49,17 +76,22 @@ const CalendarView = () => {
     return formatDateToYYYYMMDD(date);
   };
 
+
   // Function to load calendar entries by date range
   const loadCalendarEntries = async () => {
+    const userData = await getCurrentUser();
     const startDate = new Date();
     startDate.setFullYear(startDate.getFullYear() - 1); // Start date: 1 year ago
     const endDate = new Date();
     endDate.setFullYear(endDate.getFullYear() + 1); // End date: 1 year from now
+    const locationIdentification = userData.locationID;
 
     try {
       const entries = await retrieveCalendarEntriesByDate(
         formatDateToYYYYMMDD(startDate),
-        formatDateToYYYYMMDD(endDate)
+        formatDateToYYYYMMDD(endDate),
+        locationIdentification
+
       );
 
       if (entries.length === 0) {
@@ -83,29 +115,6 @@ const CalendarView = () => {
       console.error("Error fetching calendar entries:", error);
     }
   };
-
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const userData = await getCurrentUser();
-        setUserDetails(userData);
-        if (userData) {
-          setUserId(userData.userID);
-          setNewEvent((prev) => ({ ...prev, createdBy: userId }));
-          setIsAuthorized(
-            userData.accountType === "Admin" || userData.accountType === "Staff"
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setErrorMessage("Failed to load user details. Please log in again.");
-        setShowErrorModal(true);
-      }
-    };
-
-    fetchUserDetails();
-    loadCalendarEntries();
-  }, []);
 
   // Handle event creation (with date and time selection)
   const handleSelect = (selectionInfo) => {
@@ -175,6 +184,7 @@ const CalendarView = () => {
         dateStart: formatDateToYYYYMMDD(newEvent.dateStart),
         dateEnd: formatDateToYYYYMMDD(newEvent.dateEnd),
         createdBy: userDetails?.userID,
+        locationID: userDetails?.locationID,
       };
 
       if (editingEvent) {

@@ -96,7 +96,6 @@ const NavBar = () => {
                   <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
                   <li><Link href="/contact" className={styles.dropdownItem}>Contact List</Link></li>
                   <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
-                  <li><Link href="/progressReport" className={styles.dropdownItem}>Progress Report</Link></li>
                   <li><Link href="/newsletter" className={styles.dropdownItem}>Newsletter</Link></li>
                   <li><Link href="/message" className={styles.dropdownItem}>Messages</Link></li>
 
@@ -105,6 +104,7 @@ const NavBar = () => {
                     <>
                       <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
                       <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
+                      <li><Link href="/executiveServices" className={styles.dropdownItem}>Executive Services</Link></li>
                     </>
                   )}
                     <li>
