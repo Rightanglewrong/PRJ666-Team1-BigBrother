@@ -52,13 +52,14 @@ export default function ProgressReport() {
           
             for (const childID of uniqueChildIDs) {
               const childProfile = await retrieveChildProfileByID(childID);
-              console.log("Child Profile:", childProfile); 
+              const childData = { profile: childProfile, reports: [] };
           
               const reportsResult = await retrieveProgressReportByChildID(childID);
           
-              if (reportsResult) {
-                childReports.push(...reportsResult); 
+              if (reportsResult && reportsResult.length > 0) {
+                childData.reports = reportsResult; // Add reports if available
               }
+              childReports.push(childData);
             }
             setFilteredReports(childReports);
           }
