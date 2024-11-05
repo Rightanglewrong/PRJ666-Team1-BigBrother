@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/list": "^6.1.15",
@@ -16,6 +18,8 @@
     "@fullcalendar/timegrid": "^6.1.15",
     "@headlessui/react": "^2.1.7",
     "@heroicons/react": "^2.1.5",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/material": "^6.1.6",
     "@nextui-org/navbar": "^2.0.37",
     "@popperjs/core": "^2.11.8",
     "amplify": "^0.0.11",
