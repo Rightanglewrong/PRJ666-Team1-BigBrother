@@ -22,7 +22,7 @@ export default function ChildCrudTest() {
   // Handle creating a child profile
   const handleCreateChild = async (e) => {
     e.preventDefault();
-    if (!childData.firstName || !childData.lastName || !childData.age || !childData.classID) {
+    if (!childData.firstName || !childData.lastName || !childData.classID) {
       setMessage("First Name, Last Name, Age, and Class ID are required.");
       return;
     }
@@ -117,7 +117,6 @@ export default function ChildCrudTest() {
           <input type="text" placeholder="Child ID" value={updateID} onChange={(e) => setUpdateID(e.target.value)} />
           <input type="text" placeholder="New First Name" onChange={(e) => setChildData({ ...childData, firstName: e.target.value })} />
           <input type="text" placeholder="New Last Name" onChange={(e) => setChildData({ ...childData, lastName: e.target.value })} />
-          <input type="number" placeholder="New Age" onChange={(e) => setChildData({ ...childData, age: e.target.value })} />
           <input type="text" placeholder="New Class ID" onChange={(e) => setChildData({ ...childData, classID: e.target.value })} />
           <button type="submit">Update Child Profile</button>
         </form>
