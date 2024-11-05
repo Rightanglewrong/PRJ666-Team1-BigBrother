@@ -5,7 +5,9 @@ import {
   updateProgressReportInDynamoDB,
   deleteProgressReportFromDynamoDB,
   retrieveProgressReportByChildID,
+  retrieveProgressReportByLocationID
 } from "../utils/progressReportAPI";
+import {getRelationshipByParentID} from "../utils/relationshipAPI"
 import { getCurrentUser } from "../utils/api"; // Importing the function to get current user
 import styles from "./progressReport.module.css";
 
@@ -39,10 +41,10 @@ export default function ProgressReport() {
           setUserId(userData.userID);
           if (userData.accountType === 'Admin' || userData.accountType === 'Staff') {
             setIsAuthorized(true); 
-            const locationReports = await getProgressReportsByLocation(userData.locationID);
+            const locationReports = await retrieveProgressReportByLocationID(userData.locationID);
             setAllReports(locationReports);
           } else if (userData.accountType === 'Parent') {
-            const relationshipData = await getRelationshipByID(userData.userID);
+            const relationshipData = await getRelationshipByParentID(userData.userID);
             const childReports = await Promise.all(
               relationshipData.childIDs.map((id) => retrieveProgressReportByChildID(id))
             );
