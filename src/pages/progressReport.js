@@ -45,9 +45,12 @@ export default function ProgressReport() {
             setAllReports(locationReports);
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
+            const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
             const childReports = await Promise.all(
-              relationshipData.childIDs.map((id) => retrieveProgressReportByChildID(id))
+              uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
             );
+  
+            // Flatten the results since each child’s reports come in an array
             setFilteredReports(childReports.flat());
           }
         }
