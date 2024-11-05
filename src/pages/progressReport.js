@@ -46,12 +46,16 @@ export default function ProgressReport() {
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
-            const childReports = await Promise.all(
+            
+            const childReportsResults = await Promise.allSettled(
               uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
             );
   
-            // Flatten the results since each child’s reports come in an array
-            setFilteredReports(childReports.flat());
+            const childReports = childReportsResults
+              .filter(result => result.status === 'fulfilled')
+              .flatMap(result => result.value);
+  
+            setFilteredReports(childReports);
           }
         }
       } catch (error) {
