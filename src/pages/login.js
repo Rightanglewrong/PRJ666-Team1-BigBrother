@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link'; // Import Link from next/link
 import { login } from '../utils/api'; 
-import styles from './login.module.css';
+import { Box, Container, Typography, TextField, Button, Alert } from '@mui/material';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -38,43 +38,74 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.heading}>Login</h1>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <label className={styles.label} htmlFor="email">Email</label>
-        <input
-          className={styles.input}
-          type="email"
-          id="email"
-          name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+    <Box
+      sx={{
+        backgroundImage: "url('/background/background3.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Container maxWidth="xs" sx={{ textAlign: 'center', backgroundColor: 'rgba(255, 255, 255, 0.85)', p: 4, borderRadius: 2, boxShadow: 3 }}>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 2 }}>
+          Login
+        </Typography>
+        
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <TextField
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            fullWidth
+            required
+          />
+          <TextField
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            fullWidth
+            required
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              backgroundColor: "#3498db",
+              color: "#fff",
+              fontWeight: "bold",
+              "&:hover": { backgroundColor: "#2980b9" },
+              textTransform: "none",
+            }}
+            fullWidth
+          >
+            Log In
+          </Button>
+        </Box>
 
-        <label className={styles.label} htmlFor="password">Password</label>
-        <input
-          className={styles.input}
-          type="password"
-          id="password"
-          name="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-
-        <button type="submit" className={styles.button}>Log In</button>
-        {error && <p className={styles.error}>{error}</p>}
-      </form>
-
-      <br />
-      <Link href="/forgot-password" className={styles['footer-link']}>
-        Forgot password?
-      </Link>
-      <br />
-      <Link href="/register" className={styles['footer-link']}>
-        Register Now!
-      </Link>
-    </div>
+        <Box mt={2}>
+          <Link href="/forgot-password" passHref>
+            <Typography variant="body2" sx={{ color: "#3498db", mb: 1, textDecoration: "underline", cursor: "pointer" }}>
+              Forgot password?
+            </Typography>
+          </Link>
+          <Link href="/register" passHref>
+            <Typography variant="body2" sx={{ color: "#3498db", textDecoration: "underline", cursor: "pointer" }}>
+              Register Now!
+            </Typography>
+          </Link>
+        </Box>
+      </Container>
+    </Box>
   );
 }
