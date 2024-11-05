@@ -27,7 +27,8 @@ export default function ProgressReport() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [childID, setChildID] = useState("");
+  const [childProfiles, setChildProfiles] = useState([]);
+  const [selectedChildID, setSelectedChildID] = useState(null);
   const [filteredReports, setFilteredReports] = useState([]);
   const [allReports, setAllReports] = useState([]);
 
@@ -51,11 +52,7 @@ export default function ProgressReport() {
               uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
             );
   
-            const childReports = childReportsResults
-              .filter(result => result.status === 'fulfilled')
-              .flatMap(result => result.value);
-  
-            setFilteredReports(childReports);
+            setChildProfiles(uniqueChildIDs.map(id => ({ childID: id, firstName: `Child ${id}` }))); 
           }
         }
       } catch (error) {
@@ -188,7 +185,6 @@ export default function ProgressReport() {
         <h1 className={styles.h1Style}>Progress Reports</h1>
         <p className={styles.message}>{message}</p>
 
-        {/* Display reports based on user role */}
         {isAuthorized ? (
           <>
             <h3>All Progress Reports by Location</h3>
@@ -203,15 +199,38 @@ export default function ProgressReport() {
           </>
         ) : (
           <>
-            <h3>Filtered Progress Reports for Child</h3>
-            <ul>
-              {filteredReports.map((report) => (
-                <li key={report.progressReportID}>
-                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                  (Created by: {report.createdBy})
-                </li>
-              ))}
-            </ul>
+            {!selectedChildID ? (
+              <div>
+                <h3>Select a Child Profile</h3>
+                <ul>
+                  {childProfiles.map((child) => (
+                    <li key={child.childID}>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleChildClick(child.childID);
+                        }}
+                      >
+                        {child.firstName}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div>
+                <h3>Progress Reports for Selected Child</h3>
+                <ul>
+                  {filteredReports.map((report) => (
+                    <li key={report.progressReportID}>
+                      <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                      (Created by: {report.createdBy})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </>
         )}
 
