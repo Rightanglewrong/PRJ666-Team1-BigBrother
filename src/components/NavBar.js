@@ -148,7 +148,7 @@ const NavBar = () => {
                     <Link href="/dynamoCrudTester">Dynamo CRUD Testing</Link>
                   </MenuItem>
                   <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
-                    <Link href="/executiveServices">Executive Services</Link>
+                    <Link href="/admin">Admin Services</Link>
                   </MenuItem>
                 </>
               )}
