@@ -169,6 +169,7 @@ export default function ProgressReport() {
         })
       );
       setChildProfiles(childProfileData)
+      console.log(`Child data for :`, childProfiles);
             
     } catch (error) {
       console.error("Error fetching child profiles:", error);
