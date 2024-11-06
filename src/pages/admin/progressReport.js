@@ -48,6 +48,7 @@ export default function ProgressReport() {
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
             
             await fetchChildProfiles(uniqueChildIDs);
+            console.log("child Profiles")
             console.log(childProfiles);
           }
         }
