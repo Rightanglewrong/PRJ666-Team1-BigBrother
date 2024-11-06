@@ -46,8 +46,8 @@ export default function ProgressReport() {
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
-            
-            await fetchChildProfiles(uniqueChildIDs);
+            const childProfileData = await fetchChildProfiles(uniqueChildIDs);
+            setChildProfiles(childProfileData);
           }
         }
       } catch (error) {
@@ -177,9 +177,9 @@ export default function ProgressReport() {
           age: childData.age,
           birthDate: childData.birthDate
         }));
-      setChildProfiles(TransformedChildProfiles);
+      
+      return TransformedChildProfiles;
 
-      console.log("Child Profiles Set:", TransformedChildProfiles);
       
     } catch (error) {
       console.error("Error fetching child profiles:", error);
