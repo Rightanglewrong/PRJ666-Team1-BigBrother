@@ -30,7 +30,6 @@ export default function EditMealPlanPage() {
       const fetchMealPlan = async () => {
         try {
           const data = await getMealPlan(token, id);
-          console.log(data);
           const mealPlan = data.mealPlan.mealPlan;
           setMealPlan(mealPlan);
         } catch (error) {
