@@ -1,5 +1,3 @@
-// src/pages/newsletter/[id].js
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import {
@@ -9,6 +7,23 @@ import {
 } from "@/utils/newsletterAPI";
 import { getCurrentUser } from "@/utils/api";
 import { sendEmailsToUsers } from "@/utils/emailAPI";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  CircularProgress,
+  Checkbox,
+  FormControlLabel,
+  Snackbar,
+  Alert,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
 export default function NewsletterDetailPage() {
   const router = useRouter();
@@ -25,11 +40,10 @@ export default function NewsletterDetailPage() {
   const [loading, setLoading] = useState(true);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [selectedAccountTypes, setSelectedAccountTypes] = useState([]);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State for delete confirmation dialog
 
-  // Define account type options
   const accountTypeOptions = ["Admin", "Staff", "Parent"];
 
-  // Fetch newsletter details and user info on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -61,28 +75,18 @@ export default function NewsletterDetailPage() {
     fetchData();
   }, [id, router]);
 
-  // Handle input change when in edit mode
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewsletter((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle account type selection
   const handleAccountTypeChange = (e) => {
     const { value, checked } = e.target;
     setSelectedAccountTypes((prevSelected) =>
-      checked
-        ? [...prevSelected, value]
-        : prevSelected.filter((accountType) => accountType !== value)
+      checked ? [...prevSelected, value] : prevSelected.filter((accountType) => accountType !== value)
     );
   };
 
-  // Return to main list of newsletters
-  const backToList = () => {
-    return router.push("/newsletter");
-  };
-
-  // Handle newsletter update
   const handleUpdate = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -103,154 +107,145 @@ export default function NewsletterDetailPage() {
     }
   };
 
-  // Handle sending the newsletter via email
   const sendNewsletterViaEmail = async () => {
-    setSendingEmail(true); // Set email sending state
+    setSendingEmail(true);
     const token = localStorage.getItem("token");
     const subject = newsletter.title;
     const content = newsletter.content;
 
     try {
-      // Send emails to the selected account types
       for (const accountType of selectedAccountTypes) {
-        console.log(accountType)
-        console.log(userDetails.locationID)
-        await sendEmailsToUsers(
-          token,
-          accountType,
-          userDetails.locationID,
-          subject,
-          content
-        );
+        await sendEmailsToUsers(token, accountType, userDetails.locationID, subject, content);
       }
       setMessage("Newsletter emailed successfully to selected users.");
     } catch (error) {
       setMessage("Error sending newsletter via email.");
     } finally {
-      setSendingEmail(false); // Reset the email sending state
+      setSendingEmail(false);
     }
   };
 
-  const deleteNewsletterBtn = async (e) => {
+  const handleDelete = async () => {
+    setOpenDeleteDialog(false);
     const token = localStorage.getItem("token");
     try {
       await deleteNewsletter(token, id);
-      setMessage("Deleting now");
-      setTimeout(() => {
-        router.push("/newsletter");
-      }, 500);
+      setMessage("Newsletter deleted successfully");
+      setTimeout(() => router.push("/newsletter"), 500);
     } catch (error) {
-      console.log(error);
-      setMessage(error);
+      setMessage("Error deleting newsletter");
     }
   };
 
+  const backToList = () => {
+    router.push("/newsletter");
+  };
+
   if (loading) {
-    return <p>Loading...</p>; // Show loading state while fetching user details
+    return (
+      <Container maxWidth="sm" sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+        <CircularProgress />
+      </Container>
+    );
   }
 
   return (
-    <div>
-      <h1>Newsletter Details</h1>
-      {message && <p>{message}</p>}
+    <Container maxWidth="md" sx={{ mt: 4, p: 3, backgroundColor: "#f7f9fc", borderRadius: 2, boxShadow: 3, mb: 4, overflow: "hidden",}}>
+      <Typography variant="h4" align="center" gutterBottom sx={{ color: "#2c3e50", fontWeight: "bold" }}>
+        Newsletter Details
+      </Typography>
 
-      {newsletter ? (
-        <div>
+      {message && (
+        <Snackbar open={Boolean(message)} autoHideDuration={6000} onClose={() => setMessage("")}>
+          <Alert severity="info">{message}</Alert>
+        </Snackbar>
+      )}
+
+      {newsletter && (
+        <Box>
           {editMode ? (
-            <form onSubmit={handleUpdate}>
-              <label>
-                Title:
-                <input
-                  type="text"
-                  name="title"
-                  value={newsletter.title}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-              <br></br>
-              <label>
-                Content:
-                <textarea
-                  name="content"
-                  value={newsletter.content}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-              <br></br>
-              <button type="submit">Save Changes</button>
-              <br></br>
-              <button type="button" onClick={() => setEditMode(false)}>
+            <Box component="form" onSubmit={handleUpdate} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <TextField label="Title" name="title" value={newsletter.title} onChange={handleInputChange} required fullWidth />
+              <TextField label="Content" name="content" value={newsletter.content} onChange={handleInputChange} required fullWidth multiline rows={6} />
+              <Button type="submit" variant="contained" sx={{ backgroundColor: "#3498db", color: "#fff", "&:hover": { backgroundColor: "#2980b9" } }}>
+                Save Changes
+              </Button>
+              <Button variant="outlined" onClick={() => setEditMode(false)} sx={{ mt: 1 }}>
                 Cancel
-              </button>
-            </form>
+              </Button>
+            </Box>
           ) : (
-            <div>
-              <p>
-                <strong>Title:</strong> {newsletter.title}
-              </p>
-              <p>
-                <strong>Content:</strong> {newsletter.content}
-              </p>
-              <p>
-                <strong>Published By:</strong> {newsletter.publishedBy}
-              </p>
-              <p>
-                <strong>Created At:</strong> {newsletter.createdAt}
-              </p>
-              <p>
-                <strong>Updated At:</strong> {newsletter.updatedAt}
-              </p>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>Title:</Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>{newsletter.title}</Typography>
 
-              {/* Show the Edit button only for Admin or Staff */}
-              {(userDetails.accountType === "Admin" ||
-                userDetails.accountType === "Staff") && (
-                <button onClick={() => setEditMode(true)}>
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>Content:</Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>{newsletter.content}</Typography>
+
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>Published By:</Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>{newsletter.publishedBy}</Typography>
+
+              <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>Created At: {newsletter.createdAt}</Typography>
+              <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>Updated At: {newsletter.updatedAt}</Typography>
+
+              {(userDetails.accountType === "Admin" || userDetails.accountType === "Staff") && (
+                <Button variant="contained" onClick={() => setEditMode(true)} sx={{ mt: 2 }}>
                   Edit Newsletter
-                </button>
+                </Button>
               )}
-              <br></br>
               {userDetails.accountType === "Admin" && (
-                <button onClick={() => deleteNewsletterBtn()}>Delete</button>
-              )}
-              <br></br>
-              {/* Account type selection for sending emails */}
-              <div>
-                <h3>Select Account Types to Email</h3>
-                {accountTypeOptions.map((accountType) => (
-                  <label key={accountType}>
-                    <input
-                      type="checkbox"
-                      value={accountType}
-                      onChange={handleAccountTypeChange}
-                    />
-                    {accountType}
-                  </label>
-                ))}
-              </div>
-
-              {/* Send Newsletter via Email */}
-              {(userDetails.accountType === "Admin" ||
-                userDetails.accountType === "Staff") && (
                 <>
-                  <button
-                    onClick={sendNewsletterViaEmail}
-                    disabled={sendingEmail || selectedAccountTypes.length === 0}
-                  >
-                    {sendingEmail ? "Sending..." : "Email Newsletter"}
-                  </button>
-                  <br />
+                  <Button variant="outlined" color="error" onClick={() => setOpenDeleteDialog(true)} sx={{ mt: 2, ml: 2 }}>
+                    Delete
+                  </Button>
+                  <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+                    <DialogTitle>Confirm Delete</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>
+                        Are you sure you want to delete this newsletter? This action cannot be undone.
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
+                        Cancel
+                      </Button>
+                      <Button onClick={handleDelete} color="error">
+                        Delete
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                 </>
               )}
-              <br></br>
-              <button onClick={() => backToList()}>Back</button>
-            </div>
+
+              <Typography variant="h6" sx={{ mt: 3 }}>Select Account Types to Email:</Typography>
+              <Box>
+                {accountTypeOptions.map((accountType) => (
+                  <FormControlLabel
+                    key={accountType}
+                    control={<Checkbox value={accountType} onChange={handleAccountTypeChange} />}
+                    label={accountType}
+                  />
+                ))}
+              </Box>
+
+              {(userDetails.accountType === "Admin" || userDetails.accountType === "Staff") && (
+                <Button
+                  variant="contained"
+                  onClick={sendNewsletterViaEmail}
+                  disabled={sendingEmail || selectedAccountTypes.length === 0}
+                  sx={{ mt: 3 }}
+                  startIcon={sendingEmail && <CircularProgress size={20} />}
+                >
+                  {sendingEmail ? "Sending..." : "Email Newsletter"}
+                </Button>
+              )}
+              <Button variant="text" onClick={backToList} sx={{ mt: 3, color: "#3498db" }}>
+                Back to Newsletter List
+              </Button>
+            </Box>
           )}
-        </div>
-      ) : (
-        <p>Loading newsletter...</p>
+        </Box>
       )}
-    </div>
+    </Container>
   );
 }

@@ -1,6 +1,6 @@
 .nav {
   background: linear-gradient(90deg, #6a11cb, #2575fc);
-  padding: 10px 20px;
+  padding: 20px 20px;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -130,3 +130,4 @@
 .logoutButton:hover {
   background: linear-gradient(90deg, #ff512f, #f09819); /* Darker gradient for hover effect */
 }
+

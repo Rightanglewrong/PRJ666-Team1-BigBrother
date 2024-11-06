@@ -3,17 +3,18 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import styles from "./NavBar.module.css";
+import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Button } from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { getCurrentUser } from '../utils/api';
+import { Divider } from "@mui/material";
 
 const NavBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [firstName, setFirstName] = useState(''); 
-  const [accountType, setAccountType] = useState(''); // Track account type (e.g., parent)
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [accountType, setAccountType] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null); // Controls dropdown menu
   const router = useRouter();
 
-  // Check user authentication status when the component is mounted
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
@@ -22,7 +23,7 @@ const NavBar = () => {
         if (token) {
           const userDetails = await getCurrentUser(); 
           setFirstName(userDetails.firstName);
-          setAccountType(userDetails.accountType); // Set account type (e.g., parent)
+          setAccountType(userDetails.accountType);
           setIsLoggedIn(true);
         } else {
           setIsLoggedIn(false);
@@ -34,95 +35,156 @@ const NavBar = () => {
     };
 
     checkUserStatus();
-
-    // Listen for storage events to trigger a refresh when the login status changes
-    const handleStorageChange = () => {
-      const loggedIn = localStorage.getItem('userLoggedIn') === 'true';
-      if (loggedIn) {
-        checkUserStatus();
-      } else {
-        setIsLoggedIn(false);
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
   }, []);
 
-  // Handle Logout
-  const handleLogout = async () => {
-    try {
-      localStorage.removeItem('token');  // Remove the token when logging out
-      localStorage.removeItem('userLoggedIn');
-      window.dispatchEvent(new Event('storage'));
-      setIsLoggedIn(false);
-      setFirstName('');
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    setFirstName('');
+    router.push('/');
   };
 
-  // Toggle dropdown menu visibility
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
   return (
-    <nav className={styles.nav}>
-      <div className={styles.navContainer}>
-        {/* Logo */}
-        <div className={styles.leftSection}>
-          {/* Conditionally link based on login status */}
-          <Link href={isLoggedIn ? "/HomePage" : "/"} className={styles.logo}>
-            Big Brother
+    <AppBar
+      position="sticky"
+      sx={{
+        background: "linear-gradient(90deg, #6a11cb, #2575fc)",
+        padding: "5px 20px",
+        zIndex: 1000,
+      }}
+    >
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {/* Logo Section */}
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Link href={isLoggedIn ? "/HomePage" : "/"} passHref>
+            <Button
+              color="inherit"
+              sx={{
+                fontSize: "1.8rem",
+                fontWeight: "bold",
+                textTransform: "none",
+                color: "#fff",
+                textDecoration: "none",
+              }}
+            >
+              Big Brother
+            </Button>
           </Link>
-        </div>
+        </Typography>
 
         {/* Right Section */}
-        <div className={styles.rightSection}>
-          <ul className={styles.navList}>
-            {isLoggedIn ? (
-              <div className={styles.dropdown} onMouseEnter={toggleDropdown} onMouseLeave={toggleDropdown}>
-                <span className={styles.navItem}>
-                  Welcome, {firstName} {dropdownOpen ? '▲' : '▼'}
-                </span>
-                {dropdownOpen && (
-                  <ul className={styles.dropdownMenu}>
-                  <li><Link href="/profile" className={styles.dropdownItem}>Profile</Link></li>
-                  <li><Link href="/calendar" className={styles.dropdownItem}>Calendar</Link></li>
-                  <li><Link href="/contact" className={styles.dropdownItem}>Contact List</Link></li>
-                  <li><Link href="/mealPlan" className={styles.dropdownItem}>Meal Plan</Link></li>
-                  <li><Link href="/newsletter" className={styles.dropdownItem}>Newsletter</Link></li>
-                  <li><Link href="/message" className={styles.dropdownItem}>Messages</Link></li>
+        {isLoggedIn ? (
+          <>
+            <IconButton
+              color="inherit"
+              onClick={handleMenuOpen}
+              sx={{
+                color: "#fff",
+                fontWeight: 600,
+                '&:hover': {
+                  transform: "translateY(-2px)",
+                  color: "#fbc531",
+                }
+              }}
+            >
+              <AccountCircleIcon />
+              <Typography
+                variant="body1"
+                sx={{
+                  marginLeft: 1,
+                  color: "#fff",
+                  fontWeight: 600,
+                }}
+              >
+                Welcome, {firstName}
+              </Typography>
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              sx={{
+                "& .MuiPaper-root": {
+                  background: "linear-gradient(90deg, #f52ad3f4, #25dcfce4)",
+                  color: "#fff",
+                  borderRadius: "4px",
+                  minWidth: "160px",
+                },
+              }}
+            >
+              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                <Link href="/profile">Profile</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                <Link href="/calendar">Calendar</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                <Link href="/contact">Contact List</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                <Link href="/mealPlan">Meal Plan</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                <Link href="/newsletter">Newsletter</Link>
+              </MenuItem>
+              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                <Link href="/message">Messages</Link>
+              </MenuItem>
 
+              {(accountType === 'Admin' || accountType === 'Staff') && (
+                <>
+                  <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                    <Link href="/crudTester">Crud Testing</Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                    <Link href="/dynamoCrudTester">Dynamo CRUD Testing</Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                    <Link href="/executiveServices">Executive Services</Link>
+                  </MenuItem>
+                </>
+              )}
 
-                  {(accountType === 'Admin' || accountType === 'Staff') && (
-                    <>
-                      <li><Link href="/crudTester" className={styles.dropdownItem}>Crud Testing</Link></li>
-                      <li><Link href="/dynamoCrudTester" className={styles.dropdownItem}>Dynamo CRUD Testing</Link></li>
-                      <li><Link href="/executiveServices" className={styles.dropdownItem}>Executive Services</Link></li>
-                    </>
-                  )}
-                    <li>
-                      <button onClick={handleLogout} className={styles.logoutButton}>
-                        Logout
-                      </button>
-                    </li>
-                  </ul>
-                )}
-              </div>
-            ) : (
-              // Message for not logged in users
-              <span className={styles.navItem}>You are not logged in</span>
-            )}
-          </ul>
-        </div>
-      </div>
-    </nav>
+              {/* Divider line before Logout */}
+              <Divider sx={{ my: 1, backgroundColor: "white" }} />
+
+              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                <Link href="/examplePage">Example Page</Link>
+              </MenuItem>
+
+              <MenuItem
+                onClick={handleLogout}
+                sx={{
+                  color: "white",
+                  cursor: "pointer",
+                  textAlign: "center",
+                  transition: "all 0.3s ease", // Smooth transition for hover effect
+                  "&:hover": {
+                    background: "linear-gradient(90deg, #ff512f, #f09819)",
+                    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)", // Enhanced shadow on hover
+                    transform: "scale(1.05)", // Slight scale-up effect on hover
+                  },
+                }}
+              >
+                Logout
+              </MenuItem>
+            </Menu>
+          </>
+        ) : (
+          <Typography variant="body1" sx={{ color: "#fff", fontWeight: 600 }}>
+            You are not logged in
+          </Typography>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 };
 

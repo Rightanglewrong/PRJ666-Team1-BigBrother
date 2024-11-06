@@ -82,7 +82,7 @@ const HomePage = () => {
           {/* News or Update Section */}
           <Link href="/newsletter" className={styles.gridItem}>
             <div className={styles.news}>
-              <h2>News or Update</h2>
+              <h2>Newsletter</h2>
               {/* Add dynamic news or static content */}
               <img
                 src="https://cdn-icons-png.flaticon.com/512/7305/7305498.png"

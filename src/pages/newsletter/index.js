@@ -4,13 +4,28 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getCurrentUser } from "@/utils/api";
 import { getAllNewsletters } from "@/utils/newsletterAPI";
-import styles from "./Newsletter.module.css";
+import {
+  Container,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  Grid,
+  CircularProgress,
+  Snackbar,
+  Box,
+  Pagination,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function NewsletterIndex() {
   const [newsletters, setNewsletters] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null); // State to store user details
+  const [user, setUser] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const newslettersPerPage = 5; // Adjust this value for the number of newsletters per page
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -22,21 +37,20 @@ export default function NewsletterIndex() {
     async function fetchNewsletters() {
       try {
         const user = await getCurrentUser(token);
-        setUser(user); // Set the user details
+        setUser(user);
 
         const newsletters = await getAllNewsletters(token, user.locationID);
-        // Sort newsletters by `createdAt` in descending order (newest first)
         const sortedNewsletters = newsletters.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
         setNewsletters(sortedNewsletters);
-        setLoading(false);
       } catch (error) {
-        if (error.message === "404: No Newsletters currently") {
-          setMessage("");
-        } else {
-          setMessage(`${error}`);
-        }
+        setMessage(
+          error.message === "404: No Newsletters currently"
+            ? "No newsletters found."
+            : `Error: ${error.message}`
+        );
+      } finally {
         setLoading(false);
       }
     }
@@ -44,45 +58,165 @@ export default function NewsletterIndex() {
     fetchNewsletters();
   }, []);
 
+  // Calculate the newsletters to display on the current page
+  const indexOfLastNewsletter = currentPage * newslettersPerPage;
+  const indexOfFirstNewsletter = indexOfLastNewsletter - newslettersPerPage;
+  const currentNewsletters = newsletters.slice(
+    indexOfFirstNewsletter,
+    indexOfLastNewsletter
+  );
+
+  // Handle page change
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   if (loading) {
-    return <p>Loading...</p>; // Show loading state while fetching user details
+    return (
+      <Container
+        maxWidth="md"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Container>
+    );
   }
 
   return (
-    <div className={styles.pageWrapper}>
-      <div className={styles.container}>
-        <h1 className={styles.h1style}>Newsletters</h1>
-        {message && <p className={styles.message}>{message}</p>}
+    <Container
+      maxWidth="md"
+      sx={{ mt: 4, p: 3, backgroundColor: "#f7f9fc", borderRadius: 2, boxShadow: 3, mb: 4, overflow: "hidden", }}
+    >
+      <Typography
+        variant="h4"
+        align="center"
+        gutterBottom
+        sx={{ color: "#2c3e50", mb: 3, fontSize: "2.5rem", fontWeight: "bold" }}
+      >
+        Newsletters
+      </Typography>
 
-        {newsletters.length > 0 ? (
-          newsletters.map((newsletter) => (
-            <div key={newsletter.newsletterID} className={styles.newsletter}>
-              <h3>{newsletter.title}</h3>
-              <p>{newsletter.content}</p>
-              <p className={styles.newsletterDate}>{newsletter.createdAt}</p>
-              <div className={styles.buttonGroup}>
-                <Link href={`/newsletter/${newsletter.newsletterID}`}>
-                  <button className={`${styles.button} ${styles.expandButton}`}>
-                    Expand
-                  </button>
-                </Link>
-              </div>
-              <br></br>
-            </div>
-          ))
-        ) : (
-          <p className={styles.noNewsletters}>No newsletters found.</p>
-        )}
-        <br></br>
+      {message && (
+        <Snackbar
+          open={Boolean(message)}
+          autoHideDuration={6000}
+          onClose={() => setMessage("")}
+          message={message}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        />
+      )}
 
-        {user && (user.accountType === "Admin" || user.accountType === "Staff") && (
-        <Link href="/newsletter/create">
-          <button className={`${styles.button} ${styles.createButton}`}>
-            Create New Newsletter
-          </button>
-        </Link>
+      {user &&
+        (user.accountType === "Admin" || user.accountType === "Staff") && (
+          <Box textAlign="center" sx={{ mt: 4 }}>
+            <Button
+              component={Link}
+              href="/newsletter/create"
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{
+                backgroundColor: "#2ecc71",
+                color: "#fff",
+                "&:hover": { backgroundColor: "#27ae60" },
+                textTransform: "none",
+                fontWeight: "bold",
+                width: "100%",
+              }}
+            >
+              Create New Newsletter
+            </Button>
+          </Box>
         )}
-      </div>
-    </div>
+
+      {newsletters.length > 0 ? (
+        <Grid container spacing={3} sx={{ mt: 3 }}>
+          {currentNewsletters.map((newsletter) => (
+            <Grid item xs={12} key={newsletter.newsletterID}>
+              <Card
+                variant="outlined"
+                sx={{
+                  backgroundColor: "#f9f9f9",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-3px)",
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.15)",
+                  },
+                  borderRadius: 2,
+                }}
+              >
+                <CardContent>
+                  <Typography
+                    variant="h6"
+                    sx={{ color: "#2c3e50", fontWeight: "bold" }}
+                  >
+                    {newsletter.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#7f8c8d",
+                      mt: 1,
+                      mb: 1,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      WebkitBoxOrient: "vertical",
+                      WebkitLineClamp: 3,
+                    }}
+                  >
+                    {newsletter.content}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontSize: "0.9rem", color: "#95a5a6" }}
+                  >
+                    {new Date(newsletter.createdAt).toLocaleDateString()}
+                  </Typography>
+                </CardContent>
+                <CardActions sx={{ pl: 2, pb: 2 }}>
+                  <Link href={`/newsletter/${newsletter.newsletterID}`} passHref>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#3498db",
+                        color: "#fff",
+                        "&:hover": { backgroundColor: "#2980b9" },
+                        textTransform: "none",
+                      }}
+                    >
+                      Expand
+                    </Button>
+                  </Link>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
+        <Typography
+          variant="body2"
+          align="center"
+          sx={{ color: "#7f8c8d", fontSize: "1.2rem", mt: 3 }}
+        >
+          No newsletters found.
+        </Typography>
+      )}
+
+      {/* Pagination */}
+      <Box display="flex" justifyContent="center" sx={{ mt: 4 }}>
+        <Pagination
+          count={Math.ceil(newsletters.length / newslettersPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+        />
+      </Box>
+    </Container>
   );
 }
