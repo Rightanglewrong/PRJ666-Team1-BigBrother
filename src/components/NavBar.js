@@ -1,47 +1,31 @@
-'use client'; // Ensure this is a Client Component
+"use client"; // Ensure this is a Client Component
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Button } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  Button,
+  Divider,
+} from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { getCurrentUser } from '../utils/api';
-import { Divider } from "@mui/material";
+import { useUser } from "../components/authenticate";
 
 const NavBar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [firstName, setFirstName] = useState(''); 
-  const [accountType, setAccountType] = useState('');
+  const { accountType, firstName } = useUser(); // Access user data from context
   const [anchorEl, setAnchorEl] = useState(null); // Controls dropdown menu
   const router = useRouter();
 
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        
-        if (token) {
-          const userDetails = await getCurrentUser(); 
-          setFirstName(userDetails.firstName);
-          setAccountType(userDetails.accountType);
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
-        }
-      } catch (error) {
-        console.error('Error fetching user details:', error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkUserStatus();
-  }, []);
+  const isLoggedIn = !!firstName; // Checks if user data is present to determine login status
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    setFirstName('');
-    router.push('/');
+    localStorage.removeItem("token");
+    router.push("/");
   };
 
   const handleMenuOpen = (event) => {
@@ -61,7 +45,13 @@ const NavBar = () => {
         zIndex: 1000,
       }}
     >
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         {/* Logo Section */}
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           <Link href={isLoggedIn ? "/HomePage" : "/"} passHref>
@@ -89,10 +79,10 @@ const NavBar = () => {
               sx={{
                 color: "#fff",
                 fontWeight: 600,
-                '&:hover': {
+                "&:hover": {
                   transform: "translateY(-2px)",
                   color: "#fbc531",
-                }
+                },
               }}
             >
               <AccountCircleIcon />
@@ -120,34 +110,77 @@ const NavBar = () => {
                 },
               }}
             >
-              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+              <MenuItem
+                onClick={handleMenuClose}
+                sx={{
+                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
+                }}
+              >
                 <Link href="/profile">Profile</Link>
               </MenuItem>
-              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+              <MenuItem
+                onClick={handleMenuClose}
+                sx={{
+                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
+                }}
+              >
                 <Link href="/calendar">Calendar</Link>
               </MenuItem>
-              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+              <MenuItem
+                onClick={handleMenuClose}
+                sx={{
+                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
+                }}
+              >
                 <Link href="/contact">Contact List</Link>
               </MenuItem>
-              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+              <MenuItem
+                onClick={handleMenuClose}
+                sx={{
+                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
+                }}
+              >
                 <Link href="/mealPlan">Meal Plan</Link>
               </MenuItem>
-              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+              <MenuItem
+                onClick={handleMenuClose}
+                sx={{
+                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
+                }}
+              >
                 <Link href="/newsletter">Newsletter</Link>
               </MenuItem>
-              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+              <MenuItem
+                onClick={handleMenuClose}
+                sx={{
+                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
+                }}
+              >
                 <Link href="/message">Messages</Link>
               </MenuItem>
 
-              {(accountType === 'Admin' || accountType === 'Staff') && (
+              {(accountType === "Admin" || accountType === "Staff") && (
                 <>
-                  <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                  <MenuItem
+                    onClick={handleMenuClose}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "#ffcf4d",
+                        color: "#9318a5",
+                      },
+                    }}
+                  >
                     <Link href="/crudTester">Crud Testing</Link>
                   </MenuItem>
-                  <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
-                    <Link href="/dynamoCrudTester">Dynamo CRUD Testing</Link>
-                  </MenuItem>
-                  <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+                  <MenuItem
+                    onClick={handleMenuClose}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "#ffcf4d",
+                        color: "#9318a5",
+                      },
+                    }}
+                  >
                     <Link href="/admin">Admin Services</Link>
                   </MenuItem>
                 </>
@@ -156,7 +189,12 @@ const NavBar = () => {
               {/* Divider line before Logout */}
               <Divider sx={{ my: 1, backgroundColor: "white" }} />
 
-              <MenuItem onClick={handleMenuClose} sx={{ "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" } }}>
+              <MenuItem
+                onClick={handleMenuClose}
+                sx={{
+                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
+                }}
+              >
                 <Link href="/examplePage">Example Page</Link>
               </MenuItem>
 
@@ -166,11 +204,11 @@ const NavBar = () => {
                   color: "white",
                   cursor: "pointer",
                   textAlign: "center",
-                  transition: "all 0.3s ease", // Smooth transition for hover effect
+                  transition: "all 0.3s ease",
                   "&:hover": {
                     background: "linear-gradient(90deg, #ff512f, #f09819)",
-                    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)", // Enhanced shadow on hover
-                    transform: "scale(1.05)", // Slight scale-up effect on hover
+                    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)",
+                    transform: "scale(1.05)",
                   },
                 }}
               >

@@ -1,14 +1,20 @@
 // components/authenticate.js
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import jwt from 'jsonwebtoken';
+import { createContext, useContext, useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import jwt from "jsonwebtoken";
 
-const publicPaths = ['/login', '/register', '/'];
+export const UserContext = createContext(null);
+const publicPaths = ["/login", "/register", "/"];
+
+export function useUser() {
+  return useContext(UserContext);
+}
 
 export default function Authenticate({ children }) {
   const [loading, setLoading] = useState(true);
+  const [userDetails, setUserDetails] = useState(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -22,25 +28,34 @@ export default function Authenticate({ children }) {
           const decodedToken = jwt.decode(token);
           const accountType = decodedToken?.accountType;
 
-          if (accountType && ["admin", "staff", "parent"].includes(accountType.toLowerCase())) {
+          if (
+            accountType &&
+            ["admin", "staff", "parent"].includes(accountType.toLowerCase())
+          ) {
+            setUserDetails({
+              accountType: decodedToken.accountType,
+              firstName: decodedToken.firstName,
+              lastName: decodedToken.lastName,
+              email: decodedToken.email,
+            });
             setLoading(false); // Token is valid with a correct account type
           } else {
             setLoading(false);
             if (!publicPaths.includes(pathname)) {
-              router.push('/login'); // Account type is not valid, redirect to login
+              router.push("/login"); // Account type is not valid, redirect to login
             }
           }
         } catch (error) {
           console.error("Error decoding token:", error);
           setLoading(false);
           if (!publicPaths.includes(pathname)) {
-            router.push('/login'); // Decoding failed, redirect to login
+            router.push("/login"); // Decoding failed, redirect to login
           }
         }
       } else {
         setLoading(false);
         if (!publicPaths.includes(pathname)) {
-          router.push('/login'); // No token, redirect to login
+          router.push("/login"); // No token, redirect to login
         }
       }
     };
@@ -49,8 +64,12 @@ export default function Authenticate({ children }) {
   }, [pathname, router]);
 
   if (loading) {
-    return null; // Optionally, return a loading spinner here
+    return null;
   }
 
-  return <>{children}</>;
+  return (
+    <UserContext.Provider value={userDetails}>
+      <>{children}</>;
+    </UserContext.Provider>
+  );
 }
