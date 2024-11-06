@@ -5,10 +5,10 @@ import {
   deleteProgressReportFromDynamoDB,
   retrieveProgressReportByChildID,
   retrieveProgressReportByLocationID
-} from "../utils/progressReportAPI";
-import {retrieveChildProfileByID} from "../utils/childAPI"
-import {getRelationshipByParentID} from "../utils/relationshipAPI"
-import { getCurrentUser } from "../utils/api"; // Importing the function to get current user
+} from "../../utils/progressReportAPI";
+import {retrieveChildProfileByID} from "../../utils/childAPI"
+import {getRelationshipByParentID} from "../../utils/relationshipAPI"
+import { getCurrentUser } from "../../utils/api"; 
 import styles from "./progressReport.module.css";
 
 export default function ProgressReport() {
