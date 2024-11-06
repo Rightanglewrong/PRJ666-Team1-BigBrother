@@ -56,7 +56,7 @@ export default function ProgressReport() {
     };
 
     fetchUserDetails();
-  }, []);
+  }, [childProfiles]);
 
   // Handle creating a Progress Report in DynamoDB
   const handleCreateReport = async (e) => {
@@ -160,7 +160,6 @@ export default function ProgressReport() {
         uniqueChildIDs.map(async (id) => {
           try {
             const childData = await retrieveChildProfileByID(id);
-            console.log(`Child data for ${id}:`, childData); // Add this log to check the data
             return childData;
           } catch (error) {
             console.error(`Error retrieving data for child ${id}:`, error);
@@ -169,7 +168,6 @@ export default function ProgressReport() {
         })
       );
       setChildProfiles(childProfileData)
-      console.log(`Child data for :`, childProfiles);
             
     } catch (error) {
       console.error("Error fetching child profiles:", error);
