@@ -29,7 +29,6 @@ export default function ProgressReport() {
   const [childProfiles, setChildProfiles] = useState([]);
   const [selectedChildID, setSelectedChildID] = useState(null);
   const [filteredReports, setFilteredReports] = useState([]);
-  const [allReports, setAllReports] = useState([]);
 
 
   useEffect(() => {
@@ -314,7 +313,6 @@ export default function ProgressReport() {
         <button onClick={handleDeleteReport} disabled={!deleteReportID}>
           Delete Report
         </button>
-
           </>
         ) : (
           <>
@@ -343,21 +341,20 @@ export default function ProgressReport() {
               </div>
             ) : (
               <div>
+                <div className={styles.reportsSection}>
                 <h3>Progress Reports for Selected Child</h3>
                 <div className={styles.reportCardContainer}>
                   {filteredReports.map((report) => (
-                    <li key={report.progressReportID}
-                    className={styles.reportCard}
-                    onClick={() => handleReportClick(report)}
-                  >
-                      <h4><strong>{report.reportTitle}</strong></h4>: {report.content}{" "}
+                    <div key={report.progressReportID}>
+                      <strong>{report.reportTitle}</strong>: {report.content}{" "}
                       (Created by: {report.createdBy})
-                    </li>
+                    </div>
                   ))}
                 </div>
                 <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
               </div>
-            )}
+            </div>
+          )};
           </>
         )}
       
