@@ -213,6 +213,13 @@ export default function ProgressReport() {
     }
   };
 
+  const handleReportClick = (report) => {
+    setUpdateReportID(report.progressReportID);
+    setUpdateReportTitle(report.reportTitle);
+    setUpdateReportContent(report.content);
+    setDeleteReportID(report.progressReportID);
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
@@ -222,14 +229,17 @@ export default function ProgressReport() {
         {isAuthorized ? (
           <>
             <h3>All Progress Reports by Location</h3>
-            <ul>
+            <div className={styles.reportCardContainer}>
               {allReports.map((report) => (
-                <li key={report.progressReportID}>
-                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                <div key={report.progressReportID}
+                className= {styles.reportCard}
+                onClick = {() => handleReportClick(report)}
+                >
+                  <h4><strong>{report.reportTitle}</strong></h4>: {report.content}{" "}
                   (Created by: {report.createdBy})
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
 
              {/* Create Progress Report */}
         <h3>Create Progress Report</h3>
