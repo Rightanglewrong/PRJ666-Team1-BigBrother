@@ -160,17 +160,18 @@ export default function ProgressReport() {
       const childProfiles = await Promise.all(
         uniqueChildIDs.map((id) => retrieveChildProfileByID(id))
       );
+      
+      const formattedChildProfiles = childProfiles.map((profileData) => ({
+        childID: profileData.child.childID, // Accessing the childID inside the 'child' object
+        firstName: profileData.child.firstName,
+        lastName: profileData.child.lastName,
+        age: profileData.child.age,
+        birthDate: profileData.child.birthDate,
+        locationID: profileData.child.locationID,
+      }));
   
-      setChildProfiles(
-          childProfiles.map((childData) => ({
-          childID: childData.childID,
-          firstName: childData.firstName,
-          lastName: childData.lastName,
-          age: childData.age,
-          birthDate: childData.birthDate
-        }))
-      );
-      console.log(childProfiles);
+      setChildProfiles(formattedChildProfiles);
+      console.log(formattedChildProfiles);
     } catch (error) {
       console.error("Error fetching child profiles:", error);
     }
