@@ -5,10 +5,10 @@ import {
   deleteProgressReportFromDynamoDB,
   retrieveProgressReportByChildID,
   retrieveProgressReportByLocationID
-} from "../../utils/progressReportAPI";
-import {retrieveChildProfileByID} from "../../utils/childAPI"
-import {getRelationshipByParentID} from "../../utils/relationshipAPI"
-import { getCurrentUser } from "../../utils/api"; 
+} from "../utils/progressReportAPI";
+import {retrieveChildProfileByID} from "../utils/childAPI"
+import {getRelationshipByParentID} from "../utils/relationshipAPI"
+import { getCurrentUser } from "../utils/api"; 
 import styles from "./progressReport.module.css";
 
 export default function ProgressReport() {
@@ -173,7 +173,7 @@ export default function ProgressReport() {
       const TransformedChildProfiles = childProfiles.map((childData) => ({
         ...childData,
         }));
-      console.log(TransformedChildProfiles)
+      
       return TransformedChildProfiles;
 
       
