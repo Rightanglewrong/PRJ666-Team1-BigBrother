@@ -99,8 +99,27 @@ export const fetchLogsByUser = async (
       );
     }
 
-    const data = await response.json();
-    return data.logs || [];
+    // Handle ReadableStream
+    const reader = response.body.getReader();
+    let decoder = new TextDecoder();
+    let result = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      result += decoder.decode(value, { stream: true });
+    }
+    result += decoder.decode(); // finalize decoding
+
+    // Parse the result as JSON
+    const data = JSON.parse(result);
+
+    // Convert numeric keys to an array if the data is in this format
+    const logs = Object.keys(data)
+      .filter((key) => !isNaN(key)) // Filter for numeric keys only
+      .map((key) => data[key]);
+
+    return logs;
   } catch (error) {
     console.error("Error fetching logs by user:", error);
     throw new Error(error.message);
