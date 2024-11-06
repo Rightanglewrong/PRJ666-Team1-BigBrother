@@ -46,7 +46,10 @@ export default function ProgressReport() {
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
-            await fetchChildProfiles(uniqueChildIDs);
+            console.log(uniqueChildIDs);
+            const updatedProfiles = await fetchChildProfiles(uniqueChildIDs);
+            setChildProfiles(updatedProfiles);
+            console.log(childProfiles);
           }
         }
       } catch (error) {
@@ -54,7 +57,6 @@ export default function ProgressReport() {
         setErrorMessage("Failed to load user details. Please log in again.");
       }
     };
-
     fetchUserDetails();
   }, []);
 
