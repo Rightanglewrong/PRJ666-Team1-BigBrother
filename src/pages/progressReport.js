@@ -4,7 +4,6 @@ import {
   updateProgressReportInDynamoDB,
   deleteProgressReportFromDynamoDB,
   retrieveProgressReportByChildID,
-  retrieveProgressReportByLocationID
 } from "../utils/progressReportAPI";
 import {retrieveChildProfileByID, retrieveChildrenByLocationID} from "../utils/childAPI"
 import {getRelationshipByParentID} from "../utils/relationshipAPI"
@@ -141,20 +140,6 @@ export default function ProgressReport() {
     }
   };
 
-  // Handle filtering progress reports by child ID
-  const handleFilterByChildID = async (e) => {
-    e.preventDefault();
-    try {
-      const reports = await retrieveProgressReportByChildID(childID);
-      setFilteredReports(reports);
-      setMessage(
-        `Found ${reports.length} progress reports for child ID: ${childID}`
-      );
-    } catch (error) {
-      setMessage(`Error fetching progress reports: ${error.message}`);
-    }
-  };
-
   const fetchChildProfiles = async (uniqueChildIDs) => {
     try {
       const childProfileData = await Promise.all(
@@ -227,8 +212,9 @@ export default function ProgressReport() {
         <p className={styles.message}>{message}</p>
 
         {isAuthorized ? (
-          <>
-            <h3>All Progress Reports by Location</h3>
+          <> {!selectedChildID ? (
+            <div>
+            <h3>All Children by Location</h3>
             <div className={styles.profileContainer}>
             {childProfiles.map((child) => (
                     <div key={child.childID} className={styles.profileCard}>
@@ -248,6 +234,22 @@ export default function ProgressReport() {
                      </div>
                   ))}
             </div>
+          </div>
+          ) : (
+
+            <div className={styles.reportsSection}>
+            <h3>Progress Reports for Selected Child</h3>
+            <div className={styles.reportCardContainer}>
+              {filteredReports.map((report) => (
+                <div key={report.progressReportID}>
+                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                  (Created by: {report.createdBy})
+                </div>
+              ))}
+            </div>
+            <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
+          </div>
+      )};
 
              {/* Create Progress Report */}
         <h4>Create Progress Report</h4>
