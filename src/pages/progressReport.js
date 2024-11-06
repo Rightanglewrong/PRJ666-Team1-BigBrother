@@ -296,21 +296,25 @@ export default function ProgressReport() {
             {!selectedChildID ? (
               <div>
                 <h3>Select a Child Profile</h3>
-                <ul>
-                  {childProfiles.map((child) => (
-                    <li key={child.childID}>
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleChildClick(child.childID);
-                        }}
-                      >
-                        {child.firstName}
-                      </a>
-                    </li>
+                <div className={styles.profileContainer}>
+                {childProfiles.map((child) => (
+                    <div key={child.childID} className={styles.profileCard}>
+                        <h4>{child.firstName} {child.lastName}</h4>
+                        <p><strong>Age:</strong> {child.age}</p>
+                        <p><strong>Birth Date:</strong> {child.birthDate}</p>
+
+                        <button
+                          className={styles.viewReportsButton}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleChildClick(child.childID);
+                          }}
+                        >
+                          View Progress Reports
+                        </button>
+                     </div>
                   ))}
-                </ul>
+                </div>
               </div>
             ) : (
               <div>
