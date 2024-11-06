@@ -170,6 +170,7 @@ export default function ProgressReport() {
           birthDate: childData.birthDate
         }))
       );
+      console.log(childProfiles)
     } catch (error) {
       console.error("Error fetching child profiles:", error);
     }
