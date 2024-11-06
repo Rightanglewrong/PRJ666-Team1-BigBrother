@@ -165,7 +165,7 @@ export default function ProgressReport() {
               console.warn(`No data found for child with ID ${id}`);
               return null; 
             }
-            const { childID, firstName, lastName, age, birthDate, ...rest } = childData.child;
+            const { childID, firstName, lastName, age, birthDate, ...rest } = childData.child.child;
             return {
               childID,
               firstName,
