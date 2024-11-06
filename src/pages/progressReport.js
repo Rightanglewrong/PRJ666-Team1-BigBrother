@@ -316,7 +316,7 @@ export default function ProgressReport() {
                 <div className={styles.profileContainer}>
                 {childProfiles.map((child) => (
                     <div key={child.childID} className={styles.profileCard}>
-                        <h4>{child.firstName} {child.lastName}</h4>
+                        <h4>{child.child.firstName} {child.child.lastName}</h4>
                         <p><strong>Age:</strong> {child.age}</p>
                         <p><strong>Birth Date:</strong> {child.birthDate}</p>
 
