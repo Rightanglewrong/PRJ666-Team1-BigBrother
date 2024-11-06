@@ -49,31 +49,12 @@ export default function ProgressReport() {
             const childReportsResults = await Promise.allSettled(
               uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
             );
+
+            const profiles = childReportsResults
+            .filter((result) => result.status === "fulfilled") 
+            .map((result) => result.value);
   
-            setChildProfiles(
-              uniqueChildIDs.map((id, index) => {
-                const result = childReportsResults[index];
-                if (result.status === 'fulfilled' && result.value) {
-                  // Assuming result.value contains an object with { firstName, lastName, age, birthDate }
-                  return {
-                    childID: id,
-                    firstName: result.value.firstName,
-                    lastName: result.value.lastName,
-                    age: result.value.age,
-                    birthDate: result.value.birthDate
-                  };
-                } else {
-                  // Fallback to default values if there's no data or an error occurred
-                  return {
-                    childID: id,
-                    firstName: `Child ${id}`,
-                    lastName: "Unknown",
-                    age: "N/A",
-                    birthDate: "N/A"
-                  };
-                }
-              })
-            );
+            setChildProfiles(profiles); 
           }
         }
       } catch (error) {
