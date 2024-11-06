@@ -46,8 +46,7 @@ export default function ProgressReport() {
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
-            const childProfileData = await fetchChildProfiles(uniqueChildIDs);
-            setChildProfiles(childProfileData);
+            await fetchChildProfiles(uniqueChildIDs);
           }
         }
       } catch (error) {
@@ -174,7 +173,7 @@ export default function ProgressReport() {
         ...childData,
         }));
       
-      return TransformedChildProfiles;
+      setChildProfiles(TransformedChildProfiles);
 
       
     } catch (error) {
