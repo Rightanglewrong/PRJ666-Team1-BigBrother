@@ -161,6 +161,11 @@ export default function ProgressReport() {
         uniqueChildIDs.map(async (id) => {
           try {
             const childData = await retrieveChildProfileByID(id);
+            console.log(`Data retrieved for child ${id}:`, childData); // Debug log
+            if (!childData) {
+              console.warn(`No data found for child with ID ${id}`);
+              return null; 
+            }
             return {
               childID: id,
               firstName: childData.firstName,
