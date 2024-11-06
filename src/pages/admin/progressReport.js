@@ -161,16 +161,17 @@ export default function ProgressReport() {
         uniqueChildIDs.map((id) => retrieveChildProfileByID(id))
       );
   
-      setChildProfiles(
-          childProfiles.map((childData) => ({
+      const TransformedChildProfiles = childProfiles.map((childData) => ({
           childID: childData.childID,
           firstName: childData.firstName,
           lastName: childData.lastName,
           age: childData.age,
           birthDate: childData.birthDate
-        }))
-      );
-      console.log(childProfiles);
+        }));
+      
+      console.log(TransformedChildProfiles);
+
+      setChildProfiles(TransformedChildProfiles);
     } catch (error) {
       console.error("Error fetching child profiles:", error);
     }
