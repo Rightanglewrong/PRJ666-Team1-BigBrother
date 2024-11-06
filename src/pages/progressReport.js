@@ -162,6 +162,13 @@ export default function ProgressReport() {
     setShowErrorModal(false);
   };
 
+  const handleReset = () => {
+    setSelectedChildID(null);
+    setFilteredReports([]);
+    setChildID("");
+    setMessage("");
+  };
+
   const handleChildClick = async (childID) => {
     setSelectedChildID(childID);
     setChildID(childID); 
@@ -318,6 +325,7 @@ export default function ProgressReport() {
                 </ul>
               </div>
             )}
+            <button onClick={handleReset} className={styles.resetButton}>Reset</button>
           </>
         )}
       
