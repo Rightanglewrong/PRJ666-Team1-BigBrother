@@ -171,11 +171,7 @@ export default function ProgressReport() {
       );
   
       const TransformedChildProfiles = childProfiles.map((childData) => ({
-          childID: childData.childID,
-          firstName: childData.firstName,
-          lastName: childData.lastName,
-          age: childData.age,
-          birthDate: childData.birthDate
+        ...childData,
         }));
       
       return TransformedChildProfiles;
