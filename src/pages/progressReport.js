@@ -50,7 +50,15 @@ export default function ProgressReport() {
               uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
             );
   
-            setChildProfiles(uniqueChildIDs.map(id => ({ childID: id, firstName: `Child ${id}` }))); 
+            const filledChildProfiles = childReportsResults.map((result, index) => {
+              if (result.status === 'fulfilled' && result.value) {
+                return {
+                  childID: uniqueChildIDs[index],
+                  firstName: result.value.firstName,
+                  lastName: result.value.lastName,
+                  age: result.value.age,
+                  birthDate: result.value.birthDate
+                };
           }
         }
       } catch (error) {
