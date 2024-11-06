@@ -47,7 +47,7 @@ export default function ProgressReport() {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
             
-            fetchChildProfiles(uniqueChildIDs)
+            await fetchChildProfiles(uniqueChildIDs);
           }
         }
       } catch (error) {
@@ -160,18 +160,17 @@ export default function ProgressReport() {
       const childProfiles = await Promise.all(
         uniqueChildIDs.map((id) => retrieveChildProfileByID(id))
       );
-      
-      const formattedChildProfiles = childProfiles.map((profileData) => ({
-        childID: profileData.child.childID, // Accessing the childID inside the 'child' object
-        firstName: profileData.child.firstName,
-        lastName: profileData.child.lastName,
-        age: profileData.child.age,
-        birthDate: profileData.child.birthDate,
-        locationID: profileData.child.locationID,
-      }));
   
-      setChildProfiles(formattedChildProfiles);
-      console.log(formattedChildProfiles);
+      setChildProfiles(
+          childProfiles.map((childData) => ({
+          childID: childData.childID,
+          firstName: childData.firstName,
+          lastName: childData.lastName,
+          age: childData.age,
+          birthDate: childData.birthDate
+        }))
+      );
+      console.log(childProfiles);
     } catch (error) {
       console.error("Error fetching child profiles:", error);
     }
