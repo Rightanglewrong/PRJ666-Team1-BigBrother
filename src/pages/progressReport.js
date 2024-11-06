@@ -323,9 +323,9 @@ export default function ProgressReport() {
                     </li>
                   ))}
                 </ul>
+                <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
               </div>
             )}
-            <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
           </>
         )}
       
