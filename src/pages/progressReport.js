@@ -49,7 +49,6 @@ export default function ProgressReport() {
             const childProfilesData = await fetchChildProfiles(uniqueChildIDs);
             console.log(childProfilesData);
             setChildProfiles(childProfilesData);
-            console.log(childProfiles)
           }
         }
       } catch (error) {
@@ -162,14 +161,21 @@ export default function ProgressReport() {
         uniqueChildIDs.map(async (id) => {
           try {
             const childData = await retrieveChildProfileByID(id);
-            return childData;
+            return {
+              childID: id,
+              firstName: childData.firstName,
+              lastName: childData.lastName,
+              age: childData.age,
+              birthDate: childData.birthDate,
+            };
           } catch (error) {
             console.error(`Error retrieving data for child ${id}:`, error);
             throw error; 
           }
         })
       );
-      return childProfileData;
+      const validChildProfiles = childProfileData.filter(profile => profile !== null);
+      return validChildProfiles;
             
     } catch (error) {
       console.error("Error fetching child profiles:", error);
