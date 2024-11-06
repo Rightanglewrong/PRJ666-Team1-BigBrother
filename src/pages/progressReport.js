@@ -50,13 +50,7 @@ export default function ProgressReport() {
               uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
             );
   
-            setChildProfiles(relationshipData.map(child => ({
-              childID: child.childID,
-              firstName: child.firstName,
-              lastName: child.lastName,
-              age: child.age,
-              birthDate: child.birthDate,
-            })));
+            setChildProfiles(uniqueChildIDs.map(id => ({ childID: id, firstName: `Child ${id}` }))); 
           }
         }
       } catch (error) {
@@ -329,9 +323,9 @@ export default function ProgressReport() {
                     </li>
                   ))}
                 </ul>
-                <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
               </div>
             )}
+            <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
           </>
         )}
       
