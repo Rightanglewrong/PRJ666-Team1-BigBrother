@@ -162,9 +162,17 @@ export default function ProgressReport() {
     setShowErrorModal(false);
   };
 
-  const handleChildClick = (childID) => {
+  const handleChildClick = async (childID) => {
     setSelectedChildID(childID);
     setChildID(childID); 
+
+    try {
+      const reports = await retrieveProgressReportByChildID(childID);
+      setFilteredReports(reports);
+      setMessage(`Found ${reports.length} progress reports for child ID: ${childID}`);
+    } catch (error) {
+      setMessage(`Error fetching progress reports: ${error.message}`);
+    }
   };
 
   return (
