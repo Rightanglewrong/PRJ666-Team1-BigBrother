@@ -34,3 +34,44 @@
     color: red;
   }
   
+  .profileContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+  .profileCard {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    width: 350px;
+    text-align: center;
+    background-color: #f9f9f9;
+  }
+  
+  .profileCard h4 {
+    margin: 0 0 8px;
+  }
+  
+  .profileCard p {
+    margin: 4px 0;
+  }
+  
+  .reportsSection {
+    margin-top: 20px;
+  }
+  
+  .resetButton {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .resetButton:hover {
+    background-color: #0056b3;
+  }
+  

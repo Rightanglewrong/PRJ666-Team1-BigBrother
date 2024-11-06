@@ -1,25 +1,24 @@
 import { useState, useEffect } from "react";
 import {
   createProgressReportInDynamoDB,
-  retrieveProgressReportFromDynamoDB,
   updateProgressReportInDynamoDB,
   deleteProgressReportFromDynamoDB,
   retrieveProgressReportByChildID,
   retrieveProgressReportByLocationID
 } from "../utils/progressReportAPI";
+import {retrieveChildProfileByID} from "../utils/childAPI"
 import {getRelationshipByParentID} from "../utils/relationshipAPI"
-import { getCurrentUser } from "../utils/api"; // Importing the function to get current user
+import { getCurrentUser } from "../utils/api"; 
 import styles from "./progressReport.module.css";
 
 export default function ProgressReport() {
+  const [childID, setChildID] = useState("");
   const [createReportChildID, setCreateReportChildID] = useState("");
   const [createReportTitle, setCreateReportTitle] = useState(""); // New field for report title
   const [createReportContent, setCreateReportContent] = useState("");
   const [updateReportID, setUpdateReportID] = useState("");
   const [updateReportTitle, setUpdateReportTitle] = useState("");
   const [updateReportContent, setUpdateReportContent] = useState("");
-  const [retrieveReportID, setRetrieveReportID] = useState("");
-  const [retrievedReport, setRetrievedReport] = useState(null);
   const [deleteReportID, setDeleteReportID] = useState("");
   const [message, setMessage] = useState("");
   const [userDetails, setUserDetails] = useState(null);
@@ -27,7 +26,8 @@ export default function ProgressReport() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [childID, setChildID] = useState("");
+  const [childProfiles, setChildProfiles] = useState([]);
+  const [selectedChildID, setSelectedChildID] = useState(null);
   const [filteredReports, setFilteredReports] = useState([]);
   const [allReports, setAllReports] = useState([]);
 
@@ -46,16 +46,8 @@ export default function ProgressReport() {
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
-            
-            const childReportsResults = await Promise.allSettled(
-              uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
-            );
-  
-            const childReports = childReportsResults
-              .filter(result => result.status === 'fulfilled')
-              .flatMap(result => result.value);
-  
-            setFilteredReports(childReports);
+            const childProfilesData = await fetchChildProfiles(uniqueChildIDs);
+            setChildProfiles(childProfilesData);
           }
         }
       } catch (error) {
@@ -63,7 +55,6 @@ export default function ProgressReport() {
         setErrorMessage("Failed to load user details. Please log in again.");
       }
     };
-
     fetchUserDetails();
   }, []);
 
@@ -93,21 +84,6 @@ export default function ProgressReport() {
       setCreateReportContent('');
     } catch (error) {
       setMessage(`Error creating Progress Report: ${error.message}`);
-    }
-  };
-
-  // Handle retrieving a Progress Report from DynamoDB
-  const handleRetrieveReport = async (e) => {
-    e.preventDefault();
-    try {
-      const data = await retrieveProgressReportFromDynamoDB({
-        id: retrieveReportID,
-      });
-      setRetrievedReport(data);
-      setMessage("Progress Report retrieved successfully");
-      setRetrieveReportID("");
-    } catch (error) {
-      setMessage(`Error retrieving Progress Report: ${error.message}`);
     }
   };
 
@@ -178,8 +154,63 @@ export default function ProgressReport() {
     }
   };
 
+  const fetchChildProfiles = async (uniqueChildIDs) => {
+    try {
+      const childProfileData = await Promise.all(
+        uniqueChildIDs.map(async (id) => {
+          try {
+            const childData = await retrieveChildProfileByID(id);
+            console.log(`Data retrieved for child ${id}:`, childData); // Debug log
+            if (!childData) {
+              console.warn(`No data found for child with ID ${id}`);
+              return null; 
+            }
+            const { childID, firstName, lastName, age, birthDate, ...rest } = childData.child.child;
+            return {
+              childID,
+              firstName,
+              lastName,
+              age,
+              birthDate,
+            };
+          } catch (error) {
+            console.error(`Error retrieving data for child ${id}:`, error);
+            throw error; 
+          }
+        })
+      );
+      console.log(childProfileData);
+      const validChildProfiles = childProfileData.filter(profile => profile !== null).flat();
+      return validChildProfiles;
+            
+    } catch (error) {
+      console.error("Error fetching child profiles:", error);
+      setErrorMessage("Failed to fetch child profiles.");
+    }
+  };
+
   const handleCloseErrorModal = () => {
     setShowErrorModal(false);
+  };
+
+  const handleReset = () => {
+    setSelectedChildID(null);
+    setFilteredReports([]);
+    setChildID("");
+    setMessage("");
+  };
+
+  const handleChildClick = async (childID) => {
+    setSelectedChildID(childID);
+    setChildID(childID); 
+
+    try {
+      const reports = await retrieveProgressReportByChildID(childID);
+      setFilteredReports(reports);
+      setMessage(`Found ${reports.length} progress reports for child ID: ${childID}`);
+    } catch (error) {
+      setMessage(`Error fetching progress reports: ${error.message}`);
+    }
   };
 
   return (
@@ -188,7 +219,6 @@ export default function ProgressReport() {
         <h1 className={styles.h1Style}>Progress Reports</h1>
         <p className={styles.message}>{message}</p>
 
-        {/* Display reports based on user role */}
         {isAuthorized ? (
           <>
             <h3>All Progress Reports by Location</h3>
@@ -200,23 +230,8 @@ export default function ProgressReport() {
                 </li>
               ))}
             </ul>
-          </>
-        ) : (
-          <>
-            <h3>Filtered Progress Reports for Child</h3>
-            <ul>
-              {filteredReports.map((report) => (
-                <li key={report.progressReportID}>
-                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                  (Created by: {report.createdBy})
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
 
-
-        {/* Create Progress Report */}
+             {/* Create Progress Report */}
         <h3>Create Progress Report</h3>
         <form onSubmit={handleCreateReport}>
           <input
@@ -240,20 +255,7 @@ export default function ProgressReport() {
           <button type="submit">Create Report</button>
         </form>
 
-        {/* Retrieve Progress Report */}
-        <h3>Retrieve Progress Report</h3>
-        <input
-          type="text"
-          value={retrieveReportID}
-          placeholder="Report ID"
-          onChange={(e) => setRetrieveReportID(e.target.value)}
-        />
-        <button onClick={handleRetrieveReport} disabled={!retrieveReportID}>
-          Retrieve Report
-        </button>
-        {retrievedReport && (
-          <p>Retrieved Report: {JSON.stringify(retrievedReport)}</p>
-        )}
+
 
         {/* Update Progress Report */}
         <h3>Update Progress Report</h3>
@@ -319,7 +321,49 @@ export default function ProgressReport() {
             </ul>
           </div>
         )}
+          </>
+        ) : (
+          <>
+            {!selectedChildID ? (
+              <div>
+                <h3>Select a Child Profile</h3>
+                <div className={styles.profileContainer}>
+                {childProfiles.map((child) => (
+                    <div key={child.childID} className={styles.profileCard}>
+                        <h4>{child.firstName} {child.lastName}</h4>
+                        <p><strong>Age:</strong> {child.age}</p>
+                        <p><strong>Birth Date:</strong> {child.birthDate}</p>
 
+                        <button
+                          className={styles.viewReportsButton}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleChildClick(child.childID);
+                          }}
+                        >
+                          View Progress Reports
+                        </button>
+                     </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h3>Progress Reports for Selected Child</h3>
+                <ul>
+                  {filteredReports.map((report) => (
+                    <li key={report.progressReportID}>
+                      <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                      (Created by: {report.createdBy})
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
+              </div>
+            )}
+          </>
+        )}
+      
         {showErrorModal && (
           <div className={styles.overlay}>
             <div className={styles.modal}>
