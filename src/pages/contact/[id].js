@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { fetchContactById, updateContact, deleteContact } from '../../utils/contactApi'; // Import necessary API calls
+import { fetchContacts, updateContact, deleteContact } from '../../utils/contactApi'; // Import necessary API calls
 import styles from './contact.module.css';
 
 const ContactDetail = () => {
@@ -12,7 +12,7 @@ const ContactDetail = () => {
 
   useEffect(() => {
     if (id) {
-      fetchContactById(id).then(setContact).catch(() => setMessage('Error fetching contact.'));
+      fetchContacts(id).then(setContact).catch(() => setMessage('Error fetching contact.'));
     }
   }, [id]);
 
