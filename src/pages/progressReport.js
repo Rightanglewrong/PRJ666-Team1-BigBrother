@@ -44,6 +44,12 @@ export default function ProgressReport() {
             setAllReports(locationReports);
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
+            const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
+            
+            const childReportsResults = await Promise.allSettled(
+              uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
+            );
+  
             setChildProfiles(relationshipData.map(child => ({
               childID: child.childID,
               firstName: child.firstName,
@@ -292,21 +298,41 @@ export default function ProgressReport() {
         )}
           </>
         ) : (
-          <div>
-            <h3>Child Profiles</h3>
-            <div className={styles.profileContainer}>
-              {childProfiles.map((child) => (
-                <div key={child.childID} className={styles.profileCard}>
-                  <h4>{child.firstName} {child.lastName}</h4>
-                  <p><strong>Age:</strong> {child.age}</p>
-                  <p><strong>Birth Date:</strong> {child.birthDate}</p>
-                  <button onClick={() => handleChildClick(child.childID)}>
-                    View Progress Reports
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
+          <>
+            {!selectedChildID ? (
+              <div>
+                <h3>Select a Child Profile</h3>
+                <ul>
+                  {childProfiles.map((child) => (
+                    <li key={child.childID}>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleChildClick(child.childID);
+                        }}
+                      >
+                        {child.firstName}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div>
+                <h3>Progress Reports for Selected Child</h3>
+                <ul>
+                  {filteredReports.map((report) => (
+                    <li key={report.progressReportID}>
+                      <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                      (Created by: {report.createdBy})
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
+              </div>
+            )}
+          </>
         )}
       
         {showErrorModal && (
