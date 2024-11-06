@@ -49,12 +49,8 @@ export default function ProgressReport() {
             const childReportsResults = await Promise.allSettled(
               uniqueChildIDs.map((id) => retrieveProgressReportByChildID(id))
             );
-
-            const profiles = childReportsResults
-            .filter((result) => result.status === "fulfilled") 
-            .map((result) => result.value);
   
-            setChildProfiles(profiles); 
+            setChildProfiles(uniqueChildIDs.map(id => ({ childID: id, firstName: `Child ${firstName}`, lastName: lastName, age: age, birthDate: birthDate }))); 
           }
         }
       } catch (error) {
