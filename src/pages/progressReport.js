@@ -52,6 +52,7 @@ export default function ProgressReport() {
   
             const filledChildProfiles = childReportsResults.map((result, index) => {
               if (result.status === 'fulfilled' && result.value) {
+                // Assuming result.value contains the full profile of the child, like { firstName, lastName, age, birthDate }
                 return {
                   childID: uniqueChildIDs[index],
                   firstName: result.value.firstName,
@@ -59,6 +60,20 @@ export default function ProgressReport() {
                   age: result.value.age,
                   birthDate: result.value.birthDate
                 };
+              } else {
+                // Handle cases where profile retrieval failed
+                console.warn(`Failed to retrieve profile for child ID: ${uniqueChildIDs[index]}`);
+                return {
+                  childID: uniqueChildIDs[index],
+                  firstName: 'Unknown',
+                  lastName: 'Unknown',
+                  age: null,
+                  birthDate: null
+                };
+              }
+            });
+  
+            setChildProfiles(filledChildProfiles);
           }
         }
       } catch (error) {
