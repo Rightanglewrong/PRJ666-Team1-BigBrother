@@ -6,7 +6,7 @@ import {
   deleteChildProfileFromDynamoDB,
   retrieveChildrenByClassID,
   retrieveChildrenByLocationID
-} from '../utils/childAPI';
+} from '../../utils/childAPI';
 import styles from "./crudTester.module.css";
 
 export default function ChildCrudTest() {
