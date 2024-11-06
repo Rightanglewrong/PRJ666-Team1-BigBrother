@@ -169,9 +169,6 @@ export default function ProgressReport() {
           age: childData.age,
           birthDate: childData.birthDate
         }));
-      
-      console.log(TransformedChildProfiles);
-
       setChildProfiles(TransformedChildProfiles);
       
     } catch (error) {
