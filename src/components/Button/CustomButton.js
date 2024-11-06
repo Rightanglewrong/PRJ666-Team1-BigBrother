@@ -4,7 +4,7 @@ import { styled } from "@mui/system";
 
 // Customizing the Material UI Button component
 const StyledButton = styled(Button)(({ theme }) => ({
-  padding: "10px 20px",
+  padding: "13px 20px",
   fontWeight: "bold",
   borderRadius: "6px",
   transition: "all 0.3s ease",

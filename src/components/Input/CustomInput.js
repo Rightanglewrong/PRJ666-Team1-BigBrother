@@ -1,6 +1,6 @@
-// components/CustomInput.js
-import React from 'react';
-import { TextField } from '@mui/material';
+// src/components/CustomInput.js
+import React from "react";
+import { TextField } from "@mui/material";
 
 const CustomInput = ({ label, ...props }) => {
   return (
@@ -9,7 +9,9 @@ const CustomInput = ({ label, ...props }) => {
       variant="outlined"
       fullWidth
       sx={{
-        marginBottom: '16px',
+        "& .MuiInputLabel-root": {
+          transform: "translate(14px, -3px) scale(0.85)",
+        },
       }}
       {...props}
     />
