@@ -165,12 +165,13 @@ export default function ProgressReport() {
               console.warn(`No data found for child with ID ${id}`);
               return null; 
             }
+            const { childID, firstName, lastName, age, birthDate, ...rest } = childData.child;
             return {
-              childID: id,
-              firstName: childData.firstName,
-              lastName: childData.lastName,
-              age: childData.age,
-              birthDate: childData.birthDate,
+              childID,
+              firstName,
+              lastName,
+              age,
+              birthDate,
             };
           } catch (error) {
             console.error(`Error retrieving data for child ${id}:`, error);
