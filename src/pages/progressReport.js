@@ -157,7 +157,7 @@ export default function ProgressReport() {
   const fetchChildProfiles = async (uniqueChildIDs) => {
     try {
       const childProfileData = await Promise.all(
-        uniqueChildIDs.flatmap(async (id) => {
+        uniqueChildIDs.map(async (id) => {
           try {
             const childData = await retrieveChildProfileByID(id);
             console.log(`Data retrieved for child ${id}:`, childData); // Debug log
@@ -179,7 +179,7 @@ export default function ProgressReport() {
         })
       );
       console.log(childProfileData);
-      const validChildProfiles = childProfileData.filter(profile => profile !== null);
+      const validChildProfiles = childProfileData.filter(profile => profile !== null).flat();
       return validChildProfiles;
             
     } catch (error) {
