@@ -33,6 +33,7 @@ export default function Authenticate({ children }) {
             ["admin", "staff", "parent"].includes(accountType.toLowerCase())
           ) {
             setUserDetails({
+              userID: decodedToken.userID,
               accountType: decodedToken.accountType,
               firstName: decodedToken.firstName,
               lastName: decodedToken.lastName,

@@ -15,9 +15,10 @@ import {
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useUser } from "../components/authenticate";
+import styles from "./NavBar.module.css";
 
 const NavBar = () => {
-  const { accountType = "", firstName = "" } = useUser() || {};
+  const { firstName, accountType } = useUser() || {};
   const [anchorEl, setAnchorEl] = useState(null); // Controls dropdown menu
   const router = useRouter();
 
@@ -97,7 +98,7 @@ const NavBar = () => {
                 Welcome, {firstName}
               </Typography>
             </IconButton>
-            <Menu
+            {/* <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
@@ -118,6 +119,7 @@ const NavBar = () => {
               >
                 <Link href="/profile">Profile</Link>
               </MenuItem>
+
               <MenuItem
                 onClick={handleMenuClose}
                 sx={{
@@ -158,20 +160,8 @@ const NavBar = () => {
               >
                 <Link href="/message">Messages</Link>
               </MenuItem>
-
               {(accountType === "Admin" || accountType === "Staff") && (
-                <>
-                  <MenuItem
-                    onClick={handleMenuClose}
-                    sx={{
-                      "&:hover": {
-                        backgroundColor: "#ffcf4d",
-                        color: "#9318a5",
-                      },
-                    }}
-                  >
-                    <Link href="/crudTester">Crud Testing</Link>
-                  </MenuItem>
+                <div>
                   <MenuItem
                     onClick={handleMenuClose}
                     sx={{
@@ -183,12 +173,10 @@ const NavBar = () => {
                   >
                     <Link href="/admin">Admin Services</Link>
                   </MenuItem>
-                </>
+                </div>
               )}
-
               {/* Divider line before Logout */}
-              <Divider sx={{ my: 1, backgroundColor: "white" }} />
-
+            {/* <Divider sx={{ my: 1, backgroundColor: "white" }} /> 
               <MenuItem
                 onClick={handleMenuClose}
                 sx={{
@@ -197,7 +185,6 @@ const NavBar = () => {
               >
                 <Link href="/examplePage">Example Page</Link>
               </MenuItem>
-
               <MenuItem
                 onClick={handleLogout}
                 sx={{
@@ -214,6 +201,113 @@ const NavBar = () => {
               >
                 Logout
               </MenuItem>
+            </Menu> */}
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              sx={{
+                "& .MuiPaper-root": {
+                  background: "linear-gradient(90deg, #f52ad3f4, #25dcfce4)",
+                  color: "#fff",
+                  borderRadius: "4px",
+                  minWidth: "160px",
+                },
+              }}
+            >
+              <Link
+                href="/profile"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Profile
+              </Link>
+              <Link
+                href="/calendar"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Calendar
+              </Link>
+              <Link
+                href="/contact"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Contact List
+              </Link>
+              <Link
+                href="/mealPlan"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Meal Plan
+              </Link>
+              <Link
+                href="/newsletter"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Newsletter
+              </Link>
+              <Link
+                href="/message"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Messages
+              </Link>
+
+              {(accountType === "Admin" || accountType === "Staff") && (
+                <div>
+                  <Link
+                    href="/crudTester"
+                    passHref
+                    className={styles.dropdownItem}
+                    onClick={handleMenuClose}
+                  >
+                    Crud Testing
+                  </Link>
+                  <Link
+                    href="/admin"
+                    passHref
+                    className={styles.dropdownItem}
+                    onClick={handleMenuClose}
+                  >
+                    Admin Services
+                  </Link>
+                </div>
+              )}
+
+              <Divider sx={{ my: 1, backgroundColor: "white" }} />
+
+              <Link
+                href="/examplePage"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Example Page
+              </Link>
+
+              <Link
+                href="#"
+                passHref
+                className={styles.dropdownItem}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLogout();
+                  handleMenuClose();
+                }}
+              >
+                Logout
+              </Link>
             </Menu>
           </>
         ) : (
