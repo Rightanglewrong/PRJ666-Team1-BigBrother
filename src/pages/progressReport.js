@@ -47,7 +47,6 @@ export default function ProgressReport() {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
             const childProfilesData = await fetchChildProfiles(uniqueChildIDs);
-            console.log(childProfilesData);
             setChildProfiles(childProfilesData);
           }
         }
@@ -180,6 +179,7 @@ export default function ProgressReport() {
         })
       );
       const validChildProfiles = childProfileData.filter(profile => profile !== null);
+      console.log(validChildProfiles);
       return validChildProfiles;
             
     } catch (error) {
