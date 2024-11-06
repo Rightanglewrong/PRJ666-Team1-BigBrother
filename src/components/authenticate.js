@@ -35,6 +35,7 @@ export default function Authenticate({ children }) {
             setUserDetails({
               userID: decodedToken.userID,
               accountType: decodedToken.accountType,
+              locationID: decodedToken.locationID,
               firstName: decodedToken.firstName,
               lastName: decodedToken.lastName,
               email: decodedToken.email,

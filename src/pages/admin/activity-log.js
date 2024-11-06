@@ -7,7 +7,6 @@ import {
   fetchLogsByLocation,
   fetchLogsByUser,
 } from "../../utils/activityLogAPI";
-import { getCurrentUser } from "@/utils/api";
 import {
   Typography,
   Table,
