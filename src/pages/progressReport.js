@@ -46,10 +46,10 @@ export default function ProgressReport() {
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
-            console.log(uniqueChildIDs);
-            const updatedProfiles = await fetchChildProfiles(uniqueChildIDs);
-            setChildProfiles(updatedProfiles);
-            console.log(childProfiles);
+            const childProfilesData = await fetchChildProfiles(uniqueChildIDs);
+            console.log(childProfilesData);
+            setChildProfiles(childProfilesData);
+            console.log(childProfiles)
           }
         }
       } catch (error) {
@@ -162,7 +162,6 @@ export default function ProgressReport() {
         uniqueChildIDs.map(async (id) => {
           try {
             const childData = await retrieveChildProfileByID(id);
-            console.log(`Child data for ${id}:`, childData); 
             return childData;
           } catch (error) {
             console.error(`Error retrieving data for child ${id}:`, error);
@@ -170,10 +169,7 @@ export default function ProgressReport() {
           }
         })
       );
-      setChildProfiles(childProfileData)
-      console.log(`Child data for :`, childProfileData);
-      console.log(`Child data for :`, childProfiles);
-
+      return childProfileData;
             
     } catch (error) {
       console.error("Error fetching child profiles:", error);
