@@ -6,7 +6,7 @@ import {
   retrieveProgressReportByChildID,
   retrieveProgressReportByLocationID
 } from "../utils/progressReportAPI";
-import {retrieveChildProfileByID} from "../utils/childAPI"
+import {retrieveChildProfileByID, retrieveChildrenByLocationID} from "../utils/childAPI"
 import {getRelationshipByParentID} from "../utils/relationshipAPI"
 import { getCurrentUser } from "../utils/api"; 
 import styles from "./progressReport.module.css";
@@ -41,8 +41,10 @@ export default function ProgressReport() {
           setUserId(userData.userID);
           if (userData.accountType === 'Admin' || userData.accountType === 'Staff') {
             setIsAuthorized(true); 
-            const locationReports = await retrieveProgressReportByLocationID(userData.locationID);
-            setAllReports(locationReports);
+            const childrenProfiles = await retrieveChildrenByLocationID(userData.locationID);
+            const uniqueChildIDs = [...new Set(childrenProfiles.map((child) => child.childID))];
+            const childProfilesData = await fetchChildProfiles(uniqueChildIDs);
+            setChildProfiles(childProfilesData);
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
@@ -160,7 +162,6 @@ export default function ProgressReport() {
         uniqueChildIDs.map(async (id) => {
           try {
             const childData = await retrieveChildProfileByID(id);
-            console.log(`Data retrieved for child ${id}:`, childData); // Debug log
             if (!childData) {
               console.warn(`No data found for child with ID ${id}`);
               return null; 
@@ -229,16 +230,24 @@ export default function ProgressReport() {
         {isAuthorized ? (
           <>
             <h3>All Progress Reports by Location</h3>
-            <div className={styles.reportCardContainer}>
-              {allReports.map((report) => (
-                <div key={report.progressReportID}
-                className= {styles.reportCard}
-                onClick = {() => handleReportClick(report)}
-                >
-                  <h4><strong>{report.reportTitle}</strong></h4>: {report.content}{" "}
-                  (Created by: {report.createdBy})
-                </div>
-              ))}
+            <div className={styles.profileContainer}>
+            {childProfiles.map((child) => (
+                    <div key={child.childID} className={styles.profileCard}>
+                        <h4>{child.firstName} {child.lastName}</h4>
+                        <p><strong>Age:</strong> {child.age}</p>
+                        <p><strong>Birth Date:</strong> {child.birthDate}</p>
+
+                        <button
+                          className={styles.viewReportsButton}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleChildClick(child.childID);
+                          }}
+                        >
+                          View Progress Reports
+                        </button>
+                     </div>
+                  ))}
             </div>
 
              {/* Create Progress Report */}
