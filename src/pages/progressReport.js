@@ -251,7 +251,7 @@ export default function ProgressReport() {
             </div>
 
              {/* Create Progress Report */}
-        <h3>Create Progress Report</h3>
+        <h4>Create Progress Report</h4>
         <form onSubmit={handleCreateReport}>
           <input
             type="text"
@@ -277,7 +277,7 @@ export default function ProgressReport() {
 
 
         {/* Update Progress Report */}
-        <h3>Update Progress Report</h3>
+        <h4>Update Progress Report</h4>
         <form onSubmit={handleUpdateReport}>
           <input
             type="text"
@@ -304,7 +304,7 @@ export default function ProgressReport() {
         </form>
 
         {/* Delete Progress Report */}
-        <h3>Delete Progress Report</h3>
+        <h4>Delete Progress Report</h4>
         <input
           type="text"
           value={deleteReportID}
@@ -315,31 +315,6 @@ export default function ProgressReport() {
           Delete Report
         </button>
 
-        {/* Filter Progress Reports by Child ID */}
-        <h3>Filter Progress Reports by Child ID</h3>
-        <form onSubmit={handleFilterByChildID}>
-          <input
-            type="text"
-            value={childID}
-            placeholder="Child ID"
-            onChange={(e) => setChildID(e.target.value)}
-          />
-          <button type="submit">Filter Reports</button>
-        </form>
-
-        {filteredReports.length > 0 && (
-          <div>
-            <h4>Filtered Progress Reports</h4>
-            <ul>
-              {filteredReports.map((report) => (
-                <li key={report.progressReportID}>
-                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                  (Created by: {report.createdBy})
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
           </>
         ) : (
           <>
@@ -369,14 +344,17 @@ export default function ProgressReport() {
             ) : (
               <div>
                 <h3>Progress Reports for Selected Child</h3>
-                <ul>
+                <div className={styles.reportCardContainer}>
                   {filteredReports.map((report) => (
-                    <li key={report.progressReportID}>
-                      <strong>{report.reportTitle}</strong>: {report.content}{" "}
+                    <li key={report.progressReportID}
+                    className={styles.reportCard}
+                    onClick={() => handleReportClick(report)}
+                  >
+                      <h4><strong>{report.reportTitle}</strong></h4>: {report.content}{" "}
                       (Created by: {report.createdBy})
                     </li>
                   ))}
-                </ul>
+                </div>
                 <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
               </div>
             )}
