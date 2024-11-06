@@ -1,12 +1,10 @@
 // src/pages/admin/activity-log.js
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchLogsByLocation } from "../../utils/activityLogAPI";
 import {
-  Button,
-  TextField,
   Typography,
   Table,
   TableBody,
@@ -17,13 +15,21 @@ import {
   Paper,
   Box,
 } from "@mui/material";
+import CustomButton from "../../components/Button/CustomButton";
+import CustomInput from "../../components/Input/CustomInput";
 import styles from "./ActivityLogPage.module.css";
 
 const ActivityLogPage = () => {
+  const getDateNDaysFromToday = (days) => {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date.toISOString().split("T")[0];
+  };
+  
   const [logs, setLogs] = useState([]);
   const [locationID, setLocationID] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(getDateNDaysFromToday(-7)); // Today's date in 'YYYY-MM-DD' format
+  const [endDate, setEndDate] = useState(getDateNDaysFromToday(1));
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -37,22 +43,15 @@ const ActivityLogPage = () => {
 
   const fetchLogs = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
       const formattedStartDate = formatDateToISOString(startDate);
       const formattedEndDate = formatDateToISOString(endDate);
 
-      const response = await fetchLogsByLocation(
-        token,
+      const logsData = await fetchLogsByLocation(
         locationID,
         formattedStartDate,
         formattedEndDate
       );
-      setLogs(response.logs);
+      setLogs(logsData);
       setError("");
     } catch (err) {
       console.error("Error fetching activity logs:", err);
@@ -76,41 +75,27 @@ const ActivityLogPage = () => {
       </Typography>
 
       <Box className={styles.filterContainer}>
-        <TextField
+        <CustomInput
           label="Location ID"
-          variant="outlined"
           value={locationID}
           onChange={(e) => setLocationID(e.target.value)}
-          className={styles.filterField}
+          placeholder="Enter Location ID"
         />
-        <TextField
+        <CustomInput
           label="Start Date"
           type="date"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
-          className={styles.filterField}
-          InputLabelProps={{
-            shrink: true,
-          }}
         />
-        <TextField
+        <CustomInput
           label="End Date"
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
-          className={styles.filterField}
-          InputLabelProps={{
-            shrink: true,
-          }}
         />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={fetchLogs}
-          className={styles.filterButton}
-        >
+        <CustomButton color="primary" variant="contained" onClick={fetchLogs}>
           Fetch Logs
-        </Button>
+        </CustomButton>
       </Box>
 
       {error && (

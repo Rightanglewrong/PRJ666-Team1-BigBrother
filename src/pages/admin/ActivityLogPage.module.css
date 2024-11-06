@@ -1,8 +1,32 @@
-.container {
-    max-width: 800px;
-    width: 100%;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+/* ActivityLogPage.module.css */
+
+.activityLogContainer {
+  padding: 20px;
+}
+
+.pageTitle {
+  margin-bottom: 20px;
+}
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.filterField {
+  width: 200px;
+}
+
+.filterButton {
+  height: 56px;
+}
+
+.errorText {
+  margin-bottom: 20px;
+}
+
+.tableContainer {
+  max-height: 600px;
+}
