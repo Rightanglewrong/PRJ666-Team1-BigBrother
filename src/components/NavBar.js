@@ -17,7 +17,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useUser } from "../components/authenticate";
 
 const NavBar = () => {
-  const { accountType, firstName } = useUser(); // Access user data from context
+  const { accountType = "", firstName = "" } = useUser() || {};
   const [anchorEl, setAnchorEl] = useState(null); // Controls dropdown menu
   const router = useRouter();
 
