@@ -303,7 +303,7 @@ export default function ProgressReport() {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          handleChildClick(child.firstName);
+                          handleChildClick(child.childID);
                         }}
                       >
                         {child.firstName}
