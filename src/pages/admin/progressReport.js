@@ -48,6 +48,7 @@ export default function ProgressReport() {
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
             
             await fetchChildProfiles(uniqueChildIDs);
+            console.log(childProfiles);
           }
         }
       } catch (error) {
@@ -172,7 +173,7 @@ export default function ProgressReport() {
       console.log(TransformedChildProfiles);
 
       setChildProfiles(TransformedChildProfiles);
-      console.log(childProfiles);
+      
     } catch (error) {
       console.error("Error fetching child profiles:", error);
     }
