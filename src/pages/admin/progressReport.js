@@ -158,7 +158,16 @@ export default function ProgressReport() {
   const fetchChildProfiles = async (uniqueChildIDs) => {
     try {
       const childProfiles = await Promise.all(
-        uniqueChildIDs.map((id) => retrieveChildProfileByID(id))
+        uniqueChildIDs.map(async (id) => {
+          try {
+            const childData = await retrieveChildProfileByID(id);
+            console.log(`Child data for ${id}:`, childData); // Add this log to check the data
+            return childData;
+          } catch (error) {
+            console.error(`Error retrieving data for child ${id}:`, error);
+            throw error; 
+          }
+        })
       );
   
       const TransformedChildProfiles = childProfiles.map((childData) => ({
@@ -177,6 +186,7 @@ export default function ProgressReport() {
       setErrorMessage("Failed to fetch child profiles.");
     }
   };
+
   const handleCloseErrorModal = () => {
     setShowErrorModal(false);
   };
