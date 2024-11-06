@@ -1,6 +1,6 @@
 import React from "react";
 import { TextField, InputAdornment } from "@mui/material";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import Image from "next/image";
 
 const CustomDateInput = ({ label, value, onChange }) => {
   return (
@@ -14,13 +14,18 @@ const CustomDateInput = ({ label, value, onChange }) => {
       slots={{
         startAdornment: (
           <InputAdornment position="start">
-            <CalendarTodayIcon color="action" />
+            <Image
+              src="/icons/date_range_24dp.svg"
+              alt="Calendar Icon"
+              width={24} 
+              height={24}
+            />
           </InputAdornment>
         ),
       }}
       sx={{
         "& .MuiInputBase-root": {
-          paddingLeft: "8px", // Adjust padding for icon spacing
+          paddingLeft: "8px", 
         },
         marginBottom: "16px",
       }}

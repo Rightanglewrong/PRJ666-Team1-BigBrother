@@ -2,10 +2,13 @@
 
 .activityLogContainer {
   padding: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .pageTitle {
   margin-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 .filterContainer {
@@ -15,18 +18,10 @@
   margin-bottom: 20px;
 }
 
-.filterField {
-  width: 200px;
-}
-
-.filterButton {
-  height: 56px;
-}
-
 .errorText {
   margin-bottom: 20px;
 }
 
 .tableContainer {
-  max-height: 600px;
+  max-height: 1000px;
 }

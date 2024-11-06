@@ -3,7 +3,11 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchLogsByLocation } from "../../utils/activityLogAPI";
+import {
+  fetchLogsByLocation,
+  fetchLogsByUser,
+} from "../../utils/activityLogAPI";
+import { getCurrentUser } from "@/utils/api";
 import {
   Typography,
   Table,
@@ -14,43 +18,57 @@ import {
   TableRow,
   Paper,
   Box,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
 import CustomButton from "../../components/Button/CustomButton";
 import CustomInput from "../../components/Input/CustomInput";
 import styles from "./ActivityLogPage.module.css";
 
+const getDateNDaysFromToday = (daysOffset) =>
+  new Date(new Date().setDate(new Date().getDate() + daysOffset))
+    .toISOString()
+    .split("T")[0];
+
 const ActivityLogPage = () => {
-  const getDateNDaysFromToday = (days) => {
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-    return date.toISOString().split("T")[0];
-  };
-  
   const [logs, setLogs] = useState([]);
+  const [searchType, setSearchType] = useState("location"); // Radio button state
   const [locationID, setLocationID] = useState("");
-  const [startDate, setStartDate] = useState(getDateNDaysFromToday(-7)); // Today's date in 'YYYY-MM-DD' format
+  const [email, setEmail] = useState("");
+  const [userDetails, setUserDetails] = useState({
+    accountType: "",
+    email: "",
+    locationID: "",
+  });
+  const [isAuthorized, setIsAuthorized] = useState(null);
+  const [startDate, setStartDate] = useState(getDateNDaysFromToday(-7));
   const [endDate, setEndDate] = useState(getDateNDaysFromToday(1));
+  const [limit, setLimit] = useState(10);
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const formatDateToISOString = (date) => {
-    const d = new Date(date);
-    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(
-      2,
-      "0"
-    )}-${String(d.getUTCDate()).padStart(2, "0")}T00:00:00Z`;
-  };
-
   const fetchLogs = async () => {
     try {
-      const formattedStartDate = formatDateToISOString(startDate);
-      const formattedEndDate = formatDateToISOString(endDate);
+      const formattedStartDate = new Date(startDate).toISOString();
+      const formattedEndDate = new Date(endDate).toISOString();
+      const logsData =
+        searchType === "email"
+          ? await fetchLogsByUser(
+              email,
+              formattedStartDate,
+              formattedEndDate,
+              limit
+            )
+          : await fetchLogsByLocation(
+              locationID,
+              formattedStartDate,
+              formattedEndDate,
+              limit
+            );
 
-      const logsData = await fetchLogsByLocation(
-        locationID,
-        formattedStartDate,
-        formattedEndDate
-      );
       setLogs(logsData);
       setError("");
     } catch (err) {
@@ -62,40 +80,147 @@ const ActivityLogPage = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
+    // Will grab data or kill the page if token has ended or set page to blank if not admin
+    async function fetchData() {
+      try {
+        const userData = await getCurrentUser();
+        setIsAuthorized(userData.accountType === "Admin");
+        setUserDetails({
+          accountType: userData.accountType,
+          email: userData.email,
+          locationID: userData.locationID,
+        });
+      } catch (error) {
+        router.push("/login");
+      }
     }
+    fetchData();
   }, [router]);
+
+  if (isAuthorized == false) {
+    return (
+      <Typography
+        variant="h4"
+        align="center"
+        color="error"
+        sx={{ marginTop: 5 }}
+      >
+        Unauthorized Access
+      </Typography>
+    );
+  }
+
+  if (isAuthorized === null) {
+    return (
+      <Typography
+        variant="h4"
+        align="center"
+        color="info"
+        sx={{ marginTop: 5 }}
+      >
+        Loading...
+      </Typography>
+    );
+  }
 
   return (
     <div className={styles.activityLogContainer}>
-      <Typography variant="h4" className={styles.pageTitle}>
+      <Typography variant="h3" className={styles.pageTitle} align="center">
         Activity Log
       </Typography>
 
-      <Box className={styles.filterContainer}>
-        <CustomInput
-          label="Location ID"
-          value={locationID}
-          onChange={(e) => setLocationID(e.target.value)}
-          placeholder="Enter Location ID"
-        />
-        <CustomInput
-          label="Start Date"
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <CustomInput
-          label="End Date"
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-        <CustomButton color="primary" variant="contained" onClick={fetchLogs}>
-          Fetch Logs
-        </CustomButton>
+      <Box
+        className={styles.filterContainer}
+        sx={{
+          padding: "20px",
+          borderRadius: "20px",
+          backgroundColor: "#FC9BF7",
+          boxShadow: "0 4px 8px rgba(1,1,1,0.5)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <FormControl component="fieldset" sx={{ marginBottom: 0 }}>
+          <FormLabel
+            component="legend"
+            align="center"
+            sx={{ fontWeight: "bold", color: "#3f51b5" }}
+          >
+            Search By
+          </FormLabel>
+          <RadioGroup
+            row
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value)}
+            sx={{ display: "flex", gap: 2 }}
+          >
+            <FormControlLabel
+              value="location"
+              control={<Radio />}
+              label="Location ID"
+            />
+            <FormControlLabel value="email" control={<Radio />} label="Email" />
+          </RadioGroup>
+        </FormControl>
+
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          {searchType === "location" ? (
+            <Box sx={{ flex: 1 }}>
+              <CustomInput
+                label="Location ID"
+                value={locationID}
+                onChange={(e) => setLocationID(e.target.value)}
+                placeholder="Enter Location ID"
+              />
+            </Box>
+          ) : (
+            <Box sx={{ flex: 1 }}>
+              <CustomInput
+                label="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter Email"
+              />
+            </Box>
+          )}
+
+          <Box sx={{ flex: 1 }}>
+            <CustomInput
+              label="Start Date"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <CustomInput
+              label="End Date"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <CustomInput
+              label="Limit"
+              type="number"
+              value={limit}
+              onChange={(e) => setLimit(e.target.value)}
+              placeholder="Enter Limit"
+            />
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <CustomButton
+              color="primary"
+              variant="contained"
+              onClick={fetchLogs}
+              fullWidth
+            >
+              Fetch Logs
+            </CustomButton>
+          </Box>
+        </Box>
       </Box>
 
       {error && (
@@ -104,7 +229,11 @@ const ActivityLogPage = () => {
         </Typography>
       )}
 
-      <TableContainer component={Paper} className={styles.tableContainer}>
+      <TableContainer
+        component={Paper}
+        className={styles.tableContainer}
+        sx={{ marginTop: 3 }}
+      >
         <Table>
           <TableHead>
             <TableRow>
@@ -122,7 +251,7 @@ const ActivityLogPage = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              logs.map((log) => (
+              Object.values(logs).map((log) => (
                 <TableRow key={log.ID}>
                   <TableCell>{log.activityType}</TableCell>
                   <TableCell>{log.desc}</TableCell>
@@ -137,5 +266,4 @@ const ActivityLogPage = () => {
     </div>
   );
 };
-
 export default ActivityLogPage;
