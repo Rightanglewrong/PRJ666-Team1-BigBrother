@@ -169,9 +169,12 @@ export default function ProgressReport() {
           birthDate: childData.birthDate
         }));
       setChildProfiles(TransformedChildProfiles);
+
+      console.log("Child Profiles Set:", TransformedChildProfiles);
       
     } catch (error) {
       console.error("Error fetching child profiles:", error);
+      setErrorMessage("Failed to fetch child profiles.");
     }
   };
   const handleCloseErrorModal = () => {
