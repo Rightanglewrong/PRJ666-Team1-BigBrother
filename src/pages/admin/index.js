@@ -68,10 +68,8 @@ const AdminPage = () => {
             title="Media"
             content="Upload and manage media files."
             actions={
-              <Link href="/admin/media">
-                <Button size="small" color="primary">
-                  Go to Media
-                </Button>
+              <Link href="/admin/mediaGallery">
+                <Button size="small" color="primary">Go to Media</Button>
               </Link>
             }
           />
