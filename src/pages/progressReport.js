@@ -266,6 +266,7 @@ export default function ProgressReport() {
                           onClick={(e) => {
                             e.preventDefault();
                             handleChildClick(child.childID);
+                            setCreateReportChildID(child.childID);
                           }}
                         >
                           View Progress Reports
@@ -285,7 +286,8 @@ export default function ProgressReport() {
                 <div 
                   key={report.progressReportID}
                   className ={styles.reportCard}
-                  onClick={() => handleReportClick(report)}
+                  onClick={(e) => handleReportClick(report)}
+                  
                 >  
                   <strong>{report.reportTitle}</strong> 
                   <p>{report.content}</p>
@@ -385,7 +387,6 @@ export default function ProgressReport() {
                           onClick={(e) => {
                             e.preventDefault();
                             handleChildClick(child.childID);
-                            setCreateReportChildID(child.childID);
                           }}
                         >
                           View Progress Reports
