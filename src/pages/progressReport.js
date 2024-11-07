@@ -114,6 +114,9 @@ export default function ProgressReport() {
       );
       setUpdateReportID("");
       setUpdateReportContent("");
+      setUpdateReportTitle("");
+      const reports = await retrieveProgressReportByChildID(updateReportID);
+      setFilteredReports(reports);
     } catch (error) {
       setMessage(`Error updating Progress Report: ${error.message}`);
     }
