@@ -29,43 +29,43 @@ export const fetchMediaByLocationID = async (locationID) => {
     }
 };
 
-// API call to paginate the media entries and use pre-signed URLs for the images
 export const fetchPaginatedMedia = async (mediaEntries, page) => {
     const token = localStorage.getItem('token');
-    
+  
     if (!token) {
-        throw new Error('No authentication token found');
+      throw new Error('No authentication token found');
     }
-
+  
     try {
-        const response = await fetch(`${BACKEND_URL}v1/media/paginated-media`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                mediaEntries,
-                page,
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error fetching paginated media: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        
-        // Return media files with pre-signed URLs or base64 strings
-        return data.mediaFiles.map(file => ({
-            ...file,
-            url: file.FileData || file.presignedUrl, // FileData as base64 or presigned URL
-        }));
+      const response = await fetch(`${BACKEND_URL}v1/media/paginated-media`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mediaEntries,
+          page,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error fetching paginated media: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      return data.mediaFiles.map(file => ({
+        mediaID: file.mediaID,
+        LastModified: file.LastModified, // Capture LastModified here
+        Size: file.Size,                 // Capture Size here
+        url: file.FileData || file.presignedUrl,
+      }));
     } catch (error) {
-        console.error('Error fetching paginated media:', error);
-        throw error;
+      console.error('Error fetching paginated media:', error);
+      throw error;
     }
-};
+  };
+  
 
 // Main function to handle both calls in sequence
 export const getPaginatedMediaByLocation = async (locationID, page) => {
@@ -79,6 +79,36 @@ export const getPaginatedMediaByLocation = async (locationID, page) => {
         return paginatedMedia;
     } catch (error) {
         console.error('Error fetching paginated media by location:', error);
+        throw error;
+    }
+};
+export const deleteMediaByMediaID = async (mediaID) => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        throw new Error('No authentication token found');
+    }
+
+    try {
+        console.log("Sending delete request for mediaID:", mediaID); // Debugging line
+        const response = await fetch(`${BACKEND_URL}v1/media/delete/${mediaID}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error(`Error deleting media: ${response.statusText}`, errorData);
+            throw new Error(`Error deleting media: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.message;
+    } catch (error) {
+        console.error('Error deleting media by mediaID:', error);
         throw error;
     }
 };

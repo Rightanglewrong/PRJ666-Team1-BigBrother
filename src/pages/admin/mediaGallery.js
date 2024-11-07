@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, TextField, Dialog, DialogContent } from '@mui/material';
+import { Button, TextField, Dialog, DialogContent, Typography, DialogActions } from '@mui/material';
 import styles from '../HomePage.module.css';
-import { getPaginatedMediaByLocation } from '../../utils/mediaAPI';
+import { getPaginatedMediaByLocation, deleteMediaByMediaID, fetchMediaByLocationID, fetchPaginatedMedia } from '../../utils/mediaAPI';
 
 const MediaGallery = () => {
   const [locationID, setLocationID] = useState('');
@@ -14,6 +14,7 @@ const MediaGallery = () => {
   const [hasMore, setHasMore] = useState(true);
   const [showResults, setShowResults] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const pageLimit = 3; // Number of media files per page
 
@@ -52,13 +53,60 @@ const MediaGallery = () => {
     await fetchMediaFiles(prevPage);
   };
 
-  const openImageModal = (url) => {
-    setSelectedImage(url);
+  const openImageModal = (file) => {
+    setSelectedImage(file);
   };
 
   const closeImageModal = () => {
     setSelectedImage(null);
   };
+
+  const formatSize = (sizeInBytes) => {
+    return `${(sizeInBytes / 1024).toFixed(2)} KB`;
+  };
+
+  const openDeleteConfirm = () => {
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const closeDeleteConfirm = () => {
+    setIsDeleteConfirmOpen(false);
+  };
+
+  const handleDelete = async () => {
+    if (selectedImage) {
+      console.log("Selected mediaID for deletion:", selectedImage.mediaID); // Debugging line
+      try {
+        // Step 1: Delete the selected media item
+        await deleteMediaByMediaID(selectedImage.mediaID);
+        closeImageModal();
+        closeDeleteConfirm();
+  
+        // Step 2: Re-fetch all the media entries by location ID
+        const mediaEntries = await fetchMediaByLocationID(locationID);
+  
+        // Step 3: Adjust the page if necessary (e.g., when deleting the last item on the current page)
+        const totalItems = mediaEntries.length;
+        const totalPages = Math.ceil(totalItems / pageLimit);
+        const newPage = Math.min(page, totalPages);
+  
+        // Step 4: Fetch the updated media for the current page
+        const paginatedMedia = await fetchPaginatedMedia(mediaEntries, newPage);
+        
+        // Update state with new media and page details
+        setMediaFiles(paginatedMedia);
+        setPage(newPage);
+  
+        // Step 5: Update `hasMore` based on the number of items remaining
+        setHasMore(mediaEntries.length > newPage * pageLimit);
+  
+      } catch (error) {
+        console.error("Error deleting media:", error);
+        setError('Failed to delete media.');
+      }
+    }
+  };
+  
 
   if (!isClient) return null;
 
@@ -91,7 +139,7 @@ const MediaGallery = () => {
         {showResults && (
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
             {error && <p className={styles.error}>{error}</p>}
-            
+
             <div
               className={styles.mediaList}
               style={{
@@ -110,7 +158,7 @@ const MediaGallery = () => {
                         src={file.url}
                         alt={`Media ID: ${file.mediaID}`}
                         style={{ maxWidth: '200px', maxHeight: '200px', cursor: 'pointer' }}
-                        onClick={() => openImageModal(file.url)}
+                        onClick={() => openImageModal(file)}
                         onError={(e) => {
                           e.target.style.display = 'none';
                         }}
@@ -149,15 +197,51 @@ const MediaGallery = () => {
 
       {/* Modal for enlarged image */}
       <Dialog open={!!selectedImage} onClose={closeImageModal} maxWidth="md">
-        <DialogContent style={{ display: 'flex', justifyContent: 'center' }}>
+        <DialogContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {selectedImage && (
-            <img
-              src={selectedImage}
-              alt="Enlarged media"
-              style={{ maxWidth: '100%', maxHeight: '100%' }}
-            />
+            <>
+              <img
+                src={selectedImage.url}
+                alt={`Enlarged Media ID: ${selectedImage.mediaID}`}
+                style={{ maxWidth: '100%', maxHeight: '80vh' }}
+              />
+              <Typography variant="body1" style={{ marginTop: '10px', textAlign: 'center' }}>
+                <strong>Media ID:</strong> {selectedImage.mediaID}
+              </Typography>
+              <Typography variant="body1" style={{ textAlign: 'center' }}>
+                <strong>Last Modified:</strong> {selectedImage.LastModified ? new Date(selectedImage.LastModified).toLocaleString() : 'N/A'}
+              </Typography>
+              <Typography variant="body1" style={{ textAlign: 'center' }}>
+                <strong>Size:</strong> {selectedImage.Size ? formatSize(selectedImage.Size) : 'N/A'}
+              </Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                style={{ marginTop: '20px' }}
+                onClick={openDeleteConfirm}
+              >
+                Delete
+              </Button>
+            </>
           )}
         </DialogContent>
+      </Dialog>
+
+      {/* Confirmation dialog for delete action */}
+      <Dialog open={isDeleteConfirmOpen} onClose={closeDeleteConfirm}>
+        <DialogContent>
+          <Typography variant="body1" style={{ textAlign: 'center' }}>
+            Are you sure you want to delete this media file?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteConfirm} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="secondary">
+            Confirm
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );
