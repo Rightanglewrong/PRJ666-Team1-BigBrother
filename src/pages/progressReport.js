@@ -192,7 +192,7 @@ export default function ProgressReport() {
 
     try {
       const child = await retrieveChildProfileByID(childID);
-      setCurrentChildProfile(child.child);
+      setCurrentChildProfile(child);
     } catch (error) {
       setMessage(`Error fetching child profile: ${error.message}`);
     }
@@ -247,7 +247,7 @@ export default function ProgressReport() {
             
             <div className={styles.reportsSection}>
             <div className={styles.selectedChildHeader}>
-              <h3>Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}</h3>
+              <h3>Progress Reports for {currentChildProfile.child.firstName} {currentChildProfile.child.lastName}</h3>
             </div>
             <div className={styles.reportCardContainer}>
               {filteredReports.map((report) => (
