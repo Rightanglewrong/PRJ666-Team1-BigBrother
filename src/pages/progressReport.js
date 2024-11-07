@@ -287,8 +287,9 @@ export default function ProgressReport() {
                   className ={styles.reportCard}
                   onClick={() => handleReportClick(report)}
                 >  
-                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                  (Created by: {report.createdBy})
+                  <strong>{report.reportTitle}</strong> 
+                  <p>{report.content}</p>
+                  <p><em>Created by: {report.createdBy}</em> on {report.datePosted}</p>
                 </div>
               ))}
             </div>
@@ -403,8 +404,9 @@ export default function ProgressReport() {
                     <div key={report.progressReportID}
                           className ={styles.reportCard}
                     >
-                      <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                      (Created by: {report.createdBy})
+                      <strong>{report.reportTitle}</strong>
+                      <p>{report.content}</p>
+                      <p><em>Created by: {report.createdBy}</em> on {report.datePosted}</p>
                     </div>
                   ))}
                 </div>
