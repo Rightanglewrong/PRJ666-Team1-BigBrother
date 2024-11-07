@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getCurrentUser } from "@/utils/api";
 import { getAllNewsletters } from "@/utils/newsletterAPI";
 import {
   Container,
