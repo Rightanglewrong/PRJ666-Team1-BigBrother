@@ -80,7 +80,6 @@ export default function ProgressReport() {
 
       const data = await createProgressReportInDynamoDB(newReport);
       //setMessage(`Progress Report created successfully: ${JSON.stringify(data.item)}`);
-      setCreateReportChildID('');
       setCreateReportTitle(''); 
       setCreateReportContent('');
       setUpdateReportID("");
@@ -120,7 +119,6 @@ export default function ProgressReport() {
       // setMessage(
       //   `Progress Report updated successfully: ${JSON.stringify(data.item)}`
       // );
-      setCreateReportChildID('');
       setCreateReportTitle(''); 
       setCreateReportContent('');
       setUpdateReportID("");
@@ -150,7 +148,6 @@ export default function ProgressReport() {
         id: deleteReportID,
       });
       // setMessage("Progress Report deleted successfully");
-      setCreateReportChildID('');
       setCreateReportTitle(''); 
       setCreateReportContent('');
       setUpdateReportID("");
@@ -207,7 +204,6 @@ export default function ProgressReport() {
     setFilteredReports([]);
     setChildID("");
     setMessage("");
-    setCreateReportChildID('');
     setCreateReportTitle(''); 
     setCreateReportContent('');
     setUpdateReportID("");
