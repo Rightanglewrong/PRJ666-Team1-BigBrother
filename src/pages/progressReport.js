@@ -120,6 +120,9 @@ export default function ProgressReport() {
       // setMessage(
       //   `Progress Report updated successfully: ${JSON.stringify(data.item)}`
       // );
+      setCreateReportChildID('');
+      setCreateReportTitle(''); 
+      setCreateReportContent('');
       setUpdateReportID("");
       setUpdateReportContent("");
       setUpdateReportTitle("");
@@ -147,6 +150,9 @@ export default function ProgressReport() {
         id: deleteReportID,
       });
       // setMessage("Progress Report deleted successfully");
+      setCreateReportChildID('');
+      setCreateReportTitle(''); 
+      setCreateReportContent('');
       setUpdateReportID("");
       setUpdateReportContent("");
       setUpdateReportTitle("");
@@ -201,6 +207,13 @@ export default function ProgressReport() {
     setFilteredReports([]);
     setChildID("");
     setMessage("");
+    setCreateReportChildID('');
+    setCreateReportTitle(''); 
+    setCreateReportContent('');
+    setUpdateReportID("");
+    setUpdateReportContent("");
+    setUpdateReportTitle("");
+    setDeleteReportID("");
   };
 
   const handleChildClick = async (childID) => {
@@ -279,11 +292,8 @@ export default function ProgressReport() {
                 </div>
               ))}
             </div>
-            <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
-          </div>
-      )};
 
-             {/* Create Progress Report */}
+            {/* Create Progress Report */}
         <h4>Create Progress Report</h4>
         <form onSubmit={handleCreateReport}>
           <input
@@ -350,6 +360,12 @@ export default function ProgressReport() {
         <button onClick={handleDeleteReport} disabled={!deleteReportID}>
           Delete Report
         </button>
+
+        <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
+
+          </div>
+      )};
+
           </>
         ) : (
           <>
