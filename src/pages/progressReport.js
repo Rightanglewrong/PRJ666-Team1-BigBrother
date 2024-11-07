@@ -28,7 +28,7 @@ export default function ProgressReport() {
   const [childProfiles, setChildProfiles] = useState([]);
   const [selectedChildID, setSelectedChildID] = useState(null);
   const [filteredReports, setFilteredReports] = useState([]);
-  const [currentChildProfile, setCurrentChildProfile] = useState([]);
+  const [currentChildProfile, setCurrentChildProfile] = useState("");
 
 
   useEffect(() => {
@@ -196,7 +196,7 @@ export default function ProgressReport() {
     } catch (error) {
       setMessage(`Error fetching child profile: ${error.message}`);
     }
-    
+
     try {
       const reports = await retrieveProgressReportByChildID(childID);
       setFilteredReports(reports);
