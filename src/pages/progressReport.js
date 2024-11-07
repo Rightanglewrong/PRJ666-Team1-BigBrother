@@ -191,7 +191,7 @@ export default function ProgressReport() {
   
     try {
       const childData = await retrieveChildProfileByID(childID);
-      setCurrentChildProfile(childData.child);
+      setCurrentChildProfile(childData.child.child);
       console.log(currentChildProfile);
     } catch (error) {
       setMessage(`Error fetching child profile: ${error.message}`);
