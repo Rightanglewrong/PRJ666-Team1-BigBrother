@@ -10,10 +10,12 @@ import {
   retrieveCalendarEntriesByDate,
 } from "../utils/calendarEntryAPI";
 import { getCurrentUser } from "../utils/api";
+import { useUser } from "@/components/authenticate";
 import { withAuth } from "@/hoc/withAuth";
 import styles from "./calendar.module.css";
 
 const CalendarView = () => {
+  const user = useUser();
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false); // Delete confirmation modal
@@ -26,37 +28,27 @@ const CalendarView = () => {
     createdBy: "",
     locationID: "",
   });
-  const [userDetails, setUserDetails] = useState(null);
-  const [userId, setUserId] = useState("");
-  const [locationId, setLocationId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const userData = await getCurrentUser();
-        setUserDetails(userData);
-        if (userData) {
-          setUserId(userData.userID);
-          setLocationId(userData.locationID);
-          setNewEvent((prev) => ({ ...prev, createdBy: userId, locationID: locationId }));
-          setIsAuthorized(
-            userData.accountType === "Admin" || userData.accountType === "Staff"
-          );
-          await loadCalendarEntries();
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setErrorMessage("Failed to load user details. Please log in again.");
-        setShowErrorModal(true);
+    const fetchUserDataAndLoadEvents = async () => {
+      if (user) {
+        setIsAuthorized(
+          user.accountType === "Admin" || user.accountType === "Staff"
+        );
+        setNewEvent((prev) => ({
+          ...prev,
+          createdBy: user.userID,
+          locationID: user.locationID,
+        }));
+        await loadCalendarEntries();
       }
     };
 
-    fetchUserDetails();
-  }, []);
-
+    fetchUserDataAndLoadEvents();
+  }, [user]);
 
   // Format date to YYYY-MM-DD
   const formatDateToYYYYMMDD = (date) => {
@@ -76,22 +68,18 @@ const CalendarView = () => {
     return formatDateToYYYYMMDD(date);
   };
 
-
   // Function to load calendar entries by date range
   const loadCalendarEntries = async () => {
-    const userData = await getCurrentUser();
     const startDate = new Date();
     startDate.setFullYear(startDate.getFullYear() - 1); // Start date: 1 year ago
     const endDate = new Date();
     endDate.setFullYear(endDate.getFullYear() + 1); // End date: 1 year from now
-    const locationIdentification = userData.locationID;
 
     try {
       const entries = await retrieveCalendarEntriesByDate(
         formatDateToYYYYMMDD(startDate),
         formatDateToYYYYMMDD(endDate),
-        locationIdentification
-
+        user.locationID
       );
 
       if (entries.length === 0) {
@@ -132,7 +120,7 @@ const CalendarView = () => {
       description: "",
       dateStart: formatDateToYYYYMMDD(startDate),
       dateEnd: formatDateToYYYYMMDD(endDate),
-      createdBy: userDetails?.userID || "",
+      createdBy: user.userID || "",
     });
     setEditingEvent(null); // Reset editingEvent when creating a new event
     setShowModal(true);
@@ -147,7 +135,7 @@ const CalendarView = () => {
         description: event.description || "",
         dateStart: formatDateForDisplay(event.start),
         dateEnd: formatDateForDisplay(event.end),
-        createdBy: userDetails?.userID || "",
+        createdBy: user.userID || "",
       });
       setEditingEvent(event.id); // Set the event ID to know we are editing
       setShowModal(true);
@@ -183,8 +171,8 @@ const CalendarView = () => {
         ...newEvent,
         dateStart: formatDateToYYYYMMDD(newEvent.dateStart),
         dateEnd: formatDateToYYYYMMDD(newEvent.dateEnd),
-        createdBy: userDetails?.userID,
-        locationID: userDetails?.locationID,
+        createdBy: user.userID,
+        locationID: user.locationID,
       };
 
       if (editingEvent) {
