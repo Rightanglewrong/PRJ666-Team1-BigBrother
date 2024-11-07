@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, TextField } from '@mui/material';
+import { Button, TextField, Dialog, DialogContent } from '@mui/material';
 import styles from '../HomePage.module.css';
 import { getPaginatedMediaByLocation } from '../../utils/mediaAPI';
 
@@ -13,6 +13,7 @@ const MediaGallery = () => {
   const [isClient, setIsClient] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [showResults, setShowResults] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const pageLimit = 3; // Number of media files per page
 
@@ -49,6 +50,14 @@ const MediaGallery = () => {
     const prevPage = Math.max(page - 1, 1);
     setPage(prevPage);
     await fetchMediaFiles(prevPage);
+  };
+
+  const openImageModal = (url) => {
+    setSelectedImage(url);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
   };
 
   if (!isClient) return null;
@@ -100,7 +109,8 @@ const MediaGallery = () => {
                       <img
                         src={file.url}
                         alt={`Media ID: ${file.mediaID}`}
-                        style={{ maxWidth: '200px', maxHeight: '200px' }}
+                        style={{ maxWidth: '200px', maxHeight: '200px', cursor: 'pointer' }}
+                        onClick={() => openImageModal(file.url)}
                         onError={(e) => {
                           e.target.style.display = 'none';
                         }}
@@ -136,6 +146,19 @@ const MediaGallery = () => {
           </div>
         )}
       </div>
+
+      {/* Modal for enlarged image */}
+      <Dialog open={!!selectedImage} onClose={closeImageModal} maxWidth="md">
+        <DialogContent style={{ display: 'flex', justifyContent: 'center' }}>
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Enlarged media"
+              style={{ maxWidth: '100%', maxHeight: '100%' }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
