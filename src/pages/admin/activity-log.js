@@ -34,7 +34,7 @@ const getDateNDaysFromToday = (daysOffset) =>
     .split("T")[0];
 
 const ActivityLogPage = () => {
-  const { user } = useUser();
+  const user = useUser();
   const [logs, setLogs] = useState([]);
   const [searchType, setSearchType] = useState("location"); // Radio button state
   const [locationID, setLocationID] = useState("");
