@@ -11,23 +11,27 @@ const MediaGallery = () => {
   const [mediaFiles, setMediaFiles] = useState([]);
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-  // Ensure rendering only on the client
+  const pageLimit = 3; // Number of media files per page
+
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await fetchMediaFiles();
+    setPage(1); // Reset to first page on new location ID search
+    await fetchMediaFiles(1); // Fetch the first page of results
   };
 
-  const fetchMediaFiles = async () => {
+  const fetchMediaFiles = async (pageNumber) => {
     try {
-      const files = await getPaginatedMediaByLocation(locationID, page);
+      const files = await getPaginatedMediaByLocation(locationID, pageNumber);
       console.log('Fetched media files:', files); // Debugging output to see file data structure
       setMediaFiles(files);
       setError('');
+      setHasMore(files.length === pageLimit); // Check if we have more pages
     } catch (err) {
       console.error('Failed to fetch media:', err);
       setError('Failed to load media files.');
@@ -35,16 +39,17 @@ const MediaGallery = () => {
   };
 
   const handleNextPage = async () => {
-    setPage((prevPage) => prevPage + 1);
-    await fetchMediaFiles();
+    const nextPage = page + 1;
+    setPage(nextPage);
+    await fetchMediaFiles(nextPage);
   };
 
   const handlePreviousPage = async () => {
-    setPage((prevPage) => Math.max(prevPage - 1, 1));
-    await fetchMediaFiles();
+    const prevPage = Math.max(page - 1, 1);
+    setPage(prevPage);
+    await fetchMediaFiles(prevPage);
   };
 
-  // Render content only when on the client side
   if (!isClient) return null;
 
   return (
@@ -80,7 +85,7 @@ const MediaGallery = () => {
             <div key={index} className={styles.mediaItem}>
               {file.url ? (
                 <img
-                  src={file.url} // Use the `url` property directly
+                  src={file.url}
                   alt={`Media ID: ${file.mediaID}`}
                   style={{ maxWidth: '200px', maxHeight: '200px' }}
                   onError={(e) => {
@@ -107,7 +112,11 @@ const MediaGallery = () => {
           Previous
         </Button>
         <span style={{ margin: '0 10px' }}>Page: {page}</span>
-        <Button variant="outlined" onClick={handleNextPage}>
+        <Button
+          variant="outlined"
+          onClick={handleNextPage}
+          disabled={!hasMore}
+        >
           Next
         </Button>
       </div>
