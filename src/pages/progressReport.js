@@ -165,7 +165,6 @@ export default function ProgressReport() {
           }
         })
       );
-      console.log(childProfileData);
       const validChildProfiles = childProfileData.filter(profile => profile !== null).flat();
       return validChildProfiles;
             
@@ -189,13 +188,15 @@ export default function ProgressReport() {
   const handleChildClick = async (childID) => {
     setSelectedChildID(childID);
     setChildID(childID); 
-
+  
     try {
-      const child = await retrieveChildProfileByID(childID);
-      setCurrentChildProfile(child);
+      const childData = await retrieveChildProfileByID(childID);
+      const { childID, firstName, lastName, age, birthDate, ...rest } = childData.child.child;
+      setCurrentChildProfile(childData);
     } catch (error) {
       setMessage(`Error fetching child profile: ${error.message}`);
     }
+
 
     try {
       const reports = await retrieveProgressReportByChildID(childID);
@@ -247,7 +248,7 @@ export default function ProgressReport() {
             
             <div className={styles.reportsSection}>
             <div className={styles.selectedChildHeader}>
-              <h3>Progress Reports for {currentChildProfile.child.firstName} {currentChildProfile.child.lastName}</h3>
+              <h3>Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}</h3>
             </div>
             <div className={styles.reportCardContainer}>
               {filteredReports.map((report) => (
