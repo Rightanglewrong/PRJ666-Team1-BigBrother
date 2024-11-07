@@ -22,7 +22,6 @@ export default function MealPlanIndex() {
     async function fetchUserAndLatestMealPlan() {
       try {
         const userDetails = await getCurrentUser();
-        console.log(userDetails);
         setUser({
           accountType: userDetails.accountType,
           email: userDetails.email,
@@ -76,21 +75,26 @@ export default function MealPlanIndex() {
             </p>
 
             <div className={styles.buttonGroup}>
-              <Link href={`/mealPlan/${mealPlan.mealPlanID}`}>
-                <button className={`${styles.button} ${styles.editButton}`}>
-                  Edit Meal Plan
-                </button>
-              </Link>
               {user &&
                 (user.accountType === "Admin" ||
                   user.accountType === "Staff") && (
-                  <Link href="/mealPlan/create">
-                    <button
-                      className={`${styles.button} ${styles.createButton}`}
-                    >
-                      Create New Meal Plan
-                    </button>
-                  </Link>
+                  <>
+                    <Link href={`/mealPlan/${mealPlan.mealPlanID}`}>
+                      <button
+                        className={`${styles.button} ${styles.editButton}`}
+                      >
+                        Edit Meal Plan
+                      </button>
+                    </Link>
+
+                    <Link href="/mealPlan/create">
+                      <button
+                        className={`${styles.button} ${styles.createButton}`}
+                      >
+                        Create New Meal Plan
+                      </button>
+                    </Link>
+                  </>
                 )}
             </div>
           </div>
