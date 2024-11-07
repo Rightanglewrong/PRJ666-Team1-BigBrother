@@ -79,7 +79,7 @@ export default function ProgressReport() {
       };
 
       const data = await createProgressReportInDynamoDB(newReport);
-      setMessage(`Progress Report created successfully: ${JSON.stringify(data.item)}`);
+      //setMessage(`Progress Report created successfully: ${JSON.stringify(data.item)}`);
       setCreateReportChildID('');
       setCreateReportTitle(''); 
       setCreateReportContent('');
@@ -109,12 +109,13 @@ export default function ProgressReport() {
         updateReportID,
         updateData
       );
-      setMessage(
-        `Progress Report updated successfully: ${JSON.stringify(data.item)}`
-      );
+      // setMessage(
+      //   `Progress Report updated successfully: ${JSON.stringify(data.item)}`
+      // );
       setUpdateReportID("");
       setUpdateReportContent("");
       setUpdateReportTitle("");
+      setDeleteReportID("");
 
       const reports = await retrieveProgressReportByChildID(childID);
       setFilteredReports(reports);
@@ -133,12 +134,14 @@ export default function ProgressReport() {
       setShowErrorModal(true);
       return;
     }
-
     try {
       const data = await deleteProgressReportFromDynamoDB({
         id: deleteReportID,
       });
-      setMessage("Progress Report deleted successfully");
+      // setMessage("Progress Report deleted successfully");
+      setUpdateReportID("");
+      setUpdateReportContent("");
+      setUpdateReportTitle("");
       setDeleteReportID("");
     } catch (error) {
       setMessage(`Error deleting Progress Report: ${error.message}`);
@@ -196,7 +199,6 @@ export default function ProgressReport() {
     try {
       const childData = await retrieveChildProfileByID(childID);
       setCurrentChildProfile(childData.child.child);
-      console.log(currentChildProfile);
     } catch (error) {
       setMessage(`Error fetching child profile: ${error.message}`);
     }
@@ -204,13 +206,14 @@ export default function ProgressReport() {
     try {
       const reports = await retrieveProgressReportByChildID(childID);
       setFilteredReports(reports);
-      setMessage(`Found ${reports.length} progress reports for child ID: ${childID}`);
+      // setMessage(`Found ${reports.length} progress reports for child ID: ${childID}`);
     } catch (error) {
       setMessage(`Error fetching progress reports: ${error.message}`);
     }
   };
 
-  const handleReportClick = (report) => {
+  const handleReportClick = (report) => { 
+    setCreateReportChildID(report.childID);
     setUpdateReportID(report.progressReportID);
     setUpdateReportTitle(report.reportTitle);
     setUpdateReportContent(report.content);
