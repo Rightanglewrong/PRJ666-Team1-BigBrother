@@ -28,6 +28,7 @@ export default function ProgressReport() {
   const [childProfiles, setChildProfiles] = useState([]);
   const [selectedChildID, setSelectedChildID] = useState(null);
   const [filteredReports, setFilteredReports] = useState([]);
+  const [currentChildProfile, setCurrentChildProfile] = useState([]);
 
 
   useEffect(() => {
@@ -190,6 +191,13 @@ export default function ProgressReport() {
     setChildID(childID); 
 
     try {
+      const child = await retrieveChildProfileByID(childID);
+      setCurrentChildProfile(child);
+    } catch (error) {
+      setMessage(`Error fetching child profile: ${error.message}`);
+    }
+    
+    try {
       const reports = await retrieveProgressReportByChildID(childID);
       setFilteredReports(reports);
       setMessage(`Found ${reports.length} progress reports for child ID: ${childID}`);
@@ -236,12 +244,18 @@ export default function ProgressReport() {
             </div>
           </div>
           ) : (
-
+            
             <div className={styles.reportsSection}>
-            <h3>Progress Reports for Selected Child</h3>
+            <div className={styles.selectedChildHeader}>
+              <h3>Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}</h3>
+            </div>
             <div className={styles.reportCardContainer}>
               {filteredReports.map((report) => (
-                <div key={report.progressReportID}>
+                <div 
+                  key={report.progressReportID}
+                  className ={styles.reportCard}
+                  onClick={() => handleReportClick(report)}
+                >  
                   <strong>{report.reportTitle}</strong>: {report.content}{" "}
                   (Created by: {report.createdBy})
                 </div>
