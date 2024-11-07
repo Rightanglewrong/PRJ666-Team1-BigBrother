@@ -360,9 +360,9 @@ export default function ProgressReport() {
         <button onClick={handleDeleteReport} disabled={!deleteReportID}>
           Delete Report
         </button>
-
+        <div>
         <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
-
+        </div>
           </div>
       )};
 
@@ -395,10 +395,14 @@ export default function ProgressReport() {
             ) : (
               <div>
                 <div className={styles.reportsSection}>
-                <h3>Progress Reports for Selected Child</h3>
+                <div className={styles.selectedChildHeader}>
+              <h3>Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}</h3>
+            </div>
                 <div className={styles.reportCardContainer}>
                   {filteredReports.map((report) => (
-                    <div key={report.progressReportID}>
+                    <div key={report.progressReportID}
+                          className ={styles.reportCard}
+                    >
                       <strong>{report.reportTitle}</strong>: {report.content}{" "}
                       (Created by: {report.createdBy})
                     </div>
