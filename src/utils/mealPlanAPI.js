@@ -14,6 +14,10 @@ export const createMealPlan = async (token, mealPlanData) => {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Throw a specific error if the user is not authorized
+        throw new Error("Unauthorized - please log in again.");
+      }
       if (response.status == 403) {
         let errText = "FORBIDDEN: Unauthorized for current action";
         console.error(`Failed to create mealPlan: ${errText}`);
@@ -45,6 +49,10 @@ export const updateMealPlan = async (token, id, updateData) => {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Throw a specific error if the user is not authorized
+        throw new Error("Unauthorized - please log in again.");
+      }
       if (response.status == 403) {
         let errText = "FORBIDDEN: Unauthorized for current action";
         console.error(`Failed to update mealPlan: ${errText}`);
@@ -73,6 +81,11 @@ export const getMealPlan = async (token, id) => {
       },
     });
 
+    if (response.status === 401) {
+      // Throw a specific error if the user is not authorized
+      throw new Error("Unauthorized - please log in again.");
+    }
+
     if (!response.ok) {
       throw new Error("Failed to retrieve meal plan");
     }
@@ -93,6 +106,11 @@ export const getLatestMealPlan = async (token, daycareID) => {
     },
   });
 
+  if (response.status === 401) {
+    // Throw a specific error if the user is not authorized
+    throw new Error("Unauthorized - please log in again.");
+  }
+
   if (!response.ok) {
     throw new Error("Failed to fetch the latest meal plan");
   }
@@ -109,6 +127,11 @@ export const deleteMealPlan = async (token, id) => {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    if (response.status === 401) {
+      // Throw a specific error if the user is not authorized
+      throw new Error("Unauthorized - please log in again.");
+    }
 
     if (!response.ok) {
       throw new Error("Failed to delete meal plan");
