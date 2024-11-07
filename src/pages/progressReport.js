@@ -79,10 +79,17 @@ export default function ProgressReport() {
       };
 
       const data = await createProgressReportInDynamoDB(newReport);
-      setMessage(`Progress Report created successfully: ${JSON.stringify(data.item)}`);
-      setCreateReportChildID('');
+      //setMessage(`Progress Report created successfully: ${JSON.stringify(data.item)}`);
       setCreateReportTitle(''); 
       setCreateReportContent('');
+      setUpdateReportID("");
+      setUpdateReportContent("");
+      setUpdateReportTitle("");
+      setDeleteReportID("");
+
+      const reports = await retrieveProgressReportByChildID(childID);
+      setFilteredReports(reports);
+      
     } catch (error) {
       setMessage(`Error creating Progress Report: ${error.message}`);
     }
@@ -109,11 +116,18 @@ export default function ProgressReport() {
         updateReportID,
         updateData
       );
-      setMessage(
-        `Progress Report updated successfully: ${JSON.stringify(data.item)}`
-      );
+      // setMessage(
+      //   `Progress Report updated successfully: ${JSON.stringify(data.item)}`
+      // );
+      setCreateReportTitle(''); 
+      setCreateReportContent('');
       setUpdateReportID("");
       setUpdateReportContent("");
+      setUpdateReportTitle("");
+      setDeleteReportID("");
+
+      const reports = await retrieveProgressReportByChildID(childID);
+      setFilteredReports(reports);
     } catch (error) {
       setMessage(`Error updating Progress Report: ${error.message}`);
     }
@@ -129,13 +143,20 @@ export default function ProgressReport() {
       setShowErrorModal(true);
       return;
     }
-
     try {
       const data = await deleteProgressReportFromDynamoDB({
         id: deleteReportID,
       });
-      setMessage("Progress Report deleted successfully");
+      // setMessage("Progress Report deleted successfully");
+      setCreateReportTitle(''); 
+      setCreateReportContent('');
+      setUpdateReportID("");
+      setUpdateReportContent("");
+      setUpdateReportTitle("");
       setDeleteReportID("");
+
+      const reports = await retrieveProgressReportByChildID(childID);
+      setFilteredReports(reports);
     } catch (error) {
       setMessage(`Error deleting Progress Report: ${error.message}`);
     }
@@ -183,6 +204,12 @@ export default function ProgressReport() {
     setFilteredReports([]);
     setChildID("");
     setMessage("");
+    setCreateReportTitle(''); 
+    setCreateReportContent('');
+    setUpdateReportID("");
+    setUpdateReportContent("");
+    setUpdateReportTitle("");
+    setDeleteReportID("");
   };
 
   const handleChildClick = async (childID) => {
@@ -192,7 +219,6 @@ export default function ProgressReport() {
     try {
       const childData = await retrieveChildProfileByID(childID);
       setCurrentChildProfile(childData.child.child);
-      console.log(currentChildProfile);
     } catch (error) {
       setMessage(`Error fetching child profile: ${error.message}`);
     }
@@ -200,13 +226,14 @@ export default function ProgressReport() {
     try {
       const reports = await retrieveProgressReportByChildID(childID);
       setFilteredReports(reports);
-      setMessage(`Found ${reports.length} progress reports for child ID: ${childID}`);
+      // setMessage(`Found ${reports.length} progress reports for child ID: ${childID}`);
     } catch (error) {
       setMessage(`Error fetching progress reports: ${error.message}`);
     }
   };
 
-  const handleReportClick = (report) => {
+  const handleReportClick = (report) => { 
+    setCreateReportChildID(report.childID);
     setUpdateReportID(report.progressReportID);
     setUpdateReportTitle(report.reportTitle);
     setUpdateReportContent(report.content);
@@ -235,6 +262,7 @@ export default function ProgressReport() {
                           onClick={(e) => {
                             e.preventDefault();
                             handleChildClick(child.childID);
+                            setCreateReportChildID(child.childID);
                           }}
                         >
                           View Progress Reports
@@ -254,18 +282,17 @@ export default function ProgressReport() {
                 <div 
                   key={report.progressReportID}
                   className ={styles.reportCard}
-                  onClick={() => handleReportClick(report)}
+                  onClick={(e) => handleReportClick(report)}
+                  
                 >  
-                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                  (Created by: {report.createdBy})
+                  <strong>{report.reportTitle}</strong> 
+                  <p>{report.content}</p>
+                  <p><em>Created by: {report.createdBy}</em> on {report.datePosted}</p>
                 </div>
               ))}
             </div>
-            <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
-          </div>
-      )};
 
-             {/* Create Progress Report */}
+            {/* Create Progress Report */}
         <h4>Create Progress Report</h4>
         <form onSubmit={handleCreateReport}>
           <input
@@ -273,6 +300,7 @@ export default function ProgressReport() {
             value={createReportChildID}
             placeholder="Child ID"
             onChange={(e) => setCreateReportChildID(e.target.value)}
+            disabled 
           />
           <input
             type="text"
@@ -299,6 +327,7 @@ export default function ProgressReport() {
             value={updateReportID}
             placeholder="Report ID"
             onChange={(e) => setUpdateReportID(e.target.value)}
+            disabled 
           />
           <input
             type="text"
@@ -325,10 +354,17 @@ export default function ProgressReport() {
           value={deleteReportID}
           placeholder="Report ID"
           onChange={(e) => setDeleteReportID(e.target.value)}
+          disabled 
         />
         <button onClick={handleDeleteReport} disabled={!deleteReportID}>
           Delete Report
         </button>
+        <div>
+        <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
+        </div>
+          </div>
+      )};
+
           </>
         ) : (
           <>
@@ -356,14 +392,20 @@ export default function ProgressReport() {
                 </div>
               </div>
             ) : (
+              
               <div>
                 <div className={styles.reportsSection}>
-                <h3>Progress Reports for Selected Child</h3>
+                <div className={styles.selectedChildHeader}>
+              <h3>Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}</h3>
+            </div>
                 <div className={styles.reportCardContainer}>
                   {filteredReports.map((report) => (
-                    <div key={report.progressReportID}>
-                      <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                      (Created by: {report.createdBy})
+                    <div key={report.progressReportID}
+                          className ={styles.reportCard}
+                    >
+                      <strong>{report.reportTitle}</strong>
+                      <p>{report.content}</p>
+                      <p><em>Created by: {report.createdBy}</em> on {report.datePosted}</p>
                     </div>
                   ))}
                 </div>

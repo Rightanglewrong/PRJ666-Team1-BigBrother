@@ -1,118 +1,180 @@
 // pages/mealPlan/index.js
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getLatestMealPlan } from "@/utils/mealPlanAPI";
-import { getCurrentUser } from "@/utils/api";
-import styles from "./MealPlan.module.css";
+import { useUser } from "@/components/authenticate";
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  CircularProgress,
+  Box,
+  Snackbar,
+  Alert,
+  Divider,
+} from "@mui/material";
 
 export default function MealPlanIndex() {
+  const user = useUser();
+  const router = useRouter();
   const [mealPlan, setMealPlan] = useState(null);
   const [message, setMessage] = useState("");
-  const [user, setUser] = useState({
-    accountType: "",
-    email: "",
-    firstName: "",
-    lastName: "",
-    locationID: "",
-  });
+  const [loading, setLoading] = useState(true);
+
   // Fetch the latest meal plan
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    async function fetchUserAndLatestMealPlan() {
+    const fetchLatestMealPlan = async () => {
       try {
-        const userDetails = await getCurrentUser();
-        setUser({
-          accountType: userDetails.accountType,
-          email: userDetails.email,
-          firstName: userDetails.firstName,
-          lastName: userDetails.lastName,
-          locationID: userDetails.locationID,
-        });
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("Unauthorized - please log in again.");
+        }
 
-        const mealPlanData = await getLatestMealPlan(
-          token,
-          userDetails.locationID
-        );
+        const mealPlanData = await getLatestMealPlan(token, user.locationID);
         setMealPlan(mealPlanData);
         setMessage("");
       } catch (error) {
-        setMessage(error.message || "Error fetching the latest meal plan.");
+        if (error.message.includes("Unauthorized")) {
+          setMessage("Session expired. Redirecting to login...");
+          localStorage.removeItem("token");
+          setTimeout(() => {
+            router.push("/login");
+          }, 2000); // Redirect after 2 seconds for message display
+        } else {
+          setMessage(error.message || "Error fetching the latest meal plan.");
+        }
         setMealPlan(null);
+      } finally {
+        setLoading(false);
       }
-    }
-    fetchUserAndLatestMealPlan();
-  }, []);
+    };
+    fetchLatestMealPlan();
+  }, [user, router]);
 
   return (
-    <div className={styles.pageWrapper}>
-      <div className={styles.container}>
-        <h1 className={styles.h1style}>Current Meal Plan</h1>
-        {message && <p className={styles.message}>{message}</p>}
+    <Container
+      maxWidth="md"
+      sx={{
+        mt: 4,
+        p: 3,
+        backgroundColor: "#f7f9fc",
+        borderRadius: 2,
+        boxShadow: 3,
+        mb: 4,
+      }}
+    >
+      <Typography
+        variant="h4"
+        align="center"
+        gutterBottom
+        sx={{ color: "#2c3e50", fontWeight: "bold" }}
+      >
+        Current Meal Plan
+      </Typography>
 
-        {mealPlan ? (
-          <div className={styles.mealPlanDetails}>
-            <p>
-              <strong>Start Date:</strong> {mealPlan.startDate}
-            </p>
-            <p>
-              <strong>End Date:</strong> {mealPlan.endDate}
-            </p>
-            <p>
-              <strong>Breakfast:</strong> {mealPlan.breakfast}
-            </p>
-            <p>
-              <strong>Lunch:</strong> {mealPlan.lunch}
-            </p>
-            <p>
-              <strong>Snack:</strong> {mealPlan.snack}
-            </p>
-            <p>
-              <strong>Allergens:</strong> {mealPlan.allergens}
-            </p>
-            <p>
-              <strong>Alternatives:</strong> {mealPlan.alternatives}
-            </p>
+      {loading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="40vh"
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          {message && (
+            <Snackbar
+              open={Boolean(message)}
+              autoHideDuration={6000}
+              onClose={() => setMessage("")}
+              anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+              <Alert severity="info" onClose={() => setMessage("")}>
+                {message}
+              </Alert>
+            </Snackbar>
+          )}
 
-            <div className={styles.buttonGroup}>
-              {user &&
-                (user.accountType === "Admin" ||
-                  user.accountType === "Staff") && (
-                  <>
-                    <Link href={`/mealPlan/${mealPlan.mealPlanID}`}>
-                      <button
-                        className={`${styles.button} ${styles.editButton}`}
-                      >
-                        Edit Meal Plan
-                      </button>
-                    </Link>
+          {mealPlan ? (
+            <Card
+              variant="outlined"
+              sx={{ backgroundColor: "#fafafa", boxShadow: 1 }}
+            >
+              <CardContent>
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{ fontWeight: "bold" }}
+                >
+                  Latest Meal Plan
+                </Typography>
+                <Divider sx={{ my: 1 }} />
+                <Typography variant="body1">
+                  <strong>Start Date:</strong> {mealPlan.startDate}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>End Date:</strong> {mealPlan.endDate}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Breakfast:</strong> {mealPlan.breakfast}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Lunch:</strong> {mealPlan.lunch}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Snack:</strong> {mealPlan.snack}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Allergens:</strong> {mealPlan.allergens}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Alternatives:</strong> {mealPlan.alternatives}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
 
-                    <Link href="/mealPlan/create">
-                      <button
-                        className={`${styles.button} ${styles.createButton}`}
-                      >
-                        Create New Meal Plan
-                      </button>
-                    </Link>
-                  </>
-                )}
-            </div>
-          </div>
-        ) : (
-          <div>
-            <p className={styles.noMealPlan}>No meal plan found.</p>
-            {user &&
-              (user.accountType === "Admin" ||
-                user.accountType === "Staff") && (
-                <Link href="/mealPlan/create">
-                  <button className={`${styles.button} ${styles.createButton}`}>
-                    Create New Meal Plan
-                  </button>
-                </Link>
-              )}
-          </div>
-        )}
-      </div>
-    </div>
+                {/* Edit Meal Plan Button - Aligned to Left */}
+                <Box display="flex" justifyContent="flex-start" mt={2}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    component={Link}
+                    href={`/mealPlan/${mealPlan.mealPlanID}`}
+                    sx={{ textTransform: "none" }}
+                  >
+                    Edit Meal Plan
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          ) : (
+            <Box textAlign="center" mt={3}>
+              <Typography variant="body1" color="textSecondary">
+                No meal plan found.
+              </Typography>
+            </Box>
+          )}
+
+          {/* Centered "Create New Meal Plan" Button Outside Card */}
+          {(user.accountType === "Admin" || user.accountType === "Staff") && (
+            <Box textAlign="center" mt={3}>
+              <Button
+                variant="contained"
+                color="success"
+                component={Link}
+                href="/mealPlan/create"
+                sx={{ textTransform: "none" }}
+              >
+                Create New Meal Plan
+              </Button>
+            </Box>
+          )}
+        </>
+      )}
+    </Container>
   );
 }

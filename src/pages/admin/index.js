@@ -15,6 +15,8 @@ const AdminPage = () => {
   useEffect(() => {
     if (!user) {
       // If the user is not logged in, redirect to login
+      // Remove the invalid token if any exists
+      localStorage.removeItem("token");
       router.push("/login");
     } else if (user.accountType !== "Admin") {
       // If the user is not an Admin, redirect or show an error
