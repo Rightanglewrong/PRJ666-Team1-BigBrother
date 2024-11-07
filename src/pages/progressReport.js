@@ -302,7 +302,7 @@ export default function ProgressReport() {
             value={createReportChildID}
             placeholder="Child ID"
             onChange={(e) => setCreateReportChildID(e.target.value)}
-            readOnly 
+            disabled 
           />
           <input
             type="text"
@@ -329,7 +329,7 @@ export default function ProgressReport() {
             value={updateReportID}
             placeholder="Report ID"
             onChange={(e) => setUpdateReportID(e.target.value)}
-            readOnly 
+            disabled 
           />
           <input
             type="text"
@@ -356,7 +356,7 @@ export default function ProgressReport() {
           value={deleteReportID}
           placeholder="Report ID"
           onChange={(e) => setDeleteReportID(e.target.value)}
-          readOnly 
+          disabled 
         />
         <button onClick={handleDeleteReport} disabled={!deleteReportID}>
           Delete Report
@@ -385,6 +385,7 @@ export default function ProgressReport() {
                           onClick={(e) => {
                             e.preventDefault();
                             handleChildClick(child.childID);
+                            setCreateReportChildID(child.childID);
                           }}
                         >
                           View Progress Reports
@@ -394,6 +395,7 @@ export default function ProgressReport() {
                 </div>
               </div>
             ) : (
+              
               <div>
                 <div className={styles.reportsSection}>
                 <div className={styles.selectedChildHeader}>
