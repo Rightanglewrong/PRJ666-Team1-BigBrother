@@ -36,7 +36,7 @@ const getDateNDaysFromToday = (daysOffset) =>
 const ActivityLogPage = () => {
   const user = useUser();
   const [logs, setLogs] = useState([]);
-  const [searchType, setSearchType] = useState("location"); // Radio button state
+  const [searchType, setSearchType] = useState("location");
   const [locationID, setLocationID] = useState("");
   const [email, setEmail] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(null);
@@ -68,24 +68,26 @@ const ActivityLogPage = () => {
       setLogs(logsData);
       setError("");
     } catch (err) {
-      console.error("Error fetching activity logs:", err);
-      setError(
-        "Failed to retrieve activity logs. Please check your filters and try again."
-      );
+      if (err.message.includes("Unauthorized")) {
+        setError("Unauthorized access. Redirecting to login...");
+        setTimeout(() => router.push("/login"), 2000); // Redirect after 2 seconds
+      } else {
+        console.error("Error fetching activity logs:", err);
+        setError("Failed to retrieve activity logs. Please try again.");
+      }
     }
   };
 
   useEffect(() => {
     if (!user) {
-      // If user is not logged in, redirect to login page
-      router.push("/login");
+      setError("Session expired. Redirecting to login...");
+      setTimeout(() => router.push("/login"), 2000); // Redirect after 2 seconds
     } else {
-      // Set authorization based on user’s account type
       setIsAuthorized(user.accountType === "Admin");
     }
   }, [user, router]);
 
-  if (isAuthorized == false) {
+  if (isAuthorized === false) {
     return (
       <Typography
         variant="h4"
@@ -254,4 +256,5 @@ const ActivityLogPage = () => {
     </div>
   );
 };
+
 export default ActivityLogPage;

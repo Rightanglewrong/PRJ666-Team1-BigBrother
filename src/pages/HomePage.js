@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter from next/navigation
-import { getCurrentUser } from "../utils/api";
 import { useUser } from "@/components/authenticate";
 import Link from "next/link";
 import styles from "./HomePage.module.css";
