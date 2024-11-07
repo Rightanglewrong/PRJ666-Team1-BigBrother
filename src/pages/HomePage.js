@@ -1,35 +1,29 @@
-'use client'; // Ensure this is a Client Component
+"use client"; // Ensure this is a Client Component
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
-import { getCurrentUser } from '../utils/api'; // Import the API function
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter from next/navigation
+import { getCurrentUser } from "../utils/api";
+import { useUser } from "@/components/authenticate";
 import Link from "next/link";
 import styles from "./HomePage.module.css";
 
 const HomePage = () => {
-  const [error, setError] = useState('');
+  const user = useUser();
+  const [error, setError] = useState("");
   const router = useRouter(); // Initialize the router
 
   useEffect(() => {
-    const validateToken = async () => {
-      try {
-        // Attempt to get user data (this will validate the token)
-        await getCurrentUser();
-      } catch (error) {
-        console.error('Invalid token:', error);
-        setError('Session expired, please log in again.');
+    if (!user) {
+      setError("Session expired, please log in again.");
 
-        // Remove the invalid token
-        localStorage.removeItem('token');
+      // Remove the invalid token if any exists
+      localStorage.removeItem("token");
 
-        // Redirect to login page
-        router.push('/login');
-      }
-    };
-
-    validateToken();
-  }, [router]);
-
+      // Redirect to login page
+      router.push("/login");
+    }
+  }, [user, router]);
+  
   if (error) {
     return <p className={styles.error}>{error}</p>;
   }

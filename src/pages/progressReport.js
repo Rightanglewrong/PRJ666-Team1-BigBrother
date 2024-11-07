@@ -4,9 +4,8 @@ import {
   updateProgressReportInDynamoDB,
   deleteProgressReportFromDynamoDB,
   retrieveProgressReportByChildID,
-  retrieveProgressReportByLocationID
 } from "../utils/progressReportAPI";
-import {retrieveChildProfileByID} from "../utils/childAPI"
+import {retrieveChildProfileByID, retrieveChildrenByLocationID} from "../utils/childAPI"
 import {getRelationshipByParentID} from "../utils/relationshipAPI"
 import { getCurrentUser } from "../utils/api"; 
 import styles from "./progressReport.module.css";
@@ -29,7 +28,7 @@ export default function ProgressReport() {
   const [childProfiles, setChildProfiles] = useState([]);
   const [selectedChildID, setSelectedChildID] = useState(null);
   const [filteredReports, setFilteredReports] = useState([]);
-  const [allReports, setAllReports] = useState([]);
+  const [currentChildProfile, setCurrentChildProfile] = useState("");
 
 
   useEffect(() => {
@@ -41,8 +40,10 @@ export default function ProgressReport() {
           setUserId(userData.userID);
           if (userData.accountType === 'Admin' || userData.accountType === 'Staff') {
             setIsAuthorized(true); 
-            const locationReports = await retrieveProgressReportByLocationID(userData.locationID);
-            setAllReports(locationReports);
+            const childrenProfiles = await retrieveChildrenByLocationID(userData.locationID);
+            const uniqueChildIDs = [...new Set(childrenProfiles.map((child) => child.childID))];
+            const childProfilesData = await fetchChildProfiles(uniqueChildIDs);
+            setChildProfiles(childProfilesData);
           } else if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
@@ -140,27 +141,12 @@ export default function ProgressReport() {
     }
   };
 
-  // Handle filtering progress reports by child ID
-  const handleFilterByChildID = async (e) => {
-    e.preventDefault();
-    try {
-      const reports = await retrieveProgressReportByChildID(childID);
-      setFilteredReports(reports);
-      setMessage(
-        `Found ${reports.length} progress reports for child ID: ${childID}`
-      );
-    } catch (error) {
-      setMessage(`Error fetching progress reports: ${error.message}`);
-    }
-  };
-
   const fetchChildProfiles = async (uniqueChildIDs) => {
     try {
       const childProfileData = await Promise.all(
         uniqueChildIDs.map(async (id) => {
           try {
             const childData = await retrieveChildProfileByID(id);
-            console.log(`Data retrieved for child ${id}:`, childData); // Debug log
             if (!childData) {
               console.warn(`No data found for child with ID ${id}`);
               return null; 
@@ -179,7 +165,6 @@ export default function ProgressReport() {
           }
         })
       );
-      console.log(childProfileData);
       const validChildProfiles = childProfileData.filter(profile => profile !== null).flat();
       return validChildProfiles;
             
@@ -203,6 +188,14 @@ export default function ProgressReport() {
   const handleChildClick = async (childID) => {
     setSelectedChildID(childID);
     setChildID(childID); 
+  
+    try {
+      const childData = await retrieveChildProfileByID(childID);
+      setCurrentChildProfile(childData.child.child);
+      console.log(currentChildProfile);
+    } catch (error) {
+      setMessage(`Error fetching child profile: ${error.message}`);
+    }
 
     try {
       const reports = await retrieveProgressReportByChildID(childID);
@@ -213,6 +206,13 @@ export default function ProgressReport() {
     }
   };
 
+  const handleReportClick = (report) => {
+    setUpdateReportID(report.progressReportID);
+    setUpdateReportTitle(report.reportTitle);
+    setUpdateReportContent(report.content);
+    setDeleteReportID(report.progressReportID);
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
@@ -220,19 +220,53 @@ export default function ProgressReport() {
         <p className={styles.message}>{message}</p>
 
         {isAuthorized ? (
-          <>
-            <h3>All Progress Reports by Location</h3>
-            <ul>
-              {allReports.map((report) => (
-                <li key={report.progressReportID}>
+          <> {!selectedChildID ? (
+            <div>
+            <h3>All Children by Location</h3>
+            <div className={styles.profileContainer}>
+            {childProfiles.map((child) => (
+                    <div key={child.childID} className={styles.profileCard}>
+                        <h4>{child.firstName} {child.lastName}</h4>
+                        <p><strong>Age:</strong> {child.age}</p>
+                        <p><strong>Birth Date:</strong> {child.birthDate}</p>
+
+                        <button
+                          className={styles.viewReportsButton}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleChildClick(child.childID);
+                          }}
+                        >
+                          View Progress Reports
+                        </button>
+                     </div>
+                  ))}
+            </div>
+          </div>
+          ) : (
+            
+            <div className={styles.reportsSection}>
+            <div className={styles.selectedChildHeader}>
+              <h3>Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}</h3>
+            </div>
+            <div className={styles.reportCardContainer}>
+              {filteredReports.map((report) => (
+                <div 
+                  key={report.progressReportID}
+                  className ={styles.reportCard}
+                  onClick={() => handleReportClick(report)}
+                >  
                   <strong>{report.reportTitle}</strong>: {report.content}{" "}
                   (Created by: {report.createdBy})
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
+            <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
+          </div>
+      )};
 
              {/* Create Progress Report */}
-        <h3>Create Progress Report</h3>
+        <h4>Create Progress Report</h4>
         <form onSubmit={handleCreateReport}>
           <input
             type="text"
@@ -258,7 +292,7 @@ export default function ProgressReport() {
 
 
         {/* Update Progress Report */}
-        <h3>Update Progress Report</h3>
+        <h4>Update Progress Report</h4>
         <form onSubmit={handleUpdateReport}>
           <input
             type="text"
@@ -285,7 +319,7 @@ export default function ProgressReport() {
         </form>
 
         {/* Delete Progress Report */}
-        <h3>Delete Progress Report</h3>
+        <h4>Delete Progress Report</h4>
         <input
           type="text"
           value={deleteReportID}
@@ -295,32 +329,6 @@ export default function ProgressReport() {
         <button onClick={handleDeleteReport} disabled={!deleteReportID}>
           Delete Report
         </button>
-
-        {/* Filter Progress Reports by Child ID */}
-        <h3>Filter Progress Reports by Child ID</h3>
-        <form onSubmit={handleFilterByChildID}>
-          <input
-            type="text"
-            value={childID}
-            placeholder="Child ID"
-            onChange={(e) => setChildID(e.target.value)}
-          />
-          <button type="submit">Filter Reports</button>
-        </form>
-
-        {filteredReports.length > 0 && (
-          <div>
-            <h4>Filtered Progress Reports</h4>
-            <ul>
-              {filteredReports.map((report) => (
-                <li key={report.progressReportID}>
-                  <strong>{report.reportTitle}</strong>: {report.content}{" "}
-                  (Created by: {report.createdBy})
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
           </>
         ) : (
           <>
@@ -349,18 +357,20 @@ export default function ProgressReport() {
               </div>
             ) : (
               <div>
+                <div className={styles.reportsSection}>
                 <h3>Progress Reports for Selected Child</h3>
-                <ul>
+                <div className={styles.reportCardContainer}>
                   {filteredReports.map((report) => (
-                    <li key={report.progressReportID}>
+                    <div key={report.progressReportID}>
                       <strong>{report.reportTitle}</strong>: {report.content}{" "}
                       (Created by: {report.createdBy})
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
                 <button onClick={handleReset} className={styles.resetButton}>Return to Child Profiles</button>
               </div>
-            )}
+            </div>
+          )};
           </>
         )}
       
