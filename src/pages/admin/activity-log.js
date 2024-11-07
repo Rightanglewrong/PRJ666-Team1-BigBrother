@@ -7,7 +7,6 @@ import {
   fetchLogsByLocation,
   fetchLogsByUser,
 } from "../../utils/activityLogAPI";
-import { getCurrentUser } from "@/utils/api";
 import {
   Typography,
   Table,
@@ -27,6 +26,7 @@ import {
 import CustomButton from "../../components/Button/CustomButton";
 import CustomInput from "../../components/Input/CustomInput";
 import styles from "./ActivityLogPage.module.css";
+import { useUser } from "@/components/authenticate";
 
 const getDateNDaysFromToday = (daysOffset) =>
   new Date(new Date().setDate(new Date().getDate() + daysOffset))
@@ -34,15 +34,11 @@ const getDateNDaysFromToday = (daysOffset) =>
     .split("T")[0];
 
 const ActivityLogPage = () => {
+  const user = useUser();
   const [logs, setLogs] = useState([]);
   const [searchType, setSearchType] = useState("location"); // Radio button state
   const [locationID, setLocationID] = useState("");
   const [email, setEmail] = useState("");
-  const [userDetails, setUserDetails] = useState({
-    accountType: "",
-    email: "",
-    locationID: "",
-  });
   const [isAuthorized, setIsAuthorized] = useState(null);
   const [startDate, setStartDate] = useState(getDateNDaysFromToday(-7));
   const [endDate, setEndDate] = useState(getDateNDaysFromToday(1));
@@ -80,22 +76,14 @@ const ActivityLogPage = () => {
   };
 
   useEffect(() => {
-    // Will grab data or kill the page if token has ended or set page to blank if not admin
-    async function fetchData() {
-      try {
-        const userData = await getCurrentUser();
-        setIsAuthorized(userData.accountType === "Admin");
-        setUserDetails({
-          accountType: userData.accountType,
-          email: userData.email,
-          locationID: userData.locationID,
-        });
-      } catch (error) {
-        router.push("/login");
-      }
+    if (!user) {
+      // If user is not logged in, redirect to login page
+      router.push("/login");
+    } else {
+      // Set authorization based on user’s account type
+      setIsAuthorized(user.accountType === "Admin");
     }
-    fetchData();
-  }, [router]);
+  }, [user, router]);
 
   if (isAuthorized == false) {
     return (

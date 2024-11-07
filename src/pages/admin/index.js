@@ -1,34 +1,34 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { getCurrentUser } from '../../utils/api';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/components/authenticate";
 import Link from "next/link";
-import CustomCard from '../../components/Card/CustomCard';
-import { Button } from '@mui/material';
+import CustomCard from "../../components/Card/CustomCard";
+import { Button, Typography } from "@mui/material";
 import styles from "../HomePage.module.css";
 
 const AdminPage = () => {
-  const [error, setError] = useState('');
+  const user = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    const validateToken = async () => {
-      try {
-        await getCurrentUser();
-      } catch (error) {
-        console.error('Invalid token:', error);
-        setError('Session expired, please log in again.');
-        localStorage.removeItem('token');
-        router.push('/login');
-      }
-    };
+    if (!user) {
+      // If the user is not logged in, redirect to login
+      router.push("/login");
+    } else if (user.accountType !== "Admin") {
+      // If the user is not an Admin, redirect or show an error
+      router.push("/");
+    }
+  }, [user, router]);
 
-    validateToken();
-  }, [router]);
-
-  if (error) {
-    return <p className={styles.error}>{error}</p>;
+  // Render an error if user data is still loading or is unauthorized
+  if (!user || user.accountType !== "Admin") {
+    return (
+      <Typography variant="h5" className={styles.error}>
+        Unauthorized Access
+      </Typography>
+    );
   }
 
   return (
@@ -43,7 +43,9 @@ const AdminPage = () => {
             content="View all administrative activity logs."
             actions={
               <Link href="/admin/activity-log">
-                <Button size="small" color="primary">Go to Activity Log</Button>
+                <Button size="small" color="primary">
+                  Go to Activity Log
+                </Button>
               </Link>
             }
           />
@@ -54,7 +56,9 @@ const AdminPage = () => {
             content="Manage and view progress reports for children."
             actions={
               <Link href="/admin/progressReport">
-                <Button size="small" color="primary">Go to Progress Reports</Button>
+                <Button size="small" color="primary">
+                  Go to Progress Reports
+                </Button>
               </Link>
             }
           />
@@ -64,7 +68,7 @@ const AdminPage = () => {
             title="Media"
             content="Upload and manage media files."
             actions={
-              <Link href="/admin/media">
+              <Link href="/admin/mediaGallery">
                 <Button size="small" color="primary">Go to Media</Button>
               </Link>
             }
@@ -76,7 +80,9 @@ const AdminPage = () => {
             content="Manage relationships between children and guardians."
             actions={
               <Link href="/admin/relationship">
-                <Button size="small" color="primary">Go to Relationships</Button>
+                <Button size="small" color="primary">
+                  Go to Relationships
+                </Button>
               </Link>
             }
           />
@@ -87,7 +93,9 @@ const AdminPage = () => {
             content="View and manage children profiles."
             actions={
               <Link href="/admin/children">
-                <Button size="small" color="primary">Go to Children</Button>
+                <Button size="small" color="primary">
+                  Go to Children
+                </Button>
               </Link>
             }
           />

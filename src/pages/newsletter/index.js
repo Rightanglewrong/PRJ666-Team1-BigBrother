@@ -1,8 +1,8 @@
 // src/pages/newsletter/index.js
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getCurrentUser } from "@/utils/api";
 import { getAllNewsletters } from "@/utils/newsletterAPI";
 import {
   Container,
@@ -11,19 +11,19 @@ import {
   Card,
   CardContent,
   CardActions,
-  Grid,
   CircularProgress,
   Snackbar,
   Box,
   Pagination,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { useUser } from "@/components/authenticate";
 
 export default function NewsletterIndex() {
+  const user = useUser();
   const [newsletters, setNewsletters] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const newslettersPerPage = 5; // Adjust this value for the number of newsletters per page
 
@@ -36,10 +36,7 @@ export default function NewsletterIndex() {
 
     async function fetchNewsletters() {
       try {
-        const user = await getCurrentUser(token);
-        setUser(user);
-
-        const newsletters = await getAllNewsletters(token, user.locationID);
+        const newsletters = await getAllNewsletters(token, user.locationID); // Fetch newsletters with user's locationID
         const sortedNewsletters = newsletters.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -56,7 +53,7 @@ export default function NewsletterIndex() {
     }
 
     fetchNewsletters();
-  }, []);
+  }, [user]);
 
   // Calculate the newsletters to display on the current page
   const indexOfLastNewsletter = currentPage * newslettersPerPage;
@@ -90,7 +87,15 @@ export default function NewsletterIndex() {
   return (
     <Container
       maxWidth="md"
-      sx={{ mt: 4, p: 3, backgroundColor: "#f7f9fc", borderRadius: 2, boxShadow: 3, mb: 4, overflow: "hidden", }}
+      sx={{
+        mt: 4,
+        p: 3,
+        backgroundColor: "#f7f9fc",
+        borderRadius: 2,
+        boxShadow: 3,
+        mb: 4,
+        overflow: "hidden",
+      }}
     >
       <Typography
         variant="h4"
@@ -134,9 +139,16 @@ export default function NewsletterIndex() {
         )}
 
       {newsletters.length > 0 ? (
-        <Grid container spacing={3} sx={{ mt: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+            mt: 3,
+          }}
+        >
           {currentNewsletters.map((newsletter) => (
-            <Grid item xs={12} key={newsletter.newsletterID}>
+            <Box key={newsletter.newsletterID}>
               <Card
                 variant="outlined"
                 sx={{
@@ -180,7 +192,10 @@ export default function NewsletterIndex() {
                   </Typography>
                 </CardContent>
                 <CardActions sx={{ pl: 2, pb: 2 }}>
-                  <Link href={`/newsletter/${newsletter.newsletterID}`} passHref>
+                  <Link
+                    href={`/newsletter/${newsletter.newsletterID}`}
+                    passHref
+                  >
                     <Button
                       variant="contained"
                       sx={{
@@ -195,9 +210,9 @@ export default function NewsletterIndex() {
                   </Link>
                 </CardActions>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       ) : (
         <Typography
           variant="body2"

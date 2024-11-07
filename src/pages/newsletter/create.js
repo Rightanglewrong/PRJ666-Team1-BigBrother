@@ -3,58 +3,25 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { createNewsletter } from "@/utils/newsletterAPI";
-import { getCurrentUser } from "@/utils/api";
+import { useUser } from "@/components/authenticate";
 import {
   Container,
   Typography,
   TextField,
   Button,
-  CircularProgress,
   Snackbar,
   Alert,
   Box,
 } from "@mui/material";
 
 export default function CreateNewsletterPage() {
+  const userDetails = useUser();
   const router = useRouter();
   const [newsletter, setNewsletter] = useState({
     title: "",
     content: "",
   });
   const [message, setMessage] = useState("");
-  const [userDetails, setUserDetails] = useState({
-    locationID: "",
-    firstName: "",
-    lastName: "",
-    accountType: "",
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setMessage("User is not authenticated");
-      return router.push("/login");
-    }
-
-    async function fetchUserProfile() {
-      try {
-        const userDetails = await getCurrentUser();
-        setUserDetails({
-          locationID: userDetails.locationID,
-          firstName: userDetails.firstName,
-          lastName: userDetails.lastName,
-          accountType: userDetails.accountType,
-        });
-        setLoading(false);
-      } catch (error) {
-        setMessage("Error fetching user details");
-        setLoading(false);
-      }
-    }
-
-    fetchUserProfile();
-  }, [router]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,14 +59,6 @@ export default function CreateNewsletterPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <Container maxWidth="sm" sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-        <CircularProgress />
-      </Container>
-    );
-  }
-
   return (
     <Container maxWidth="sm" sx={{ mt: 4, p: 3, backgroundColor: "#f7f9fc", borderRadius: 2, boxShadow: 3, mb: 4, overflow: "hidden", }}>
       <Typography variant="h4" align="center" gutterBottom sx={{ color: "#2c3e50", fontWeight: "bold" }}>
@@ -111,7 +70,7 @@ export default function CreateNewsletterPage() {
           open={Boolean(message)}
           autoHideDuration={6000}
           onClose={() => setMessage("")}
-          anchorOrigin={{ vertical: "botton", horizontal: "center" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
           <Alert onClose={() => setMessage("")} severity="info" sx={{ width: '100%' }}>
             {message}
