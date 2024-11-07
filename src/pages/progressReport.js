@@ -83,6 +83,14 @@ export default function ProgressReport() {
       setCreateReportChildID('');
       setCreateReportTitle(''); 
       setCreateReportContent('');
+      setUpdateReportID("");
+      setUpdateReportContent("");
+      setUpdateReportTitle("");
+      setDeleteReportID("");
+
+      const reports = await retrieveProgressReportByChildID(childID);
+      setFilteredReports(reports);
+      
     } catch (error) {
       setMessage(`Error creating Progress Report: ${error.message}`);
     }
@@ -143,6 +151,9 @@ export default function ProgressReport() {
       setUpdateReportContent("");
       setUpdateReportTitle("");
       setDeleteReportID("");
+
+      const reports = await retrieveProgressReportByChildID(childID);
+      setFilteredReports(reports);
     } catch (error) {
       setMessage(`Error deleting Progress Report: ${error.message}`);
     }
@@ -280,6 +291,7 @@ export default function ProgressReport() {
             value={createReportChildID}
             placeholder="Child ID"
             onChange={(e) => setCreateReportChildID(e.target.value)}
+            readOnly 
           />
           <input
             type="text"
@@ -306,6 +318,7 @@ export default function ProgressReport() {
             value={updateReportID}
             placeholder="Report ID"
             onChange={(e) => setUpdateReportID(e.target.value)}
+            readOnly 
           />
           <input
             type="text"
@@ -332,6 +345,7 @@ export default function ProgressReport() {
           value={deleteReportID}
           placeholder="Report ID"
           onChange={(e) => setDeleteReportID(e.target.value)}
+          readOnly 
         />
         <button onClick={handleDeleteReport} disabled={!deleteReportID}>
           Delete Report
