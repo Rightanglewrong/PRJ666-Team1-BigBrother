@@ -96,6 +96,7 @@ export async function signup(signupData) {
   return await response.json();
 }
 
+// Function to determine content type based on file extension
 const determineContentType = (key) => {
   const extension = key.split(".").pop().toLowerCase();
   switch (extension) {
@@ -116,21 +117,17 @@ const determineContentType = (key) => {
   }
 };
 
-// Sends call to backend API w/ file and key for upload
+// Upload a file to S3 with specified key
 export const uploadFileToS3 = async (file, key) => {
-  if (!file) {
-    throw new Error("No file selected");
-  }
-
-  if (!key) {
-    throw new Error("No key provided");
+  if (!file || !key) {
+    throw new Error("File and key are required for upload.");
   }
 
   const formData = new FormData();
   formData.append("key", key);
   formData.append("file", file);
 
-  const res = await fetch(`${BACKEND_URL}v1/test/upload`, {
+  const res = await fetch(`${BACKEND_URL}v1/media/upload`, {
     method: "POST",
     body: formData,
   });
@@ -143,32 +140,32 @@ export const uploadFileToS3 = async (file, key) => {
   return data;
 };
 
-// To GET from s3
+// Retrieve a file from S3 by key
 export const retrieveFileFromS3 = async (fileKey) => {
-  const res = await fetch(`${BACKEND_URL}v1/test/get-file?key=${fileKey}`);
+  const res = await fetch(`${BACKEND_URL}v1/media/get-file?key=${fileKey}`);
 
   if (!res.ok) {
     throw new Error("File not found");
   }
-  // Infer the content type from the file key
+
   const contentType = determineContentType(fileKey);
   const blobby = await res.blob();
-  const fileUrl = URL.createObjectURL(blobby); // Create URL from blob
+  const fileUrl = URL.createObjectURL(blobby);
 
   return { fileUrl, contentType };
 };
 
-// To update in s3
+// Update an existing file in S3 by key
 export const updateFileInS3 = async (fileKey, newFile) => {
-  if (!newFile) {
-    throw new Error("No file selected for update");
+  if (!newFile || !fileKey) {
+    throw new Error("File and key are required for update.");
   }
 
   const formData = new FormData();
   formData.append("file", newFile);
   formData.append("key", fileKey);
 
-  const res = await fetch(`${BACKEND_URL}v1/test/update-file`, {
+  const res = await fetch(`${BACKEND_URL}v1/media/update-file`, {
     method: "PUT",
     body: formData,
   });
@@ -181,9 +178,9 @@ export const updateFileInS3 = async (fileKey, newFile) => {
   return data;
 };
 
-// To DELETE from S3
+// Delete a file from S3 by key
 export const deleteFileFromS3 = async (fileKey) => {
-  const res = await fetch(`${BACKEND_URL}v1/test/delete-file`, {
+  const res = await fetch(`${BACKEND_URL}v1/media/delete-file`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ key: fileKey }),
