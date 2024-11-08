@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { retrieveChildrenByLocationID } from "../../../utils/childAPI";
 import { useUser } from "@/components/authenticate";
 import {
