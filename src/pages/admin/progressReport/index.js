@@ -5,11 +5,12 @@ import { useUser } from "@/components/authenticate";
 import {
     Container,
     Typography,
-    TextField,
+    Select,
     Button,
     Snackbar,
     Alert,
     Box,
+    MenuItem,
 } from "@mui/material"; 
 
 export default function ProgressReportLanding() {
@@ -77,7 +78,7 @@ return (
         )}
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Select
+              <Select
                     label="Select Child"
                     value={childID}
                     onChange={(e) => setChildID(e.target.value)}
