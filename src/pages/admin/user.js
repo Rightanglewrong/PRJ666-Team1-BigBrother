@@ -18,12 +18,20 @@ const UserCrudTester = () => {
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        const currentUser = getCurrentUser();
-        if ( currentUser.accountType === 'Admin') {
-            setIsAdmin(true);
-        } else if (currentUser.accountType === 'Staff') {
-            setIsAdmin(false);
-        }
+        const checkAdmin = async () => {
+            try{
+                const currentUser = await getCurrentUser();
+                if (currentUser.accountType === 'Admin') {
+                    setIsAdmin(true);
+                } else if (currentUser.accountType === 'Staff') {
+                    setIsAdmin(false);
+                }
+            } catch (error) {
+                console.error("Error verifying Admin Status:", error);
+            }
+        };
+
+        checkAdmin();
     }, []);
 
     const handleRetrieveUser = async () => {
