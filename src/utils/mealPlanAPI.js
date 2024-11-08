@@ -12,7 +12,6 @@ export const createMealPlan = async (token, mealPlanData) => {
       },
       body: JSON.stringify(mealPlanData),
     });
-    console.log(response)
     if (!response.ok) {
       if (response.status === 401) {
         // Throw a specific error if the user is not authorized
