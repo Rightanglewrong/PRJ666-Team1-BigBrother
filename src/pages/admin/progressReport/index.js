@@ -63,7 +63,7 @@ return (
         }}
     >
         <Typography variant="h4" align="center" gutterBottom sx={{ color: "#2c3e50", fontWeight: "bold" }}>
-            Progress Reports
+            Children at this Location
         </Typography>
 
         {message && (
@@ -106,7 +106,7 @@ return (
                 Create Progress Report
               </Button>
 
-            <Button
+            {/* <Button
                 variant="outlined"
                 fullWidth
                 sx={{
@@ -118,8 +118,9 @@ return (
                 onClick={handleViewChildProgressReports}
             >
                 View All Progress Reports for Child
-            </Button>
+            </Button> */}
         </Box>
     </Container>
   );
 }
+
