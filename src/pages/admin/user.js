@@ -67,7 +67,8 @@ const UserCrudTester = () => {
     const handleGetUsersByAccountTypeAndLocation = async () => {
         try {
             const users = await getUsersByAccountTypeAndLocation(accountType, locationID);
-            setUsersList(users);
+            setResult(users);
+            setUsersList(result);
             handleReset();
         } catch (error) {
             setError(error.message);
