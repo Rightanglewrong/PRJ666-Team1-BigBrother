@@ -240,6 +240,14 @@ const NavBar = () => {
                 Contact List
               </Link>
               <Link
+                href="/media"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Media
+              </Link>
+              <Link
                 href="/mealPlan"
                 passHref
                 className={styles.dropdownItem}
