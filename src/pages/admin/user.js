@@ -60,7 +60,7 @@ const UserCrudTester = () => {
         try {
             const users = await getUsersByAccountTypeAndLocation(accountType, locationID);
             setResult(users);
-            setError(null);
+            handleReset();
         } catch (error) {
             setError(error.message);
         }
@@ -76,6 +76,11 @@ const UserCrudTester = () => {
         });
     };
 
+    const handleReset = () => {
+        setAccountType('');
+        setLocationID('');
+    };
+
     return (
         <div>
             <h2>User CRUD Tester</h2>
@@ -87,7 +92,6 @@ const UserCrudTester = () => {
                     value={accountType}
                     onChange={(e) => {
                         setAccountType(e.target.value);
-                        handleGetUsersByAccountTypeAndLocation(e.target.value);
                     }}
                 >
                     <option value="">Select Account Type</option>
@@ -101,6 +105,10 @@ const UserCrudTester = () => {
                     value={locationID}
                     onChange={(e) => setLocationID(e.target.value)}
                 />
+                <button onClick={() => 
+                    handleGetUsersByAccountTypeAndLocation(accountType, locationID)}>
+                    Get Users
+                </button>
             </div>
 
             {/* Display Users List */}
