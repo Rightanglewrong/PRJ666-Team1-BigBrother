@@ -57,7 +57,7 @@ const AdminPage = () => {
             title="Progress Reports"
             content="Manage and view progress reports for children."
             actions={
-              <Link href="/admin/progressReport/">
+              <Link href="/admin/progressReport/index">
                 <Button size="small" color="primary">
                   Go to Progress Reports
                 </Button>
