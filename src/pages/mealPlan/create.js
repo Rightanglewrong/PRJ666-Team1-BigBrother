@@ -58,7 +58,7 @@ export default function CreateMealPlanPage() {
     }
 
     // Include daycareID and createdBy in the meal plan object
-    let daycareID = user.daycareID;
+    let daycareID = user.locationID;
     let fName = user.firstName;
     let lName = user.lastName;
     let createdBy = `${fName} ${lName}`;
@@ -72,7 +72,7 @@ export default function CreateMealPlanPage() {
       if (error.message.includes("403")) {
         setMessage("You do not have permission to create a meal plan.");
       } else {
-        setMessage("An error occurred while creating the meal plan");
+        setMessage("An error occurred while creating the meal plan" + error);
       }
     }
   };
