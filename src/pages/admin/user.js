@@ -5,6 +5,7 @@ import {
     deleteUserInDynamoDB,
     getUsersByAccountTypeAndLocation
 } from '../../utils/userAPI';
+import { getCurrentUser } from '@/utils/api';
 
 const UserCrudTester = () => {
     const [userID, setUserID] = useState('');
@@ -17,10 +18,10 @@ const UserCrudTester = () => {
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        const userAccountType = localStorage.getItem('accountType');
-        if (userAccountType === 'Admin') {
+        const currentUser = getCurrentUser();
+        if ( currentUser.accountType === 'Admin') {
             setIsAdmin(true);
-        } else if (userAccountType === 'Staff') {
+        } else if (currentUser.accountType === 'Staff') {
             setIsAdmin(false);
         }
     }, []);
