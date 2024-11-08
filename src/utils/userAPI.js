@@ -79,7 +79,7 @@ export const deleteUserInDynamoDB = async (id) => {
 };
 
 export const getUsersByAccountTypeAndLocation = async (accountType, locationID) => {
-    const token = localStorage.getItem('Token');
+    const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("No Token Found"); 
     }
