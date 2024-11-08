@@ -2,6 +2,19 @@ import { useState, useEffect } from "react";
 import { useUser } from "@/components/authenticate";
 import { updateUserProfile } from "../utils/api";
 import { withAuth } from "@/hoc/withAuth";
+import {
+  Box,
+  Container,
+  Typography,
+  TextField,
+  Select,
+  MenuItem,
+  Button,
+  Snackbar,
+  Alert,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 import styles from "./Profile.module.css";
 
 const ProfilePage = () => {
@@ -37,70 +50,103 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.heading}>Profile</h1>
-      {error && <p className={styles.error}>{error}</p>}
-      {success && <p className={styles.success}>{success}</p>}
-      <form className={styles.form} onSubmit={handleUpdate}>
-        {/* UserID - Uneditable */}
-        <label className={styles.label}>User ID</label>
-        <input
-          className={styles.input}
-          type="text"
+    <Container maxWidth="sm" className={styles.fadeIn} sx={{ mt: 4 }}>
+      <Typography variant="h4" component="h1" textAlign="center" gutterBottom>
+        Profile
+      </Typography>
+
+      {/* Success and Error Messages */}
+      <Snackbar
+        open={Boolean(success)}
+        autoHideDuration={6000}
+        onClose={() => setSuccess("")}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={() => setSuccess("")} severity="success" variant="filled">
+          {success}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={Boolean(error)}
+        autoHideDuration={6000}
+        onClose={() => setError("")}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={() => setError("")} severity="error" variant="filled">
+          {error}
+        </Alert>
+      </Snackbar>
+
+      <Box component="form" onSubmit={handleUpdate} sx={{ mt: 2 }}>
+        {/* User ID */}
+        <TextField
+          label="User ID"
           value={userID}
+          fullWidth
           disabled
+          margin="normal"
         />
 
-        {/* Email - Uneditable */}
-        <label className={styles.label}>Email</label>
-        <input
-          className={styles.input}
-          type="email"
-          value={user?.email}
+        {/* Email */}
+        <TextField
+          label="Email"
+          value={user?.email || ""}
+          fullWidth
           disabled
+          margin="normal"
         />
 
         {/* First Name */}
-        <label className={styles.label}>First Name</label>
-        <input
-          className={styles.input}
-          type="text"
+        <TextField
+          label="First Name"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
+          fullWidth
+          margin="normal"
+          required
         />
 
         {/* Last Name */}
-        <label className={styles.label}>Last Name</label>
-        <input
-          className={styles.input}
-          type="text"
+        <TextField
+          label="Last Name"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
+          fullWidth
+          margin="normal"
+          required
         />
 
         {/* Location ID */}
-        <label className={styles.label}>Location ID</label>
-        <input
-          className={styles.input}
-          type="text"
+        <TextField
+          label="Location ID"
           value={locationID}
           onChange={(e) => setLocationID(e.target.value)}
+          fullWidth
+          margin="normal"
         />
 
         {/* Account Type */}
-        <label className={styles.label}>Account Type</label>
-        <select className={styles.input} value={accountType} disabled>
-          <option value="Parent">Parent</option>
-          <option value="Staff">Staff</option>
-          <option value="Admin">Admin</option>
-        </select>
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Account Type</InputLabel>
+          <Select value={accountType} disabled>
+            <MenuItem value="Parent">Parent</MenuItem>
+            <MenuItem value="Staff">Staff</MenuItem>
+            <MenuItem value="Admin">Admin</MenuItem>
+          </Select>
+        </FormControl>
 
         {/* Submit Button */}
-        <button className={styles.button} type="submit">
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ mt: 2 }}
+        >
           Update Info
-        </button>
-      </form>
-    </div>
+        </Button>
+      </Box>
+    </Container>
   );
 };
 
