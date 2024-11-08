@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   createMessageInDynamoDB,
   retrieveMessageFromDynamoDB,
-  deleteMessageFromDynamoDB,
   retrieveMessageByReceiverID,
   retrieveMessageBySenderID,
   markMessageAsDeletedByReceiver,
@@ -23,7 +22,6 @@ export default function Message() {
   const [retrievedMessage, setRetrievedMessage] = useState(null);
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [userId, setUserId] = useState("");
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
