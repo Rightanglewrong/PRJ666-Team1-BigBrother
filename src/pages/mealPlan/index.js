@@ -16,6 +16,7 @@ import {
   Snackbar,
   Alert,
   Divider,
+  Grid,
 } from "@mui/material";
 
 export default function MealPlanIndex() {
@@ -56,124 +57,159 @@ export default function MealPlanIndex() {
   }, [user, router]);
 
   return (
-    <Container
-      maxWidth="md"
-      sx={{
-        mt: 4,
-        p: 3,
-        backgroundColor: "#f7f9fc",
-        borderRadius: 2,
-        boxShadow: 3,
-        mb: 4,
-      }}
-    >
+    <Container maxWidth="md" sx={{ mt: 4, p: 2, mb: 4 }}>
       <Typography
         variant="h4"
         align="center"
-        gutterBottom
-        sx={{ color: "#2c3e50", fontWeight: "bold" }}
+        sx={{ fontWeight: "bold", color: "#3A3A3A", mb: 3 }}
       >
-        Current Meal Plan
+        Weekly Meal Plan
       </Typography>
 
-      {loading ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="40vh"
+      {message && (
+        <Snackbar
+          open={Boolean(message)}
+          autoHideDuration={6000}
+          onClose={() => setMessage("")}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
+          <Alert severity="info" onClose={() => setMessage("")}>
+            {message}
+          </Alert>
+        </Snackbar>
+      )}
+
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="40vh">
           <CircularProgress />
         </Box>
-      ) : (
+      ) : mealPlan ? (
         <>
-          {message && (
-            <Snackbar
-              open={Boolean(message)}
-              autoHideDuration={6000}
-              onClose={() => setMessage("")}
-              anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            >
-              <Alert severity="info" onClose={() => setMessage("")}>
-                {message}
-              </Alert>
-            </Snackbar>
-          )}
+          <Box
+            sx={{
+              backgroundColor: "#E3F2FD",
+              borderRadius: 2,
+              p: 2,
+              textAlign: "center",
+              mb: 3,
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1565C0" }}>
+              Meal Plan Duration
+            </Typography>
+            <Divider sx={{ my: 1 }} />
+            <Typography variant="body1">
+              <strong>Start Date:</strong> {mealPlan.startDate}
+            </Typography>
+            <Typography variant="body1">
+              <strong>End Date:</strong> {mealPlan.endDate}
+            </Typography>
+          </Box>
 
-          {mealPlan ? (
-            <Card
-              variant="outlined"
-              sx={{ backgroundColor: "#fafafa", boxShadow: 1 }}
-            >
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{ fontWeight: "bold" }}
+          <Grid container spacing={2}>
+            {/* Meal Cards */}
+            {["Breakfast", "Lunch", "Snack"].map((meal, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <Card
+                  sx={{
+                    backgroundColor: "#f5f5f5",
+                    boxShadow: 3,
+                    borderRadius: 3,
+                    p: 2,
+                    minHeight: "200px",
+                  }}
                 >
-                  Latest Meal Plan
-                </Typography>
-                <Divider sx={{ my: 1 }} />
-                <Typography variant="body1">
-                  <strong>Start Date:</strong> {mealPlan.startDate}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>End Date:</strong> {mealPlan.endDate}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Breakfast:</strong> {mealPlan.breakfast}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Lunch:</strong> {mealPlan.lunch}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Snack:</strong> {mealPlan.snack}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Allergens:</strong> {mealPlan.allergens}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Alternatives:</strong> {mealPlan.alternatives}
-                </Typography>
-                <Divider sx={{ my: 2 }} />
+                  <CardContent>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        color: "#FF7043",
+                        fontSize: "1.125rem",
+                      }}
+                    >
+                      {meal}
+                    </Typography>
+                    <Divider sx={{ my: 1 }} />
+                    <Typography variant="body2" sx={{ mt: 1, color: "#3A3A3A" }}>
+                      {mealPlan[meal.toLowerCase()] || "Not specified"}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
 
-                {/* Edit Meal Plan Button - Aligned to Left */}
-                <Box display="flex" justifyContent="flex-start" mt={2}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    component={Link}
-                    href={`/mealPlan/${mealPlan.mealPlanID}`}
-                    sx={{ textTransform: "none" }}
-                  >
-                    Edit Meal Plan
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          ) : (
-            <Box textAlign="center" mt={3}>
-              <Typography variant="body1" color="textSecondary">
-                No meal plan found.
-              </Typography>
-            </Box>
-          )}
+          {/* Allergens and Alternatives Section */}
+          <Box
+            sx={{
+              mt: 3,
+              p: 2,
+              backgroundColor: "#FFEBEE",
+              borderRadius: 2,
+              boxShadow: 1,
+              textAlign: "center",
+            }}
+          >
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#C62828" }}>
+                  Allergens
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {mealPlan.allergens || "None specified"}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", color: "#C62828" }}>
+                  Alternatives
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {mealPlan.alternatives || "None available"}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
 
-          {/* Centered "Create New Meal Plan" Button Outside Card */}
-          {(user.accountType === "Admin" || user.accountType === "Staff") && (
-            <Box textAlign="center" mt={3}>
+          {/* Action Buttons */}
+          <Box display="flex" justifyContent="center" mt={3} gap={2}>
+            {user && (user.accountType === "Admin" || user.accountType === "Staff") && (
               <Button
                 variant="contained"
                 color="success"
                 component={Link}
                 href="/mealPlan/create"
-                sx={{ textTransform: "none" }}
+                sx={{
+                  textTransform: "none",
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  px: 3,
+                }}
               >
                 Create New Meal Plan
               </Button>
-            </Box>
-          )}
+            )}
+            <Button
+              variant="outlined"
+              color="primary"
+              component={Link}
+              href={`/mealPlan/${mealPlan.mealPlanID}`}
+              sx={{
+                textTransform: "none",
+                fontSize: { xs: "0.875rem", md: "1rem" },
+                px: 3,
+              }}
+            >
+              Edit Meal Plan
+            </Button>
+          </Box>
         </>
+      ) : (
+        <Box textAlign="center" mt={3}>
+          <Typography variant="body1" color="textSecondary">
+            No meal plan found.
+          </Typography>
+        </Box>
       )}
     </Container>
   );
