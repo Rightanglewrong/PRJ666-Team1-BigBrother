@@ -33,7 +33,39 @@ const UserCrudTester = () => {
 
         checkAdmin();
     }, []);
-
+    
+    const fetchUserProfiles = async (uniqueUserIDs) => {
+        try {
+          const userProfileData = await Promise.all(
+            uniqueUserIDs.map(async (id) => {
+              try {
+                const userData = await handleRetrieveUser(id);
+                if (!userData) {
+                  console.warn(`No data found for User with ID ${id}`);
+                  return null; 
+                }
+                const { userID, firstName, lastName, email, locationID, ...rest } = userData.user.user;
+                return {
+                  userID,
+                  firstName,
+                  lastName,
+                  email,
+                  locationID,
+                };
+              } catch (error) {
+                console.error(`Error retrieving data for user ${id}:`, error);
+                throw error; 
+              }
+            })
+          );
+          const validUserProfiles = userProfileData.filter(profile => profile !== null).flat();
+          return validUserProfiles;
+                
+        } catch (error) {
+          console.error("Error fetching user profiles:", error);
+          setErrorMessage("Failed to fetch user profiles.");
+        }
+      };
     const handleRetrieveUser = async () => {
         try {
             const user = await retrieveUserByIDInDynamoDB({ id: userID });
