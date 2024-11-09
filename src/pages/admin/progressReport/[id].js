@@ -58,24 +58,32 @@ export default function ViewProgressReportsPage() {
     }, [childID]);
        
 
-    function parseReportContent(contentString) {
-      if (contentString && typeof contentString === 'string' && contentString.includes("|")) {
-          const fields = contentString.split("|").map(pair => pair.trim());
-          return fields.slice(0, 4); // Return up to 4 fields
-      } else {
-          return [contentString]; // If no `|` is found, return content as single item in an array
+    const parseReportContent = (content) => {
+      if (content && typeof content === 'string') {
+          const contentArray = content.split('|').map(item => item.trim()); // Trim extra spaces
+          
+          const [subject, progressTrend, comments, action] = contentArray;
+  
+          return (
+              <div>
+                  {subject && <div><strong>Subject:</strong> {subject}</div>}
+                  {progressTrend && <div><strong>Progress Trend:</strong> {progressTrend}</div>}
+                  {comments && <div><strong>Comments:</strong> {comments}</div>}
+                  {action && <div><strong>Action:</strong> {action}</div>}
+              </div>
+          );
       }
-       
-    }
+      return null;
+  };
 
     const handleSelectReport = (report) => {
       setSelectedReport(report);
       setUpdateReportTitle(report.reportTitle);
 
       // Parse and set update fields
-      const parsedContent = parseReportContent(report.content);
-      if (parsedContent.length > 1) {
-          setUpdateFields(parsedContent);
+      const contentArray = report.content.split('|').map(item => item.trim());
+      if (contentArray.length > 1) {
+          setUpdateFields(contentArray);
       } else {
           setUpdateReportContent(report.content); // Regular content as a single string
       }
@@ -125,6 +133,13 @@ export default function ViewProgressReportsPage() {
     }
   };
 
+  const handleCancelUpdate = () => {
+    setSelectedReport(null);
+    setUpdateReportTitle("");
+    setUpdateReportContent("");
+    setUpdateFields(Array(4).fill(""));
+  };
+
   const handleDeleteCancel = () => {
     setShowDeleteDialog(false);
     setSelectedReport(null);
@@ -150,24 +165,24 @@ export default function ViewProgressReportsPage() {
             </Snackbar>
         )}
         <Box>
-            {childReports.length > 0 ? (
-                childReports.map(report => (
-                    <Box key={report.progressReportID} mb={2}>
-                        <Typography variant="h6">{report.reportTitle}</Typography>
-                        <Typography variant="body1">
-                            {JSON.stringify(parseReportContent(report.content))}
-                        </Typography>
-                        <Button onClick={() => handleSelectReport(report)} variant="outlined" color="primary" sx={{ mt: 1, mr: 1 }}>
-                            Update
-                        </Button>
-                        <Button onClick={() => handleDeleteClick(report.progressReportID)} variant="outlined" color="error" sx={{ mt: 1 }}>
-                            Delete
-                        </Button>
-                    </Box>
-                ))
-            ) : (
-                <Typography>No reports found for this child.</Typography>
-            )}
+        {childReports.length > 0 ? (
+            childReports.map(report => (
+              <Box key={report.progressReportID} mb={2}>
+                <Typography variant="h6">{report.reportTitle}</Typography>
+                <Typography variant="body1">
+                {parseReportContent(report.content)}
+                </Typography>
+                <Button onClick={() => handleSelectReport(report)} variant="outlined" color="primary" sx={{ mt: 1, mr: 1 }}>
+                    Update
+                </Button>
+                <Button onClick={() => handleDeleteClick(report.progressReportID)} variant="outlined" color="error" sx={{ mt: 1 }}>
+                    Delete
+                </Button>
+              </Box>
+            ))
+        ) : (
+          <Typography>No reports found for this child.</Typography>
+        )}
         </Box>
 
         {selectedReport && (
@@ -208,9 +223,15 @@ export default function ViewProgressReportsPage() {
                         onChange={(e) => setUpdateReportContent(e.target.value)}
                     />
                 )}
-                <Button onClick={handleUpdate} variant="contained" color="primary">
+                 <Box mt={2}>
+                <Button onClick={handleUpdate} variant="contained" color="primary" sx={{ mt: 2, mr: 2 }}>
                     Save Changes
                 </Button>
+
+                <Button onClick={handleCancelUpdate} variant="outlined" color="secondary"   sx={{ mt: 2 }}>
+                          Cancel Update
+                </Button>
+                </Box>
             </Box>
         )}
 
@@ -233,10 +254,11 @@ export default function ViewProgressReportsPage() {
                 </Button>
             </DialogActions>
         </Dialog>
-
-        <Button variant="contained" onClick={handleBack} sx={{ mb: 2 }}>
+        <div>
+        <Button variant="contained" onClick={handleBack}  sx={{ mt: 4}}>
                 Return to Previous Page
-            </Button>
+        </Button>
+        </div>
     </Container>
   );
 }
