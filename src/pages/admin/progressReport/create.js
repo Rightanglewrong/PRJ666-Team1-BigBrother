@@ -43,7 +43,6 @@ export default function CreateProgressReportPage() {
         const fetchChildProfile = async () => {
           try {
             const profile = await retrieveChildProfileByID(childID);
-            console.log(profile);
             setChildName(profile.child.child.firstName + " " + profile.child.child.lastName); // Set the child name
           } catch (error) {
             setMessage(`Error fetching child profile: ${error.message}`);
@@ -67,7 +66,9 @@ export default function CreateProgressReportPage() {
           let content;
 
           if (reportType === "detailed") {
-              content = `${subject} | ${progressTrending} | ${details} | ${recommendedActivity} | ${reportContent}`;
+              content = `${subject} | ${progressTrending} | ${details} | ${recommendedActivity}}`;
+          } else {
+            content = reportContent;
           }
 
           const newReport = {

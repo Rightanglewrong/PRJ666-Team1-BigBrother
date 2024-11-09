@@ -85,6 +85,7 @@ return (
                     onChange={(e) => setChildID(e.target.value)}
                     fullWidth
                     displayEmpty
+                    required
                 >
                     <MenuItem value="">
                         <em>Select a child</em>
@@ -106,19 +107,16 @@ return (
                 Create Progress Report
               </Button>
 
-            {/* <Button
-                variant="outlined"
-                fullWidth
-                sx={{
-                    mt: 2,
-                    borderColor: "#3498db",
-                    color: "#3498db",
-                    "&:hover": { borderColor: "#2980b9", color: "#2980b9" },
-                }}
-                onClick={handleViewChildProgressReports}
-            >
-                View All Progress Reports for Child
-            </Button> */}
+              <Button
+                variant="contained"
+                color="success"
+                component={Link}
+                href={`/admin/progressReport/child?childID=${childID}`} 
+                sx={{ textTransform: "none" }}
+              >
+                View All Progress Reports
+              </Button>
+
         </Box>
     </Container>
   );
