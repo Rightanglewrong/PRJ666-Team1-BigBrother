@@ -100,7 +100,7 @@ return (
                 variant="contained"
                 color="success"
                 component={Link}
-                href="/progressReport/create"
+                href={`/admin/progressReport/create?childID=${childID}`} 
                 sx={{ textTransform: "none" }}
               >
                 Create Progress Report
