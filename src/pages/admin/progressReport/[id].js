@@ -31,7 +31,8 @@ export default function ViewProgressReportsPage() {
     const [updateReportTitle, setUpdateReportTitle] = useState("");
     const [updateReportContent, setUpdateReportContent] = useState("");
     const [updateFields, setUpdateFields] = useState(Array(5).fill(""));
-    const [selectedReport, setSelectedReport] = useState(null);
+    const [selectedReportForUpdate, setSelectedReportForUpdate] = useState(null);
+    const [selectedReportForDelete, setSelectedReportForDelete] = useState(null);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     useEffect(() => {
@@ -76,21 +77,22 @@ export default function ViewProgressReportsPage() {
       return null;
   };
 
-    const handleSelectReport = (report) => {
-      setSelectedReport(report);
-      setUpdateReportTitle(report.reportTitle);
+  const handleSelectReportForUpdate = (report) => {
+    setSelectedReportForUpdate(report);
+    setSelectedReportForDelete(null); // Clear delete selection
+    setUpdateReportTitle(report.reportTitle);
 
-      // Parse and set update fields
-      const contentArray = report.content.split('|').map(item => item.trim());
-      if (contentArray.length > 1) {
-          setUpdateFields(contentArray);
-      } else {
-          setUpdateReportContent(report.content); // Regular content as a single string
-      }
+    // Parse and set update fields
+    const contentArray = report.content.split('|').map(item => item.trim());
+    if (contentArray.length > 1) {
+        setUpdateFields(contentArray);
+    } else {
+        setUpdateReportContent(report.content); // Regular content as a single string
+    }
   };
 
   const handleUpdate = async () => {
-    if (selectedReport) {
+    if (selectedReportForUpdate) {
         try {
             const updatedContent = updateFields.some(field => field)
                 ? updateFields.filter(Boolean).join(" | ")
@@ -101,9 +103,9 @@ export default function ViewProgressReportsPage() {
                 content: updatedContent
             }
 
-            const result = await updateProgressReportInDynamoDB(selectedReport.progressReportID, updateData);
+            const result = await updateProgressReportInDynamoDB(selectedReportForUpdate.progressReportID, updateData);
             setMessage("Progress report updated successfully.");
-            setSelectedReport(null);
+            setSelectedReportForUpdate(null);
             setUpdateReportTitle("");
             setUpdateReportContent("");
             setUpdateFields(Array(4).fill("")); // Reset fields
@@ -115,16 +117,16 @@ export default function ViewProgressReportsPage() {
 };
 
   const handleDeleteClick = (reportID) => {
-    setSelectedReport(reportID);
+    setSelectedReportForDelete(reportID);
     setShowDeleteDialog(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (selectedReport) {
+    if (selectedReportForDelete) {
         try {
-            await deleteProgressReportFromDynamoDB(selectedReport);
+            await deleteProgressReportFromDynamoDB(selectedReportForDelete);
             setMessage("Progress report deleted successfully.");
-            setSelectedReport(null);
+            setSelectedReportForDelete(null);
             setShowDeleteDialog(false);
             fetchReportsByChildID(); // Refresh reports
         } catch (error) {
@@ -134,7 +136,7 @@ export default function ViewProgressReportsPage() {
   };
 
   const handleCancelUpdate = () => {
-    setSelectedReport(null);
+    setSelectedReportForUpdate(null);
     setUpdateReportTitle("");
     setUpdateReportContent("");
     setUpdateFields(Array(4).fill(""));
@@ -142,7 +144,7 @@ export default function ViewProgressReportsPage() {
 
   const handleDeleteCancel = () => {
     setShowDeleteDialog(false);
-    setSelectedReport(null);
+    setSelectedReportForDelete(null);
   };
 
   const handleBack = () => {
@@ -172,7 +174,7 @@ export default function ViewProgressReportsPage() {
                 <Typography variant="body1">
                 {parseReportContent(report.content)}
                 </Typography>
-                <Button onClick={() => handleSelectReport(report)} variant="outlined" color="primary" sx={{ mt: 1, mr: 1 }}>
+                <Button onClick={() => handleSelectReportForUpdate(report)} variant="outlined" color="primary" sx={{ mt: 1, mr: 1 }}>
                     Update
                 </Button>
                 <Button onClick={() => handleDeleteClick(report.progressReportID)} variant="outlined" color="error" sx={{ mt: 1 }}>
@@ -185,7 +187,7 @@ export default function ViewProgressReportsPage() {
         )}
         </Box>
 
-        {selectedReport && (
+        {selectedReportForUpdate && (
             <Box mt={3}>
                 <Typography variant="h5">Update Progress Report</Typography>
                 <TextField

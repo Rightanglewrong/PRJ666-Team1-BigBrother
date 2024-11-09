@@ -80,7 +80,8 @@ export default function CreateProgressReportPage() {
           };
           await createProgressReportInDynamoDB(newReport);
           setMessage("Progress Report created successfully");
-          router.push("/admin/progressReport"); 
+          router.push(`/admin/progressReport/child?childID=${childID}`); 
+
         } catch (error) {
           setMessage(`Error creating Progress Report: ${error.message}`);
         }
