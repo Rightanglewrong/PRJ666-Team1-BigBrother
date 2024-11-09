@@ -71,7 +71,7 @@ export default function Authenticate({ children }) {
 
   return (
     <UserContext.Provider value={userDetails}>
-      <>{children}</>;
+      <>{children}</>
     </UserContext.Provider>
   );
 }
