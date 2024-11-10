@@ -83,6 +83,7 @@ export default function ProgressReport() {
     setFilteredReports([]);
     setChildID("");
     setMessage("");
+    setSelectedReport(null);
   };
 
   const handleChildClick = async (childID) => {
@@ -110,6 +111,7 @@ export default function ProgressReport() {
 
   const parseReportContent = (content) => {
     if (content && typeof content === 'string') {
+      if (content.includes('|')) {
       const contentArray = content.split('|').map(item => item.trim());
       const [subject, progressTrend, comments, action] = contentArray;
 
@@ -121,7 +123,10 @@ export default function ProgressReport() {
           {action && <div><strong>Action:</strong> {action}</div>}
         </div>
       );
+    } else {
+        return <div><strong>Content:</strong> {content}</div>;
     }
+  }
     return null;
   };
 
@@ -132,66 +137,87 @@ export default function ProgressReport() {
         <p className={styles.message}>{message}</p>
 
         <div className={styles.reportsSection}>
-          {selectedChildID ? (
-            <div>
-              <div className={styles.selectedChildHeader}>
-                <h3>Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}</h3>
-              </div>
-              <div className={styles.reportCardContainer}>
-                {filteredReports.map((report) => (
-                  <div
-                    key={report.progressReportID}
-                    className={styles.reportCard}
-                    onClick={(e) => handleReportClick(report)}
-                  >
-                    <strong>{report.reportTitle}</strong>
-                    <p>{parseReportContent(report.content)}</p>
-                    <p><em>Created by: {report.createdBy}</em> on {report.datePosted}</p>
-                  </div>
-                ))}
-              </div>
-              <button onClick={handleReset} className={styles.resetButton}>
-                Return to Child Profiles
-              </button>
-            </div>
-          ) : (
-            <div>
-              <h3>Select a Child Profile</h3>
-              <div className={styles.profileContainer}>
-                {childProfiles.map((child) => (
-                  <div key={child.childID} className={styles.profileCard}>
-                    <h4>{child.firstName} {child.lastName}</h4>
-                    <p><strong>Age:</strong> {child.age}</p>
-                    <p><strong>Birth Date:</strong> {child.birthDate}</p>
-                    <button
-                      className={styles.viewReportsButton}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleChildClick(child.childID);
-                      }}
-                    >
-                      View Progress Reports
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+  {selectedChildID ? (
+    <div className={styles.selectedChildWrapper}>
+      <div className={styles.selectedChildHeader}>
+        <h3 className={styles.h3Style}>Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}</h3>
+      </div>
 
-        {/* Show selected report details in a modal or separate section */}
-        {selectedReport && (
-          <div className={styles.reportDetailModal}>
-            <div className={styles.reportDetailContainer}>
-              <h2>{selectedReport.reportTitle}</h2>
-              <p>{selectedReport.content}</p>
-              <p><em>Created by: {selectedReport.createdBy}</em> on {selectedReport.datePosted}</p>
-              <button onClick={() => setSelectedReport(null)} className={styles.closeButton}>
-                Close
-              </button>
-            </div>
+      <div className={styles.reportCardContainer}>
+        {filteredReports.map((report) => (
+          <div
+            key={report.progressReportID}
+            className={styles.reportCard}
+            onClick={(e) => handleReportClick(report)}
+          >
+            <strong>{report.reportTitle}</strong>
+            <p>{parseReportContent(report.content)}</p>
+            <p><em>Created by: {report.createdBy}</em> on {report.datePosted}</p>
           </div>
-        )}
+        ))}
+      </div>
+
+      {/* Show selected report details in a modal or separate section */}
+      <div className={styles.selectedReportsWrapper}>
+      {selectedReport && (
+        <div className={styles.reportDetailModal}>
+          <div className={styles.reportDetailContainer}>
+            <h2>Title: {selectedReport.reportTitle}</h2>
+            
+            {/* Check if the report is detailed or simple */}
+            {selectedReport.content.includes('|') ? (
+              // If detailed report (contains '|')
+              <div>
+                {parseReportContent(selectedReport.content)}
+              </div>
+            ) : (
+              // If simple report (does not contain '|')
+              <div>
+                <strong>Content:</strong> {selectedReport.content}
+              </div>
+            )}
+
+            <p><em>Created by: {selectedReport.createdBy}</em> on {selectedReport.datePosted}</p>
+            <button onClick={() => setSelectedReport(null)} className={styles.closeButton}>
+              Close
+            </button>
+          </div>
+        
+        </div> 
+        
+      )}
+      </div>
+
+      <button onClick={handleReset} className={styles.resetButton}>
+        Return to Child Profiles
+      </button>
+    </div>
+  ) : (
+    <div>
+      <h3 className={styles.h3Style}>Select a Child Profile</h3>
+      <div className={styles.profileContainer}>
+        {childProfiles.map((child) => (
+          <div key={child.childID} className={styles.profileCard}>
+            <h4>{child.firstName} {child.lastName}</h4>
+            <p><strong>Age:</strong> {child.age}</p>
+            <p><strong>Birth Date:</strong> {child.birthDate}</p>
+            <button
+              className={styles.viewReportsButton}
+              onClick={(e) => {
+                e.preventDefault();
+                handleChildClick(child.childID);
+              }}
+            >
+              View Progress Reports
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
+        
 
         {showErrorModal && (
           <div className={styles.overlay}>

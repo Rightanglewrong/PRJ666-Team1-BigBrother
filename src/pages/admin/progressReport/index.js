@@ -8,10 +8,13 @@ import {
     Typography,
     Select,
     Button,
-    Snackbar,
     Alert,
     Box,
     MenuItem,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
 } from "@mui/material"; 
 
 export default function ProgressReportLanding() {
@@ -20,6 +23,8 @@ export default function ProgressReportLanding() {
     const [childID, setChildID] = useState("");
     const [message, setMessage] = useState("");
     const [childProfiles, setChildProfiles] = useState([]);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [openModal, setOpenModal] = useState(false);
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -48,7 +53,32 @@ export default function ProgressReportLanding() {
       fetchUserData();
     }, [user, router]);
     
-      
+    const handleCreateProgressReport = (e) => {
+      e.preventDefault();
+      if (!childID) {
+          setErrorMessage("Please select a child before proceeding.");
+          setOpenModal(true);
+          return; // Stop the navigation if no child is selected
+      }
+      setErrorMessage(""); // Clear any previous error
+      router.push(`/admin/progressReport/create?childID=${childID}`);
+  };
+
+  // Handle the view all reports action
+  const handleViewProgressReports = (e) => {
+      e.preventDefault();
+      if (!childID) {
+          setErrorMessage("Please select a child before proceeding.");
+          setOpenModal(true);
+          return; // Stop the navigation if no child is selected
+      }
+      setErrorMessage(""); // Clear any previous error
+      router.push(`/admin/progressReport/child?childID=${childID}`);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+};
 
 return (
     <Container
@@ -67,16 +97,12 @@ return (
         </Typography>
 
         {message && (
-            <Snackbar
-                open={Boolean(message)}
-                autoHideDuration={6000}
-                onClose={() => setMessage("")}
-            >
+            
                 <Alert severity="info" onClose={() => setMessage("")}>
                     {message}
                 </Alert>
-            </Snackbar>
         )}
+
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Select
@@ -100,6 +126,7 @@ return (
               <Button
                 variant="contained"
                 color="success"
+                onClick={handleCreateProgressReport}
                 component={Link}
                 href={`/admin/progressReport/create?childID=${childID}`} 
                 sx={{ textTransform: "none" }}
@@ -110,6 +137,7 @@ return (
               <Button
                 variant="contained"
                 color="success"
+                onClick={handleViewProgressReports}
                 component={Link}
                 href={`/admin/progressReport/child?childID=${childID}`} 
                 sx={{ textTransform: "none" }}
@@ -118,6 +146,27 @@ return (
               </Button>
 
         </Box>
+        <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => router.push("/admin")} // Navigates to the admin page
+                sx={{ textTransform: "none", mt: 2 }}
+              >
+                Back to Admin
+        </Button>
+
+        {/* Modal for error message */}
+      <Dialog open={openModal} onClose={handleCloseModal}>
+          <DialogTitle>Error</DialogTitle>
+          <DialogContent>
+              <Alert severity="error">{errorMessage}</Alert>
+          </DialogContent>
+          <DialogActions>
+              <Button onClick={handleCloseModal} color="primary">
+                  Close
+              </Button>
+          </DialogActions>
+      </Dialog>
     </Container>
   );
 }

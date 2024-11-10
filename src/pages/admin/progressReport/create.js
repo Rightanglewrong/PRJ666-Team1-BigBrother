@@ -201,6 +201,20 @@ return (
         >
           Create Progress Report
         </Button>
+
+        <Button
+          variant="outlined"
+          fullWidth
+          sx={{
+            mt: 2,
+            color: "#3498db",
+            borderColor: "#3498db",
+            "&:hover": { borderColor: "#2980b9", color: "#2980b9" },
+          }}
+          onClick={() => router.push("/admin/progressReport")}
+        >
+          Previous Page
+        </Button>
       </Box>
     </Container>
   );

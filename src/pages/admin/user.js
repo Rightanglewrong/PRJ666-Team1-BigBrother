@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from "next/router";
 import {
     updateUserInDynamoDB,
     deleteUserInDynamoDB,
@@ -19,25 +20,34 @@ import {
     ListItem,
     ListItemText,
     Paper,
-  } from "@mui/material"; 
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
+    InputLabel,
+} from "@mui/material"; 
 
 const AdminUserService = () => {
+    const router = useRouter();
     const [userID, setUserID] = useState('');
     const [accountType, setAccountType] = useState('');
     const [locationID, setLocationID] = useState('');
     const [updateData, setUpdateData] = useState({
         firstName: '',
         lastName: '',
-        email: '',
+        accountType: '',
     });
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
+    const [errorModalOpen, setErrorModalOpen] = useState(false);
     const [usersList, setUsersList] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         const checkAdmin = async () => {
-            try{
+            try {
                 const currentUser = await getCurrentUser();
                 if (currentUser.accountType === 'Admin') {
                     setIsAdmin(true);
@@ -48,7 +58,6 @@ const AdminUserService = () => {
                 console.error("Error verifying Admin Status:", error);
             }
         };
-
         checkAdmin();
     }, []);
 
@@ -57,9 +66,11 @@ const AdminUserService = () => {
             const response = await updateUserInDynamoDB(userID, updateData);
             setResult(response.message);
             setError(null);
-                await handleGetUsersByAccountTypeAndLocation();
+            await handleGetUsersByAccountTypeAndLocation();
         } catch (error) {
-            setError(error.message);
+            const errorMessage = "Error Updating User"
+            setError(errorMessage);
+            setErrorModalOpen(true);
         }
     };
 
@@ -70,7 +81,9 @@ const AdminUserService = () => {
             setError(null);
             await handleGetUsersByAccountTypeAndLocation();
         } catch (error) {
-            setError(error.message);
+            const errorMessage = "Error Deleting User"
+            setError(errorMessage);
+            setErrorModalOpen(true);
         }
     };
 
@@ -78,13 +91,24 @@ const AdminUserService = () => {
         try {
             const response = await getUsersByAccountTypeAndLocation(accountType, locationID);
             if (response.status === "ok") {
-                setUsersList(response.users); // Set usersList to the nested `users` array
+                setUsersList(response.users);
+                setError(null);
+                setUpdateData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    locationID: '',
+                    accountType: '', // Clear previous user data
+                });
             } else {
                 setError("Failed to retrieve users.");
+                setErrorModalOpen(true);
             }
-            setError(null);
         } catch (error) {
-            setError(error.message);
+            const errorMessage = "Account Type and Location ID are Required";
+            setError(errorMessage);
+            setErrorModalOpen(true);
+
         }
     };
 
@@ -94,32 +118,33 @@ const AdminUserService = () => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            locationID: user.locationID
+            locationID: user.locationID,
+            accountType: user.accountType
         });
     };
 
-    const handleReset = () => {
-        setAccountType('');
-        setLocationID('');
+    const closeErrorModal = () => {
+        setErrorModalOpen(false); 
     };
 
-     return (
+    return (
         <Container maxWidth="md">
             <Typography variant="h4" gutterBottom>User Management</Typography>
             <Box sx={{ mb: 3 }}>
                 <Typography variant="h6">Get Users by Account Type and Location</Typography>
                 <Box display="flex" alignItems="center" gap={2} mt={2}>
-                    <Select
+                    <FormControl fullWidth variant="outlined">
+                    <InputLabel>Account Type</InputLabel>                    <Select
                         label="Account Type"
                         value={accountType}
                         onChange={(e) => setAccountType(e.target.value)}
                         fullWidth
                     >
-                        <MenuItem value="">Select Account Type</MenuItem>
                         <MenuItem value="Admin">Admin</MenuItem>
                         <MenuItem value="Staff">Staff</MenuItem>
                         <MenuItem value="Parent">Parent</MenuItem>
                     </Select>
+                    </FormControl>
                     <TextField
                         label="Location ID"
                         variant="outlined"
@@ -133,6 +158,21 @@ const AdminUserService = () => {
                 </Box>
             </Box>
 
+             {/* Error Modal */}
+             <Dialog open={errorModalOpen} onClose={closeErrorModal}>
+                <DialogTitle>Error</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {error}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeErrorModal} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Box sx={{ mb: 3 }}>
                 <Typography variant="h6">User List</Typography>
                 <Paper elevation={2} sx={{ maxHeight: 300, overflow: 'auto', mt: 2, p: 2 }}>
@@ -141,18 +181,26 @@ const AdminUserService = () => {
                             {usersList.map((user) => (
                                 <ListItem
                                     key={user.userID}
-                                    button
                                     selected={userID === user.userID}
                                     onClick={() => handleUserSelect(user)}
+                                    sx={{
+                                        backgroundColor: userID === user.userID ? 'rgba(0, 0, 255, 0.1)' : 'transparent',
+                                        '&:hover': { backgroundColor: 'rgba(0, 0, 255, 0.1)' },
+                                        cursor: 'pointer', 
+                                    }}
                                 >
                                     <ListItemText
-                                        primary={`${user.firstName} ${user.lastName}`}
+                                        primary={
+                                            <Typography variant="body1" component="span">  
+                                                {`${user.firstName} ${user.lastName}`}
+                                            </Typography>
+                                        }
                                         secondary={
                                             <>
-                                                <Typography variant="body2" color="textSecondary">
+                                                <Typography variant="body2" color="textSecondary" component="span">
                                                     {user.email}
                                                 </Typography>
-                                                <Typography variant="caption" color="textSecondary">
+                                                <Typography variant="caption" color="textSecondary" component="span">
                                                     {user.accountType}
                                                 </Typography>
                                             </>
@@ -186,13 +234,20 @@ const AdminUserService = () => {
                                 onChange={(e) => setUpdateData((prev) => ({ ...prev, lastName: e.target.value }))}
                                 fullWidth
                             />
-                            <TextField
-                                label="Email"
-                                variant="outlined"
-                                value={updateData.email}
-                                onChange={(e) => setUpdateData((prev) => ({ ...prev, email: e.target.value }))}
-                                fullWidth
-                            />
+                           <FormControl fullWidth variant="outlined">
+                                <InputLabel>Account Type</InputLabel>
+                                <Select
+                                    disabled={updateData.accountType === 'Admin'} // Disable if the accountType is Admin
+                                    label="Account Type" // This binds the label to the Select input
+                                    value={updateData.accountType}
+                                    onChange={(e) => setUpdateData((prev) => ({ ...prev, accountType: e.target.value }))}
+                                    fullWidth
+                                >
+                                    <MenuItem value="Admin">Admin</MenuItem>
+                                    <MenuItem value="Staff">Staff</MenuItem>
+                                    <MenuItem value="Parent">Parent</MenuItem>
+                                </Select>
+                            </FormControl>
                             <Button variant="contained" color="secondary" onClick={handleUpdateUser}>
                                 Update User
                             </Button>
@@ -215,17 +270,19 @@ const AdminUserService = () => {
                 </>
             )}
 
+            <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => router.push("/admin")} // Navigates to the admin page
+                sx={{ textTransform: "none", mt: 2 }}
+              >
+                Back to Admin
+              </Button>
+
             {result && (
                 <Snackbar open={true} autoHideDuration={6000} onClose={() => setResult(null)}>
                     <Alert onClose={() => setResult(null)} severity="success" sx={{ width: '100%' }}>
                         {result}
-                    </Alert>
-                </Snackbar>
-            )}
-            {error && (
-                <Snackbar open={true} autoHideDuration={6000} onClose={() => setError(null)}>
-                    <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>
-                        {error}
                     </Alert>
                 </Snackbar>
             )}
