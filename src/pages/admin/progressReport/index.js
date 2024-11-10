@@ -118,6 +118,14 @@ return (
               </Button>
 
         </Box>
+        <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => router.push("/admin")} // Navigates to the admin page
+                sx={{ textTransform: "none", mt: 2 }}
+              >
+                Back to Admin
+              </Button>
     </Container>
   );
 }
