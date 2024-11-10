@@ -239,6 +239,20 @@ const NavBar = () => {
               >
                 Contact List
               </Link>
+
+              {(accountType === "Parent") && (
+                <div>
+                  <Link
+                    href="/progressReport"
+                    passHref
+                    className={styles.dropdownItem}
+                    onClick={handleMenuClose}
+                  >
+                    Progress Report
+                  </Link>
+                </div>
+              )}
+
               <Link
                 href="/media"
                 passHref
