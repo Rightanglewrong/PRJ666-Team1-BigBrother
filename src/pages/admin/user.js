@@ -37,7 +37,7 @@ const AdminUserService = () => {
     const [updateData, setUpdateData] = useState({
         firstName: '',
         lastName: '',
-        email: '',
+        accountType: '',
     });
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
@@ -93,6 +93,13 @@ const AdminUserService = () => {
             if (response.status === "ok") {
                 setUsersList(response.users);
                 setError(null);
+                setUpdateData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    locationID: '',
+                    accountType: '', // Clear previous user data
+                });
             } else {
                 setError("Failed to retrieve users.");
                 setErrorModalOpen(true);
@@ -174,18 +181,26 @@ const AdminUserService = () => {
                             {usersList.map((user) => (
                                 <ListItem
                                     key={user.userID}
-                                    button
                                     selected={userID === user.userID}
                                     onClick={() => handleUserSelect(user)}
+                                    sx={{
+                                        backgroundColor: userID === user.userID ? 'rgba(0, 0, 255, 0.1)' : 'transparent',
+                                        '&:hover': { backgroundColor: 'rgba(0, 0, 255, 0.1)' },
+                                        cursor: 'pointer', 
+                                    }}
                                 >
                                     <ListItemText
-                                        primary={`${user.firstName} ${user.lastName}`}
+                                        primary={
+                                            <Typography variant="body1" component="span">  
+                                                {`${user.firstName} ${user.lastName}`}
+                                            </Typography>
+                                        }
                                         secondary={
                                             <>
-                                                <Typography variant="body2" color="textSecondary">
+                                                <Typography variant="body2" color="textSecondary" component="span">
                                                     {user.email}
                                                 </Typography>
-                                                <Typography variant="caption" color="textSecondary">
+                                                <Typography variant="caption" color="textSecondary" component="span">
                                                     {user.accountType}
                                                 </Typography>
                                             </>
