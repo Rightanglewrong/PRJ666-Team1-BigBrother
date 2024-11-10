@@ -197,10 +197,10 @@ const AdminUserService = () => {
                                         }
                                         secondary={
                                             <>
-                                                <Typography variant="body2" color="textSecondary" component="span">
+                                                <Typography variant="body2" color="textSecondary" component="div">  {/* Use 'div' here */}
                                                     {user.email}
                                                 </Typography>
-                                                <Typography variant="caption" color="textSecondary" component="span">
+                                                <Typography variant="caption" color="textSecondary" component="div">  {/* Use 'div' here */}
                                                     {user.accountType}
                                                 </Typography>
                                             </>
