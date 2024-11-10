@@ -44,6 +44,8 @@ const AdminUserService = () => {
     const [errorModalOpen, setErrorModalOpen] = useState(false);
     const [usersList, setUsersList] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
 
     useEffect(() => {
         const checkAdmin = async () => {
@@ -75,13 +77,24 @@ const AdminUserService = () => {
     };
 
     const handleDeleteUser = async () => {
+        if (updateData.accountType === 'Admin') {
+            setError("Cannot delete an Admin user.");
+            setErrorModalOpen(true);
+            return;  // Prevent the delete action
+        } 
+        setUserToDelete(userID);
+        setOpenDeleteConfirmationDialog(true);
+    }
+    const handleConfirmDelete = async () => {
+        if (!userToDelete) return; // Ensure user is defined
         try {
             const response = await deleteUserInDynamoDB(userID);
             setResult(response.message);
             setError(null);
             await handleGetUsersByAccountTypeAndLocation();
+            setOpenDeleteConfirmationDialog(false); // Close dialog after deletion
         } catch (error) {
-            const errorMessage = "Error Deleting User"
+            const errorMessage = "Error Deleting User";
             setError(errorMessage);
             setErrorModalOpen(true);
         }
@@ -125,6 +138,11 @@ const AdminUserService = () => {
 
     const closeErrorModal = () => {
         setErrorModalOpen(false); 
+    };
+
+    const handleDialogClose = () => {
+        setOpenDeleteConfirmationDialog(false); // Close dialog if user cancels
+        setUserToDelete(null); // Reset the user to delete
     };
 
     return (
@@ -173,6 +191,23 @@ const AdminUserService = () => {
                 </DialogActions>
             </Dialog>
 
+            {/* Confirmation Dialog */}
+            <Dialog open={openDeleteConfirmationDialog} onClose={handleDialogClose}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    Are you sure you want to delete the user{' '}
+                    <strong>{userToDelete?.firstName} {userToDelete?.lastName}</strong>?
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDelete} color="error">
+                        Confirm Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Box sx={{ mb: 3 }}>
                 <Typography variant="h6">User List</Typography>
                 <Paper elevation={2} sx={{ maxHeight: 300, overflow: 'auto', mt: 2, p: 2 }}>
@@ -197,10 +232,10 @@ const AdminUserService = () => {
                                         }
                                         secondary={
                                             <>
-                                                <Typography variant="body2" color="textSecondary" component="div">  {/* Use 'div' here */}
+                                                <Typography variant="body2" color="textSecondary" component="span">  
                                                     {user.email}
                                                 </Typography>
-                                                <Typography variant="caption" color="textSecondary" component="div">  {/* Use 'div' here */}
+                                                <Typography variant="caption" color="textSecondary" component="span">  
                                                     {user.accountType}
                                                 </Typography>
                                             </>
@@ -259,11 +294,13 @@ const AdminUserService = () => {
                     <Box sx={{ mb: 3 }}>
                         <Typography variant="h6">Delete User</Typography>
                         <TextField
+                        
                             label="User ID"
                             variant="outlined"
                             value={userID}
                             onChange={(e) => setUserID(e.target.value)}
                             fullWidth
+                            disabled
                         />
                         <Button variant="contained" color="error" onClick={handleDeleteUser} sx={{ mt: 2 }}>
                             Delete User
