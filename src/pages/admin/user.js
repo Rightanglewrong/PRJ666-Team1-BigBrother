@@ -221,6 +221,7 @@ const AdminUserService = () => {
                         <Typography variant="h6">Update User</Typography>
                         <Box display="flex" flexDirection="column" gap={2} mt={2}>
                             <TextField
+                                disabled={updateData.accountType === 'Admin'}
                                 label="First Name"
                                 variant="outlined"
                                 value={updateData.firstName}
@@ -228,6 +229,7 @@ const AdminUserService = () => {
                                 fullWidth
                             />
                             <TextField
+                            disabled={updateData.accountType === 'Admin'}
                                 label="Last Name"
                                 variant="outlined"
                                 value={updateData.lastName}
