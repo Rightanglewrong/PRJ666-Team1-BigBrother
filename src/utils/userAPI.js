@@ -52,7 +52,7 @@ export const updateUserInDynamoDB = async (id, updateData) => {
 };
 
 export const deleteUserInDynamoDB = async (id) => {
-    const token = localStorage.getItem('Token');
+    const token = localStorage.getItem('token');
     if (!token){
         throw new Error("No Token Found"); 
     }

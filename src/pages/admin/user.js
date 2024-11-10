@@ -1,17 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import {
-    retrieveUserByIDInDynamoDB,
     updateUserInDynamoDB,
     deleteUserInDynamoDB,
     getUsersByAccountTypeAndLocation
 } from '../../utils/userAPI';
 import { getCurrentUser } from '@/utils/api';
+import {
+    Container,
+    Typography,
+    Box,
+    Snackbar,
+    Alert,
+    Button,
+    TextField,
+    Select,
+    MenuItem,
+    List,
+    ListItem,
+    ListItemText,
+    Paper,
+  } from "@mui/material"; 
 
-const UserCrudTester = () => {
+const AdminUserService = () => {
     const [userID, setUserID] = useState('');
     const [accountType, setAccountType] = useState('');
     const [locationID, setLocationID] = useState('');
-    const [updateData, setUpdateData] = useState({});
+    const [updateData, setUpdateData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+    });
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
     const [usersList, setUsersList] = useState([]);
@@ -33,54 +51,13 @@ const UserCrudTester = () => {
 
         checkAdmin();
     }, []);
-    
-    const fetchUserProfiles = async (uniqueUserIDs) => {
-        try {
-          const userProfileData = await Promise.all(
-            uniqueUserIDs.map(async (id) => {
-              try {
-                const userData = await handleRetrieveUser(id);
-                if (!userData) {
-                  console.warn(`No data found for User with ID ${id}`);
-                  return null; 
-                }
-                const { userID, firstName, lastName, email, locationID, ...rest } = userData.user.user;
-                return {
-                  userID,
-                  firstName,
-                  lastName,
-                  email,
-                  locationID,
-                };
-              } catch (error) {
-                console.error(`Error retrieving data for user ${id}:`, error);
-                throw error; 
-              }
-            })
-          );
-          const validUserProfiles = userProfileData.filter(profile => profile !== null).flat();
-          return validUserProfiles;
-                
-        } catch (error) {
-          console.error("Error fetching user profiles:", error);
-          setErrorMessage("Failed to fetch user profiles.");
-        }
-      };
-    const handleRetrieveUser = async () => {
-        try {
-            const user = await retrieveUserByIDInDynamoDB({ id: userID });
-            setResult(user);
-            setError(null);
-        } catch (error) {
-            setError(error.message);
-        }
-    };
 
     const handleUpdateUser = async () => {
         try {
             const response = await updateUserInDynamoDB(userID, updateData);
-            setResult(response);
+            setResult(response.message);
             setError(null);
+                await handleGetUsersByAccountTypeAndLocation();
         } catch (error) {
             setError(error.message);
         }
@@ -89,8 +66,9 @@ const UserCrudTester = () => {
     const handleDeleteUser = async () => {
         try {
             const response = await deleteUserInDynamoDB(userID);
-            setResult(response);
+            setResult(response.message);
             setError(null);
+            await handleGetUsersByAccountTypeAndLocation();
         } catch (error) {
             setError(error.message);
         }
@@ -98,9 +76,13 @@ const UserCrudTester = () => {
 
     const handleGetUsersByAccountTypeAndLocation = async () => {
         try {
-            const users = await getUsersByAccountTypeAndLocation(accountType, locationID);
-            setResult(users);
-            handleReset();
+            const response = await getUsersByAccountTypeAndLocation(accountType, locationID);
+            if (response.status === "ok") {
+                setUsersList(response.users); // Set usersList to the nested `users` array
+            } else {
+                setError("Failed to retrieve users.");
+            }
+            setError(null);
         } catch (error) {
             setError(error.message);
         }
@@ -121,95 +103,134 @@ const UserCrudTester = () => {
         setLocationID('');
     };
 
-    return (
-        <div>
-            <h2>User CRUD Tester</h2>
+     return (
+        <Container maxWidth="md">
+            <Typography variant="h4" gutterBottom>User Management</Typography>
+            <Box sx={{ mb: 3 }}>
+                <Typography variant="h6">Get Users by Account Type and Location</Typography>
+                <Box display="flex" alignItems="center" gap={2} mt={2}>
+                    <Select
+                        label="Account Type"
+                        value={accountType}
+                        onChange={(e) => setAccountType(e.target.value)}
+                        fullWidth
+                    >
+                        <MenuItem value="">Select Account Type</MenuItem>
+                        <MenuItem value="Admin">Admin</MenuItem>
+                        <MenuItem value="Staff">Staff</MenuItem>
+                        <MenuItem value="Parent">Parent</MenuItem>
+                    </Select>
+                    <TextField
+                        label="Location ID"
+                        variant="outlined"
+                        value={locationID}
+                        onChange={(e) => setLocationID(e.target.value)}
+                        fullWidth
+                    />
+                    <Button variant="contained" color="primary" onClick={handleGetUsersByAccountTypeAndLocation}>
+                        Get Users
+                    </Button>
+                </Box>
+            </Box>
 
-            {/* Get Users by Account Type and Location */}
-            <div>
-                <h3>Get Users by Account Type and Location</h3>
-                <select
-                    value={accountType}
-                    onChange={(e) => {
-                        setAccountType(e.target.value);
-                    }}
-                >
-                    <option value="">Select Account Type</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Staff">Staff</option>
-                    <option value="Parent">Parent</option>
-                </select>
-                <input
-                    type="text"
-                    placeholder="Location ID"
-                    value={locationID}
-                    onChange={(e) => setLocationID(e.target.value)}
-                />
-                <button onClick={() => 
-                    handleGetUsersByAccountTypeAndLocation(accountType, locationID)}>
-                    Get Users
-                </button>
-            </div>
+            <Box sx={{ mb: 3 }}>
+                <Typography variant="h6">User List</Typography>
+                <Paper elevation={2} sx={{ maxHeight: 300, overflow: 'auto', mt: 2, p: 2 }}>
+                    {usersList.length > 0 ? (
+                        <List>
+                            {usersList.map((user) => (
+                                <ListItem
+                                    key={user.userID}
+                                    button
+                                    selected={userID === user.userID}
+                                    onClick={() => handleUserSelect(user)}
+                                >
+                                    <ListItemText
+                                        primary={`${user.firstName} ${user.lastName}`}
+                                        secondary={
+                                            <>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {user.email}
+                                                </Typography>
+                                                <Typography variant="caption" color="textSecondary">
+                                                    {user.accountType}
+                                                </Typography>
+                                            </>
+                                        }
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    ) : (
+                        <Typography variant="body2" color="textSecondary">No users found</Typography>
+                    )}
+                </Paper>
+            </Box>
 
-            {/* Display Users List */}
-            <div>
-                <h3>User List</h3>
-                {usersList.length > 0 ? (
-                    <ul>
-                        {usersList.map((user) => (
-                            <li key={user.userID} onClick={() => handleUserSelect(user)}>
-                                {user.firstName} {user.lastName} - {user.accountType}
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No users found</p>
-                )}
-            </div>
-
-            {/* Admin Only: CRUD Operations */}
             {isAdmin && (
                 <>
-                    {/* Update User */}
-                    <div>
-                        <h3>Update User</h3>
-                        <input
-                            type="text"
-                            placeholder="User ID"
-                            value={userID}
-                            onChange={(e) => setUserID(e.target.value)}
-                        />
-                        <textarea
-                            placeholder="Update Data (JSON)"
-                            value={JSON.stringify(updateData)}
-                            onChange={(e) => setUpdateData(JSON.parse(e.target.value))}
-                        />
-                        <button onClick={handleUpdateUser}>Update User</button>
-                    </div>
+                    <Box sx={{ mb: 3 }}>
+                        <Typography variant="h6">Update User</Typography>
+                        <Box display="flex" flexDirection="column" gap={2} mt={2}>
+                            <TextField
+                                label="First Name"
+                                variant="outlined"
+                                value={updateData.firstName}
+                                onChange={(e) => setUpdateData((prev) => ({ ...prev, firstName: e.target.value }))}
+                                fullWidth
+                            />
+                            <TextField
+                                label="Last Name"
+                                variant="outlined"
+                                value={updateData.lastName}
+                                onChange={(e) => setUpdateData((prev) => ({ ...prev, lastName: e.target.value }))}
+                                fullWidth
+                            />
+                            <TextField
+                                label="Email"
+                                variant="outlined"
+                                value={updateData.email}
+                                onChange={(e) => setUpdateData((prev) => ({ ...prev, email: e.target.value }))}
+                                fullWidth
+                            />
+                            <Button variant="contained" color="secondary" onClick={handleUpdateUser}>
+                                Update User
+                            </Button>
+                        </Box>
+                    </Box>
 
-                    {/* Delete User */}
-                    <div>
-                        <h3>Delete User</h3>
-                        <input
-                            type="text"
-                            placeholder="User ID"
+                    <Box sx={{ mb: 3 }}>
+                        <Typography variant="h6">Delete User</Typography>
+                        <TextField
+                            label="User ID"
+                            variant="outlined"
                             value={userID}
                             onChange={(e) => setUserID(e.target.value)}
+                            fullWidth
                         />
-                        <button onClick={handleDeleteUser}>Delete User</button>
-                    </div>
+                        <Button variant="contained" color="error" onClick={handleDeleteUser} sx={{ mt: 2 }}>
+                            Delete User
+                        </Button>
+                    </Box>
                 </>
             )}
 
-            {/* Display Result */}
-            <div>
-                <h3>Result</h3>
-                {result && <pre>{JSON.stringify(result, null, 2)}</pre>}
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-            </div>
-        </div>
+            {result && (
+                <Snackbar open={true} autoHideDuration={6000} onClose={() => setResult(null)}>
+                    <Alert onClose={() => setResult(null)} severity="success" sx={{ width: '100%' }}>
+                        {result}
+                    </Alert>
+                </Snackbar>
+            )}
+            {error && (
+                <Snackbar open={true} autoHideDuration={6000} onClose={() => setError(null)}>
+                    <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>
+                        {error}
+                    </Alert>
+                </Snackbar>
+            )}
+        </Container>
     );
-
 }
 
-export default UserCrudTester;
+export default AdminUserService;
