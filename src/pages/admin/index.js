@@ -101,6 +101,19 @@ const AdminPage = () => {
               </Link>
             }
           />
+
+          {/* Users */}
+          <CustomCard
+            title="Users"
+            content="View and manage User profiles."
+            actions={
+              <Link href="/admin/user">
+                <Button size="small" color="primary">
+                  Go to Users
+                </Button>
+              </Link>
+            }
+          />
         </div>
       </div>
     </div>
