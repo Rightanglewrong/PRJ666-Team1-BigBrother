@@ -66,7 +66,7 @@ export default function CreateProgressReportPage() {
           let content;
 
           if (reportType === "detailed") {
-              content = `${subject} | ${progressTrending} | ${details} | ${recommendedActivity}}`;
+              content = `${subject} | ${progressTrending} | ${details} | ${recommendedActivity}`;
           } else {
             content = reportContent;
           }
