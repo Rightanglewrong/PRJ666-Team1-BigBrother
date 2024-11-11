@@ -61,9 +61,13 @@ export const fetchPaginatedMedia = async (mediaEntries, page) => {
     const data = await response.json();
     return data.mediaFiles.map((file) => ({
       mediaID: file.mediaID,
-      LastModified: file.LastModified, // Capture LastModified here
-      Size: file.Size, // Capture Size here
+      LastModified: file.LastModified,
+      Size: file.Size,
       url: file.FileData || file.presignedUrl,
+      uploadedBy: file.uploadedBy,
+      locationID: file.locationID,
+      childID: file.childID,
+      description: file.description || ''
     }));
   } catch (error) {
     console.error("Error fetching paginated media:", error);
@@ -88,7 +92,7 @@ export const getPaginatedMediaByLocation = async (locationID, page) => {
 };
 
 // For Deleting media in dynamoDB and s3
-export const deleteMediaByMediaID = async (mediaID) => {
+export const deleteMediaByMediaID = async (mediaID, s3Key) => {
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -96,13 +100,14 @@ export const deleteMediaByMediaID = async (mediaID) => {
   }
 
   try {
-    console.log("Sending delete request for mediaID:", mediaID); // Debugging line
+    console.log("Sending delete request for mediaID:", mediaID, "and s3Key:", s3Key); // Debugging line
     const response = await fetch(`${BACKEND_URL}v1/media/delete/${mediaID}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({ s3Key }), // Send s3Key in the request body
     });
 
     if (!response.ok) {
@@ -119,8 +124,9 @@ export const deleteMediaByMediaID = async (mediaID) => {
   }
 };
 
+
 // Upload a media file along with metadata to S3 and DynamoDB
-export const uploadMedia = async (file, childID) => {
+export const uploadMedia = async (file, childID, description = "") => {
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -131,10 +137,20 @@ export const uploadMedia = async (file, childID) => {
     throw new Error("File and childID are required");
   }
 
+  if (description && description.length > 150) {
+    throw new Error("Description must be 150 characters or fewer.");
+  }
+  console.log(description);
+
   try {
     const formData = new FormData();
     formData.append("file", file); // Attach the file
     formData.append("childID", childID); // Attach the childID as metadata
+
+    if(description){
+    formData.append("description", description); // Attach the childID as metadata
+    }
+    
 
     const response = await fetch(`${BACKEND_URL}v1/media/upload`, {
       method: "POST",
