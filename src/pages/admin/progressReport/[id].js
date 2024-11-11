@@ -170,9 +170,12 @@ export default function ViewProgressReportsPage() {
         {childReports.length > 0 ? (
             childReports.map(report => (
               <Box key={report.progressReportID} mb={2}>
-                <Typography variant="h6">{report.reportTitle}</Typography>
+                <Typography variant="h6">Title: {report.reportTitle}</Typography>
                 <Typography variant="body1">
                 {parseReportContent(report.content)}
+                </Typography>
+                <Typography variant="body1"> Created By:  
+                {report.createdBy}
                 </Typography>
                 <Button onClick={() => handleSelectReportForUpdate(report)} variant="outlined" color="primary" sx={{ mt: 1, mr: 1 }}>
                     Update
