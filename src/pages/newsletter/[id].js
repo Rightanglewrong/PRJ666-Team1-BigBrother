@@ -306,6 +306,9 @@ export default function NewsletterDetailPage() {
                 </>
               )}
 
+              {(user.accountType === "Admin" ||
+                user.accountType === "Staff") && (
+                <>
               <Typography variant="h6" sx={{ mt: 3 }}>
                 Select Account Types to Email:
               </Typography>
@@ -323,6 +326,8 @@ export default function NewsletterDetailPage() {
                   />
                 ))}
               </Box>
+              </>
+              )}
 
               {(user.accountType === "Admin" ||
                 user.accountType === "Staff") && (
