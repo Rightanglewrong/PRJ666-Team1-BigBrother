@@ -148,8 +148,9 @@ export default function ViewProgressReportsPage() {
   };
 
   const handleBack = () => {
-    router.back(); // Navigate to the previous page
-  };
+    const targetUrl = "/admin/progressReport";
+    router.push(targetUrl); 
+};
 
   function getFieldLabel(index) {
     const labels = ["Subject", "Progress Trend", "Details", "Suggestions"];
