@@ -94,14 +94,14 @@ export const updateProgressReportInDynamoDB = async (id, updateData) => {
 };
 
 // Delete an Progress Report from DynamoDB
-export const deleteProgressReportFromDynamoDB = async (item) => {
+export const deleteProgressReportFromDynamoDB = async (id) => {
   const token = localStorage.getItem('token');
 
   if (!token) {
       throw new Error("No token found");
   }
   try {
-    const response = await fetch(`${BACKEND_URL}v1/progress-report/${item.id}`, {
+    const response = await fetch(`${BACKEND_URL}v1/progress-report/${id}`, {
       method: "DELETE",
       headers: {
         'Authorization': `Bearer ${token}`, 

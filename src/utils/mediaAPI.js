@@ -120,7 +120,7 @@ export const deleteMediaByMediaID = async (mediaID) => {
 };
 
 // Upload a media file along with metadata to S3 and DynamoDB
-export const uploadMedia = async (file, childID) => {
+export const uploadMedia = async (file, childID, description = "") => {
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -131,10 +131,20 @@ export const uploadMedia = async (file, childID) => {
     throw new Error("File and childID are required");
   }
 
+  if (description && description.length > 150) {
+    throw new Error("Description must be 150 characters or fewer.");
+  }
+  console.log(description);
+
   try {
     const formData = new FormData();
     formData.append("file", file); // Attach the file
     formData.append("childID", childID); // Attach the childID as metadata
+
+    if(description){
+    formData.append("description", description); // Attach the childID as metadata
+    }
+    
 
     const response = await fetch(`${BACKEND_URL}v1/media/upload`, {
       method: "POST",
