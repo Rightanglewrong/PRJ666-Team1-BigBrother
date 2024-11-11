@@ -91,9 +91,9 @@ export default function HomePage() {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container spacing={6} justifyContent="center">
           {/* Dashboard */}
-          <Grid item xs={12} sm={6} md={3}>
+          {/* <Grid item xs={12} sm={6} md={3}>
             <Link href="/dashboard" passHref>
               <Card
                 sx={{
@@ -123,7 +123,7 @@ export default function HomePage() {
                 </CardContent>
               </Card>
             </Link>
-          </Grid>
+          </Grid> */}
 
           {/* Meal Plan */}
           <Grid item xs={12} sm={6} md={3}>
