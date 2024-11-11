@@ -25,7 +25,6 @@ const MediaGallery = () => {
     e.preventDefault();
     setPage(1);
     try {
-      // Convert locationID input to uppercase
       const uppercaseLocationID = locationID.toUpperCase();
       setLocationID(uppercaseLocationID);
   
@@ -38,7 +37,6 @@ const MediaGallery = () => {
       setError("Failed to load media files.");
     }
   };
-  
 
   const fetchPaginatedMediaFiles = async (entries, pageNumber) => {
     try {
@@ -134,7 +132,7 @@ const MediaGallery = () => {
                     ) : (
                       <p>Image data missing for {file.mediaID}</p>
                     )}
-                    <p>{file.mediaID}</p>
+                    <p>{file.mediaID.length > 30 ? `${file.mediaID.substring(0, 30)}...` : file.mediaID}</p>
                   </div>
                 ))
               ) : (
