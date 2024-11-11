@@ -7,7 +7,7 @@ import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } fro
 const MediaGallery = () => {
   const [locationID, setLocationID] = useState('');
   const [page, setPage] = useState(1);
-  const [mediaEntries, setMediaEntries] = useState([]); // All entries from fetchMediaByLocationID
+  const [mediaEntries, setMediaEntries] = useState([]);
   const [mediaFiles, setMediaFiles] = useState([]);
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
@@ -121,14 +121,7 @@ const MediaGallery = () => {
                 mediaFiles.map((file, index) => (
                   <div key={index} className={styles.mediaItem} style={{ textAlign: 'center' }}>
                     {file.url ? (
-                      file.mediaID.endsWith('.mp4') ? (
-                        <video width={200} height={200} controls style={{ cursor: 'pointer' }} onClick={() => openMediaModal(file)}>
-                          <source src={file.url} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
-                      ) : (
-                        <Image src={file.url} alt={`Media ID: ${file.mediaID}`} width={200} height={200} style={{ cursor: 'pointer' }} onClick={() => openMediaModal(file)} />
-                      )
+                      <Image src={file.url} alt={`Media ID: ${file.mediaID}`} width={200} height={200} style={{ cursor: 'pointer' }} onClick={() => openMediaModal(file)} />
                     ) : (
                       <p>Image data missing for {file.mediaID}</p>
                     )}
@@ -157,14 +150,7 @@ const MediaGallery = () => {
         <DialogContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {selectedMedia && (
             <>
-              {selectedMedia.mediaID.endsWith('.mp4') ? (
-                <video width={800} height={600} controls>
-                  <source src={selectedMedia.url} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <Image src={selectedMedia.url} alt={`Enlarged Media ID: ${selectedMedia.mediaID}`} width={800} height={600} />
-              )}
+              <Image src={selectedMedia.url} alt={`Enlarged Media ID: ${selectedMedia.mediaID}`} width={600} height={700} />
               <Typography variant="body1" style={{ marginTop: '10px', textAlign: 'center' }}>
                 <strong>Media ID:</strong> {selectedMedia.mediaID}
               </Typography>
