@@ -1,20 +1,18 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { Button, TextField, Dialog, DialogContent, Typography, DialogActions } from '@mui/material';
 import Image from 'next/image';
 import styles from '../HomePage.module.css';
-import { getPaginatedMediaByLocation, deleteMediaByMediaID, fetchMediaByLocationID, fetchPaginatedMedia } from '../../utils/mediaAPI';
+import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } from '../../utils/mediaAPI';
 
 const MediaGallery = () => {
   const [locationID, setLocationID] = useState('');
   const [page, setPage] = useState(1);
+  const [mediaEntries, setMediaEntries] = useState([]); // All entries from fetchMediaByLocationID
   const [mediaFiles, setMediaFiles] = useState([]);
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [showResults, setShowResults] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedMedia, setSelectedMedia] = useState(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const pageLimit = 3;
@@ -26,72 +24,74 @@ const MediaGallery = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setPage(1);
-    await fetchMediaFiles(1);
-    setShowResults(true);
-  };
-
-  const fetchMediaFiles = async (pageNumber) => {
     try {
-      const files = await getPaginatedMediaByLocation(locationID, pageNumber);
+      // Convert locationID input to uppercase
+      const uppercaseLocationID = locationID.toUpperCase();
+      setLocationID(uppercaseLocationID);
+  
+      const entries = await fetchMediaByLocationID(uppercaseLocationID);
+      setMediaEntries(entries);
+      setShowResults(true);
+      fetchPaginatedMediaFiles(entries, 1);
+    } catch (err) {
+      console.error("Failed to fetch media by location ID:", err);
+      setError("Failed to load media files.");
+    }
+  };
+  
+
+  const fetchPaginatedMediaFiles = async (entries, pageNumber) => {
+    try {
+      const files = await fetchPaginatedMedia(entries, pageNumber);
       setMediaFiles(files);
       setError('');
-      setHasMore(files.length === pageLimit);
     } catch (err) {
-      console.error('Failed to fetch media:', err);
-      setError('Failed to load media files.');
+      console.error("Failed to fetch paginated media:", err);
+      setError("Failed to load paginated media files.");
     }
   };
 
-  const handleNextPage = async () => {
+  const handleNextPage = () => {
     const nextPage = page + 1;
-    setPage(nextPage);
-    await fetchMediaFiles(nextPage);
+    if ((nextPage - 1) * pageLimit < mediaEntries.length) {
+      setPage(nextPage);
+      fetchPaginatedMediaFiles(mediaEntries, nextPage);
+    }
   };
 
-  const handlePreviousPage = async () => {
+  const handlePreviousPage = () => {
     const prevPage = Math.max(page - 1, 1);
     setPage(prevPage);
-    await fetchMediaFiles(prevPage);
+    fetchPaginatedMediaFiles(mediaEntries, prevPage);
   };
 
-  const openImageModal = (file) => {
-    setSelectedImage(file);
-  };
+  const openMediaModal = (file) => setSelectedMedia(file);
 
-  const closeImageModal = () => {
-    setSelectedImage(null);
-  };
+  const closeMediaModal = () => setSelectedMedia(null);
 
-  const formatSize = (sizeInBytes) => {
-    return `${(sizeInBytes / 1024).toFixed(2)} KB`;
-  };
+  const formatSize = (sizeInBytes) => `${(sizeInBytes / 1024).toFixed(2)} KB`;
 
-  const openDeleteConfirm = () => {
-    setIsDeleteConfirmOpen(true);
-  };
+  const openDeleteConfirm = () => setIsDeleteConfirmOpen(true);
 
-  const closeDeleteConfirm = () => {
-    setIsDeleteConfirmOpen(false);
-  };
+  const closeDeleteConfirm = () => setIsDeleteConfirmOpen(false);
 
   const handleDelete = async () => {
-    if (selectedImage) {
+    if (selectedMedia) {
       try {
-        await deleteMediaByMediaID(selectedImage.mediaID);
-        closeImageModal();
+        const s3Key = `${selectedMedia.locationID}/${selectedMedia.uploadedBy}/${selectedMedia.mediaID}`;
+        await deleteMediaByMediaID(selectedMedia.mediaID, s3Key);
+
+        const updatedEntries = mediaEntries.filter(entry => entry.mediaID !== selectedMedia.mediaID);
+        setMediaEntries(updatedEntries);
+        closeMediaModal();
         closeDeleteConfirm();
-        const mediaEntries = await fetchMediaByLocationID(locationID);
-        const totalItems = mediaEntries.length;
-        const totalPages = Math.ceil(totalItems / pageLimit);
-        const newPage = Math.min(page, totalPages);
-        const paginatedMedia = await fetchPaginatedMedia(mediaEntries, newPage);
-        
-        setMediaFiles(paginatedMedia);
+
+        const newPage = updatedEntries.length < (page - 1) * pageLimit + 1 ? page - 1 : page;
         setPage(newPage);
-        setHasMore(mediaEntries.length > newPage * pageLimit);
+        fetchPaginatedMediaFiles(updatedEntries, newPage);
       } catch (error) {
         console.error("Error deleting media:", error);
-        setError('Failed to delete media.');
+        setError("Failed to delete media.");
       }
     }
   };
@@ -123,14 +123,14 @@ const MediaGallery = () => {
                 mediaFiles.map((file, index) => (
                   <div key={index} className={styles.mediaItem} style={{ textAlign: 'center' }}>
                     {file.url ? (
-                      <Image
-                        src={file.url}
-                        alt={`Media ID: ${file.mediaID}`}
-                        width={200}
-                        height={200}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => openImageModal(file)}
-                      />
+                      file.mediaID.endsWith('.mp4') ? (
+                        <video width={200} height={200} controls style={{ cursor: 'pointer' }} onClick={() => openMediaModal(file)}>
+                          <source src={file.url} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : (
+                        <Image src={file.url} alt={`Media ID: ${file.mediaID}`} width={200} height={200} style={{ cursor: 'pointer' }} onClick={() => openMediaModal(file)} />
+                      )
                     ) : (
                       <p>Image data missing for {file.mediaID}</p>
                     )}
@@ -147,7 +147,7 @@ const MediaGallery = () => {
                 Previous
               </Button>
               <span>Page: {page}</span>
-              <Button variant="outlined" onClick={handleNextPage} disabled={!hasMore}>
+              <Button variant="outlined" onClick={handleNextPage} disabled={(page * pageLimit) >= mediaEntries.length}>
                 Next
               </Button>
             </div>
@@ -155,24 +155,38 @@ const MediaGallery = () => {
         )}
       </div>
 
-      <Dialog open={!!selectedImage} onClose={closeImageModal} maxWidth="md">
+      <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
         <DialogContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {selectedImage && (
+          {selectedMedia && (
             <>
-              <Image
-                src={selectedImage.url}
-                alt={`Enlarged Media ID: ${selectedImage.mediaID}`}
-                width={800}
-                height={600}
-              />
+              {selectedMedia.mediaID.endsWith('.mp4') ? (
+                <video width={800} height={600} controls>
+                  <source src={selectedMedia.url} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <Image src={selectedMedia.url} alt={`Enlarged Media ID: ${selectedMedia.mediaID}`} width={800} height={600} />
+              )}
               <Typography variant="body1" style={{ marginTop: '10px', textAlign: 'center' }}>
-                <strong>Media ID:</strong> {selectedImage.mediaID}
+                <strong>Media ID:</strong> {selectedMedia.mediaID}
               </Typography>
               <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Last Modified:</strong> {selectedImage.LastModified ? new Date(selectedImage.LastModified).toLocaleString() : 'N/A'}
+                <strong>Description:</strong> {selectedMedia.description || 'No description available'}
               </Typography>
               <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Size:</strong> {selectedImage.Size ? formatSize(selectedImage.Size) : 'N/A'}
+                <strong>Location ID:</strong> {selectedMedia.locationID}
+              </Typography>
+              <Typography variant="body1" style={{ textAlign: 'center' }}>
+                <strong>Uploaded By:</strong> {selectedMedia.uploadedBy}
+              </Typography>
+              <Typography variant="body1" style={{ textAlign: 'center' }}>
+                <strong>Child ID:</strong> {selectedMedia.childID}
+              </Typography>
+              <Typography variant="body1" style={{ textAlign: 'center' }}>
+                <strong>Last Modified:</strong> {selectedMedia.LastModified ? new Date(selectedMedia.LastModified).toLocaleString() : 'N/A'}
+              </Typography>
+              <Typography variant="body1" style={{ textAlign: 'center' }}>
+                <strong>Size:</strong> {selectedMedia.Size ? formatSize(selectedMedia.Size) : 'N/A'}
               </Typography>
               <Button variant="contained" color="secondary" style={{ marginTop: '20px' }} onClick={openDeleteConfirm}>
                 Delete
