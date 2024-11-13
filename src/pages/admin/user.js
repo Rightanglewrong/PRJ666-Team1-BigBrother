@@ -80,19 +80,19 @@ const AdminUserService = () => {
         if (updateData.accountType === 'Admin') {
             setError("Cannot delete an Admin user.");
             setErrorModalOpen(true);
-            return;  // Prevent the delete action
+            return;  
         } 
         setUserToDelete(userID);
         setOpenDeleteConfirmationDialog(true);
     }
     const handleConfirmDelete = async () => {
-        if (!userToDelete) return; // Ensure user is defined
+        if (!userToDelete) return; 
         try {
-            const response = await deleteUserInDynamoDB(userID);
+            const response = await deleteUserInDynamoDB(userToDelete);
             setResult(response.message);
             setError(null);
             await handleGetUsersByAccountTypeAndLocation();
-            setOpenDeleteConfirmationDialog(false); // Close dialog after deletion
+            setOpenDeleteConfirmationDialog(false); 
         } catch (error) {
             const errorMessage = "Error Deleting User";
             setError(errorMessage);
@@ -113,6 +113,7 @@ const AdminUserService = () => {
                     locationID: '',
                     accountType: '', // Clear previous user data
                 });
+                setUserID(null);
             } else {
                 setError("Failed to retrieve users.");
                 setErrorModalOpen(true);
@@ -241,6 +242,12 @@ const AdminUserService = () => {
                                             </>
                                         }
                                     />
+                                    <Button color="secondary" onClick={() => handleUserSelect(user)} sx={{ marginRight: 1 }}>
+                                        Update
+                                    </Button>
+                                    <Button color="error" onClick={() => handleDeleteUser(user)}>
+                                        Delete
+                                    </Button>
                                 </ListItem>
                             ))}
                         </List>
@@ -250,7 +257,7 @@ const AdminUserService = () => {
                 </Paper>
             </Box>
 
-            {isAdmin && (
+            {isAdmin && userID && (
                 <>
                     <Box sx={{ mb: 3 }}>
                         <Typography variant="h6">Update User</Typography>
@@ -275,7 +282,7 @@ const AdminUserService = () => {
                                 <InputLabel>Account Type</InputLabel>
                                 <Select
                                     disabled={updateData.accountType === 'Admin'} // Disable if the accountType is Admin
-                                    label="Account Type" // This binds the label to the Select input
+                                    label="Account Type" 
                                     value={updateData.accountType}
                                     onChange={(e) => setUpdateData((prev) => ({ ...prev, accountType: e.target.value }))}
                                     fullWidth
@@ -288,23 +295,10 @@ const AdminUserService = () => {
                             <Button variant="contained" color="secondary" onClick={handleUpdateUser}>
                                 Update User
                             </Button>
+                            <Button variant="outlined" color="default" onClick={() => setUserID(null)} style={{ marginTop: '10px' }}>
+                                Cancel
+                            </Button>
                         </Box>
-                    </Box>
-
-                    <Box sx={{ mb: 3 }}>
-                        <Typography variant="h6">Delete User</Typography>
-                        <TextField
-                        
-                            label="User ID"
-                            variant="outlined"
-                            value={userID}
-                            onChange={(e) => setUserID(e.target.value)}
-                            fullWidth
-                            disabled
-                        />
-                        <Button variant="contained" color="error" onClick={handleDeleteUser} sx={{ mt: 2 }}>
-                            Delete User
-                        </Button>
                     </Box>
                 </>
             )}
