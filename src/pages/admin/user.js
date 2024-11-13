@@ -46,6 +46,7 @@ const AdminUserService = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const checkAdmin = async () => {
@@ -82,8 +83,8 @@ const AdminUserService = () => {
             setErrorModalOpen(true);
             return;  
         } 
-        setUserToDelete(userID);
         setOpenDeleteConfirmationDialog(true);
+        setUserToDelete(userID);
     }
     const handleConfirmDelete = async () => {
         if (!userToDelete) return; 
@@ -93,6 +94,8 @@ const AdminUserService = () => {
             setError(null);
             await handleGetUsersByAccountTypeAndLocation();
             setOpenDeleteConfirmationDialog(false); 
+            setUserID(null); 
+            setIsDeleting(false);
         } catch (error) {
             const errorMessage = "Error Deleting User";
             setError(errorMessage);
@@ -242,10 +245,21 @@ const AdminUserService = () => {
                                             </>
                                         }
                                     />
-                                    <Button color="secondary" onClick={() => handleUserSelect(user)} sx={{ marginRight: 1 }}>
+                                    <Button color="secondary" 
+                                        onClick={() => {
+                                            handleUserSelect(user)
+                                            setIsDeleting(false)
+                                            }} 
+                                            sx={{ marginRight: 1 }}>
                                         Update
                                     </Button>
-                                    <Button color="error" onClick={() => handleDeleteUser(user)}>
+                                    <Button
+                                        color="error"
+                                        onClick={() => {
+                                            setIsDeleting(true);
+                                            handleDeleteUser(user);
+                                        }}
+                                    >
                                         Delete
                                     </Button>
                                 </ListItem>
@@ -257,7 +271,7 @@ const AdminUserService = () => {
                 </Paper>
             </Box>
 
-            {isAdmin && userID && (
+            {isAdmin && userID && !isDeleting && (
                 <>
                     <Box sx={{ mb: 3 }}>
                         <Typography variant="h6">Update User</Typography>
