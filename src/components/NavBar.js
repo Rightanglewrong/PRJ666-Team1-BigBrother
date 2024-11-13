@@ -37,11 +37,29 @@ const NavBar = () => {
     setAnchorEl(null);
   };
 
+  const accountColors = {
+    Admin: "linear-gradient(90deg, #6a11cb, #2575fc)", // Existing color
+    Parent: "linear-gradient(90deg, #388E3C, #66BB6A)", // Gradient green for Parent
+    Staff: "linear-gradient(90deg, #FFA000, #FFC107)",  // Darker yellow for Staff
+  };
+
+  const backgroundColor = accountColors[accountType] || accountColors.Admin;
+
+  // Define menu background colors for each account type
+  const accountMenuColors = {
+    Admin: "linear-gradient(90deg, #f52ad3f4, #25dcfce4)", // Existing color for Admin
+    Parent: "linear-gradient(90deg, #388E3C, #A5D6A7)",     // Similar green gradient for Parent
+    Staff: "linear-gradient(90deg, #FFA000, #FFCA28)",      // Matching yellow gradient for Staff
+  };
+
+  // Set the background based on the account type
+  const menuBackgroundColor = accountMenuColors[accountType] || accountMenuColors.Admin;
+
   return (
     <AppBar
       position="sticky"
       sx={{
-        background: "linear-gradient(90deg, #6a11cb, #2575fc)",
+        background: backgroundColor,
         padding: "5px 20px",
         zIndex: 1000,
       }}
@@ -208,7 +226,7 @@ const NavBar = () => {
               onClose={handleMenuClose}
               sx={{
                 "& .MuiPaper-root": {
-                  background: "linear-gradient(90deg, #f52ad3f4, #25dcfce4)",
+                  background: menuBackgroundColor,  // Apply background based on account type
                   color: "#fff",
                   borderRadius: "4px",
                   minWidth: "160px",
