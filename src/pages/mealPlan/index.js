@@ -188,7 +188,38 @@ export default function MealPlanIndex() {
             </Box>
           </Box>
 
-          <Box display="flex" justifyContent="center" mt={3} gap={2}>
+          {/* Action Buttons */}
+          <Box display="flex" justifyContent="center" mt={3} gap={2} flexWrap="wrap">
+            {user && (user.accountType === "Admin" || user.accountType === "Staff") && (
+              <>
+                <Button
+                  variant="contained"
+                  color="success"
+                  component={Link}
+                  href="/mealPlan/create"
+                  sx={{
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    px: 3,
+                  }}
+                >
+                  Create New Meal Plan
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  component={Link}
+                  href={`/mealPlan/${mealPlan.mealPlanID}`}
+                  sx={{
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    px: 3,
+                  }}
+                >
+                  Edit Meal Plan
+                </Button>
+              </>
+            )}
             <Button
               variant="contained"
               color="primary"
@@ -209,27 +240,25 @@ export default function MealPlanIndex() {
           <Typography variant="body1" color="textSecondary">
             No meal plan found.
           </Typography>
+          {user && (user.accountType === "Admin" || user.accountType === "Staff") && (
+            <Box display="flex" justifyContent="center" mt={3}>
+              <Button
+                variant="contained"
+                color="success"
+                component={Link}
+                href="/mealPlan/create"
+                sx={{
+                  textTransform: "none",
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  px: 3,
+                }}
+              >
+                Create New Meal Plan
+              </Button>
+            </Box>
+          )}
         </Box>
       )}
-
-      {user &&
-        (user.accountType === "Admin" || user.accountType === "Staff") && (
-          <Box display="flex" justifyContent="center" mt={3} gap={2}>
-            <Button
-              variant="contained"
-              color="success"
-              component={Link}
-              href="/mealPlan/create"
-              sx={{
-                textTransform: "none",
-                fontSize: { xs: "0.875rem", md: "1rem" },
-                px: 3,
-              }}
-            >
-              Create New Meal Plan
-            </Button>
-          </Box>
-        )}
     </Container>
   );
 }
