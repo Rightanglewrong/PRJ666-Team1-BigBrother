@@ -118,6 +118,38 @@ export const getLatestMealPlan = async (token, daycareID) => {
   return data.mealPlan;
 };
 
+// Fetch recent meal plans by daycare ID (up to 10)
+export const fetchRecentMealPlansByLocation = async (locationID) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/recent/${locationID}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error fetching meal plans: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.mealPlans;
+  } catch (error) {
+    console.error("Error fetching recent meal plans by location:", error);
+    throw error;
+  }
+};
+
 export const deleteMealPlan = async (token, id) => {
   try {
     const response = await fetch(`${BACKEND_URL}/${id}`, {
