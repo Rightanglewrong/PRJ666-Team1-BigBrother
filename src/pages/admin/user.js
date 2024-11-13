@@ -46,6 +46,7 @@ const AdminUserService = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const checkAdmin = async () => {
@@ -82,8 +83,8 @@ const AdminUserService = () => {
             setErrorModalOpen(true);
             return;  
         } 
-        setUserToDelete(userID);
         setOpenDeleteConfirmationDialog(true);
+        setUserToDelete(userID);
     }
     const handleConfirmDelete = async () => {
         if (!userToDelete) return; 
@@ -93,6 +94,8 @@ const AdminUserService = () => {
             setError(null);
             await handleGetUsersByAccountTypeAndLocation();
             setOpenDeleteConfirmationDialog(false); 
+            setUserID(null); 
+            setIsDeleting(false);
         } catch (error) {
             const errorMessage = "Error Deleting User";
             setError(errorMessage);
@@ -102,27 +105,46 @@ const AdminUserService = () => {
 
     const handleGetUsersByAccountTypeAndLocation = async () => {
         try {
-            const response = await getUsersByAccountTypeAndLocation(accountType, locationID);
-            if (response.status === "ok") {
-                setUsersList(response.users);
-                setError(null);
-                setUpdateData({
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    locationID: '',
-                    accountType: '', // Clear previous user data
+            let users = [];
+            
+            if (!accountType) {
+                const accountTypes = ["Admin", "Staff", "Parent"];
+                const promises = accountTypes.map(type =>
+                    getUsersByAccountTypeAndLocation(type, locationID)
+                );
+                const responses = await Promise.all(promises);
+    
+                responses.forEach(response => {
+                    if (response.status === "ok" && response.users) {
+                        users = users.concat(response.users);
+                    }
                 });
-                setUserID(null);
             } else {
-                setError("Failed to retrieve users.");
+                const response = await getUsersByAccountTypeAndLocation(accountType, locationID);
+                if (response.status === "ok" && response.users) {
+                    users = response.users;
+                }
+            }
+    
+            if (users.length > 0) {
+                setUsersList(users);
+                setError(null);
+            } else {
+                setError("No users found for the selected location.");
                 setErrorModalOpen(true);
             }
+    
+            setUpdateData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                locationID: '',
+                accountType: '', 
+            });
+            setUserID(null);
         } catch (error) {
-            const errorMessage = "Account Type and Location ID are Required";
-            setError(errorMessage);
+            setError("Failed to retrieve users.");
             setErrorModalOpen(true);
-
         }
     };
 
@@ -227,25 +249,40 @@ const AdminUserService = () => {
                                 >
                                     <ListItemText
                                         primary={
-                                            <Typography variant="body1" component="span">  
-                                                {`${user.firstName} ${user.lastName}`}
-                                            </Typography>
+                                            <>
+                                                <Typography variant="body1" component="span">
+                                                    {`${user.firstName} ${user.lastName}`}
+                                                </Typography>
+                                                <Typography variant="body2" color="textSecondary" component="div">
+                                                    {user.email}
+                                                </Typography>
+                                            </>
+                                            
                                         }
                                         secondary={
                                             <>
-                                                <Typography variant="body2" color="textSecondary" component="span">  
-                                                    {user.email}
-                                                </Typography>
+                                                
                                                 <Typography variant="caption" color="textSecondary" component="span">  
                                                     {user.accountType}
                                                 </Typography>
                                             </>
                                         }
                                     />
-                                    <Button color="secondary" onClick={() => handleUserSelect(user)} sx={{ marginRight: 1 }}>
+                                    <Button color="secondary" 
+                                        onClick={() => {
+                                            handleUserSelect(user)
+                                            setIsDeleting(false)
+                                            }} 
+                                            sx={{ marginRight: 1 }}>
                                         Update
                                     </Button>
-                                    <Button color="error" onClick={() => handleDeleteUser(user)}>
+                                    <Button
+                                        color="error"
+                                        onClick={() => {
+                                            setIsDeleting(true);
+                                            handleDeleteUser(user);
+                                        }}
+                                    >
                                         Delete
                                     </Button>
                                 </ListItem>
@@ -257,7 +294,7 @@ const AdminUserService = () => {
                 </Paper>
             </Box>
 
-            {isAdmin && userID && (
+            {isAdmin && userID && !isDeleting && (
                 <>
                     <Box sx={{ mb: 3 }}>
                         <Typography variant="h6">Update User</Typography>
