@@ -240,7 +240,7 @@ const NavBar = () => {
                 Contact List
               </Link>
 
-              {(accountType === "Parent") && (
+              {(accountType === "Parent" || accountType === "Staff") && (
                 <div>
                   <Link
                     href="/progressReport"
@@ -286,7 +286,7 @@ const NavBar = () => {
                 Messages
               </Link>
 
-              {(accountType === "Admin" || accountType === "Staff") && (
+              {(accountType === "Admin") && (
                 <div>
                   <Link
                     href="/crudTester"

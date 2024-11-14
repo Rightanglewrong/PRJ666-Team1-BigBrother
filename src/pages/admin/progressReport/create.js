@@ -118,7 +118,6 @@ return (
       >
         <TextField
           label="Child Name"
-          TextField= ""
           value={childName}
           required
           disabled
@@ -193,7 +192,6 @@ return (
           variant="contained"
           fullWidth
           sx={{
-            mt: 3,
             backgroundColor: "#3498db",
             color: "#fff",
             "&:hover": { backgroundColor: "#2980b9" },
@@ -206,12 +204,11 @@ return (
           variant="outlined"
           fullWidth
           sx={{
-            mt: 2,
             color: "#3498db",
             borderColor: "#3498db",
             "&:hover": { borderColor: "#2980b9", color: "#2980b9" },
           }}
-          onClick={() => router.push("/admin/progressReport")}
+          onClick={() => router.back()}
         >
           Previous Page
         </Button>
