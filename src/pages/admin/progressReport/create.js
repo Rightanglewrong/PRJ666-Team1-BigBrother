@@ -15,6 +15,10 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from "@mui/material"; 
 
 export default function CreateProgressReportPage() {
@@ -31,12 +35,26 @@ export default function CreateProgressReportPage() {
     const [progressTrending, setProgressTrending] = useState("");
     const [details, setDetails] = useState("");
     const [recommendedActivity, setRecommendedActivity] = useState("");
+
+    const [openErrorDialog, setOpenErrorDialog] = useState(false);
+
+    useEffect(() => {
+      if (user && !(user.accountType === "Admin" || user.accountType === "Staff")) {
+        setOpenErrorDialog(true); // Show the error dialog
+        setTimeout(() => {
+          router.push("/"); // Redirect to home after a timeout
+        }, 3000);
+      }
+    }, [user, router]);
+
+    const isFormDisabled = openErrorDialog;
   
     useEffect(() => {
       if (router.query.childID) {
         setChildID(router.query.childID);  
       }
     }, [router.query.childID]);
+
 
     useEffect(() => {
       if (childID) {
@@ -213,6 +231,30 @@ return (
           Previous Page
         </Button>
       </Box>
+
+       {/* Unauthorized Access Dialog */}
+       <Dialog
+        open={openErrorDialog}
+        onClose={() => setOpenErrorDialog(false)}
+        aria-labelledby="error-dialog-title"
+        aria-describedby="error-dialog-description"
+      >
+        <DialogTitle id="error-dialog-title">Unauthorized Access</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" id="error-dialog-description">
+            You are not authorized to create progress reports. Redirecting to the homepage...
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => router.push("/")}
+            color="primary"
+            variant="contained"
+          >
+            Go to Homepage
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
