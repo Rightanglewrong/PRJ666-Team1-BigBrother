@@ -18,7 +18,6 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions,
 } from "@mui/material"; 
 
 export default function CreateProgressReportPage() {
@@ -245,15 +244,6 @@ return (
             You are not authorized to create progress reports. Redirecting to the homepage...
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => router.push("/")}
-            color="primary"
-            variant="contained"
-          >
-            Go to Homepage
-          </Button>
-        </DialogActions>
       </Dialog>
     </Container>
   );
