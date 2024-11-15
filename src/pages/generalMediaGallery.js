@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 const MediaGallery = () => {
   const [page, setPage] = useState(1);
   const [mediaEntries, setMediaEntries] = useState([]);
+  const [filteredMediaEntries, setFilteredMediaEntries] = useState([]); // New state for filtered entries
   const [mediaFiles, setMediaFiles] = useState([]);
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
@@ -51,7 +52,6 @@ const MediaGallery = () => {
         const profile = await retrieveChildProfileByID(entry.childID);
         if (profile) {
           profiles.push({ childID: entry.childID, firstName: profile.child.child.firstName });
-          //console.log(profile.child.child.firstName);
         }
       }
 
@@ -69,6 +69,7 @@ const MediaGallery = () => {
     setSelectedChildID(childID);
     setPage(1);
     const filteredEntries = mediaEntries.filter(entry => entry.childID === childID);
+    setFilteredMediaEntries(filteredEntries); // Update filtered entries
     fetchPaginatedMediaFiles(filteredEntries, 1);
   };
 
@@ -85,53 +86,17 @@ const MediaGallery = () => {
 
   const handleNextPage = () => {
     const nextPage = page + 1;
-    if ((nextPage - 1) * pageLimit < mediaEntries.length) {
+    if ((nextPage - 1) * pageLimit < filteredMediaEntries.length) {
       setPage(nextPage);
-      const filteredEntries = mediaEntries.filter(entry => entry.childID === selectedChildID);
-      fetchPaginatedMediaFiles(filteredEntries, nextPage);
+      fetchPaginatedMediaFiles(filteredMediaEntries, nextPage);
     }
   };
 
   const handlePreviousPage = () => {
     const prevPage = Math.max(page - 1, 1);
     setPage(prevPage);
-    const filteredEntries = mediaEntries.filter(entry => entry.childID === selectedChildID);
-    fetchPaginatedMediaFiles(filteredEntries, prevPage);
+    fetchPaginatedMediaFiles(filteredMediaEntries, prevPage);
   };
-
-  const openMediaModal = (file) => setSelectedMedia(file);
-
-  const closeMediaModal = () => setSelectedMedia(null);
-
-  const formatSize = (sizeInBytes) => `${(sizeInBytes / 1024).toFixed(2)} KB`;
-
-  const openDeleteConfirm = () => setIsDeleteConfirmOpen(true);
-
-  const closeDeleteConfirm = () => setIsDeleteConfirmOpen(false);
-
-  const handleDelete = async () => {
-    if (selectedMedia) {
-      try {
-        const s3Key = `${selectedMedia.locationID}/${selectedMedia.uploadedBy}/${selectedMedia.mediaID}`;
-        await deleteMediaByMediaID(selectedMedia.mediaID, s3Key);
-
-        const updatedEntries = mediaEntries.filter(entry => entry.mediaID !== selectedMedia.mediaID);
-        setMediaEntries(updatedEntries);
-        closeMediaModal();
-        closeDeleteConfirm();
-
-        const newPage = updatedEntries.length < (page - 1) * pageLimit + 1 ? page - 1 : page;
-        setPage(newPage);
-        const filteredEntries = updatedEntries.filter(entry => entry.childID === selectedChildID);
-        fetchPaginatedMediaFiles(filteredEntries, newPage);
-      } catch (error) {
-        console.error("Error deleting media:", error);
-        setError("Failed to delete media.");
-      }
-    }
-  };
-
-  if (!isClient) return null;
 
   return (
     <div className={styles.homeContainer}>
@@ -195,72 +160,13 @@ const MediaGallery = () => {
                 Previous
               </Button>
               <span>Page: {page}</span>
-              <Button variant="outlined" onClick={handleNextPage} disabled={(page * pageLimit) >= mediaEntries.length}>
+              <Button variant="outlined" onClick={handleNextPage} disabled={(page * pageLimit) >= filteredMediaEntries.length}>
                 Next
               </Button>
             </div>
           </div>
         )}
       </div>
-
-      {/* Media Modal */}
-      <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
-        <DialogContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {selectedMedia && (
-            <>
-              {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
-                <video width="600" height="400" controls>
-                  <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <Image src={selectedMedia.url} alt={`Enlarged Media ID: ${selectedMedia.mediaID}`} width={600} height={700} />
-              )}
-              <Typography variant="body1" style={{ marginTop: '10px', textAlign: 'center' }}>
-                <strong>Media ID:</strong> {selectedMedia.mediaID}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Description:</strong> {selectedMedia.description || 'No description available'}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Location ID:</strong> {selectedMedia.locationID}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Uploaded By:</strong> {selectedMedia.uploadedBy}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Child ID:</strong> {selectedMedia.childID}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Last Modified:</strong> {selectedMedia.LastModified ? new Date(selectedMedia.LastModified).toLocaleString() : 'N/A'}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Size:</strong> {selectedMedia.Size ? formatSize(selectedMedia.Size) : 'N/A'}
-              </Typography>
-              <Button variant="contained" color="secondary" style={{ marginTop: '20px' }} onClick={openDeleteConfirm}>
-                Delete
-              </Button>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteConfirmOpen} onClose={closeDeleteConfirm}>
-        <DialogContent>
-          <Typography variant="body1" style={{ textAlign: 'center' }}>
-            Are you sure you want to delete this media file?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDeleteConfirm} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDelete} color="secondary">
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };
