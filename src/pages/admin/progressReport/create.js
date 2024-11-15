@@ -15,6 +15,9 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
 } from "@mui/material"; 
 
 export default function CreateProgressReportPage() {
@@ -31,12 +34,26 @@ export default function CreateProgressReportPage() {
     const [progressTrending, setProgressTrending] = useState("");
     const [details, setDetails] = useState("");
     const [recommendedActivity, setRecommendedActivity] = useState("");
+
+    const [openErrorDialog, setOpenErrorDialog] = useState(false);
+
+    useEffect(() => {
+      if (user && !(user.accountType === "Admin" || user.accountType === "Staff")) {
+        setOpenErrorDialog(true); // Show the error dialog
+        setTimeout(() => {
+          router.push("/"); // Redirect to home after a timeout
+        }, 3000);
+      }
+    }, [user, router]);
+
+    const isFormDisabled = openErrorDialog;
   
     useEffect(() => {
       if (router.query.childID) {
         setChildID(router.query.childID);  
       }
     }, [router.query.childID]);
+
 
     useEffect(() => {
       if (childID) {
@@ -118,7 +135,6 @@ return (
       >
         <TextField
           label="Child Name"
-          TextField= ""
           value={childName}
           required
           disabled
@@ -193,7 +209,6 @@ return (
           variant="contained"
           fullWidth
           sx={{
-            mt: 3,
             backgroundColor: "#3498db",
             color: "#fff",
             "&:hover": { backgroundColor: "#2980b9" },
@@ -206,16 +221,30 @@ return (
           variant="outlined"
           fullWidth
           sx={{
-            mt: 2,
             color: "#3498db",
             borderColor: "#3498db",
             "&:hover": { borderColor: "#2980b9", color: "#2980b9" },
           }}
-          onClick={() => router.push("/admin/progressReport")}
+          onClick={() => router.back()}
         >
           Previous Page
         </Button>
       </Box>
+
+       {/* Unauthorized Access Dialog */}
+       <Dialog
+        open={openErrorDialog}
+        onClose={() => setOpenErrorDialog(false)}
+        aria-labelledby="error-dialog-title"
+        aria-describedby="error-dialog-description"
+      >
+        <DialogTitle id="error-dialog-title">Unauthorized Access</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" id="error-dialog-description">
+            You are not authorized to create progress reports. Redirecting to the homepage...
+          </Typography>
+        </DialogContent>
+      </Dialog>
     </Container>
   );
 }

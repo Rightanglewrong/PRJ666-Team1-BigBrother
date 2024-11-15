@@ -1,13 +1,27 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router"
 import {
   retrieveProgressReportByChildID,
 } from "../utils/progressReportAPI";
 import { retrieveChildProfileByID, retrieveChildrenByLocationID } from "../utils/childAPI";
 import { getRelationshipByParentID } from "../utils/relationshipAPI";
 import { getCurrentUser } from "../utils/api";
-import styles from "./progressReport.module.css";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material"; 
 
 export default function ProgressReport() {
+  const router = useRouter();
   const [childID, setChildID] = useState("");
   const [message, setMessage] = useState("");
   const [userDetails, setUserDetails] = useState(null);
@@ -30,6 +44,11 @@ export default function ProgressReport() {
           if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
             const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
+            const childProfilesData = await fetchChildProfiles(uniqueChildIDs);
+            setChildProfiles(childProfilesData);
+          } else if (userData.accountType === 'Staff') {
+            const childrenData = await retrieveChildrenByLocationID(userData.locationID);
+            const uniqueChildIDs = [...new Set(childrenData.map((child) => child.childID))];
             const childProfilesData = await fetchChildProfiles(uniqueChildIDs);
             setChildProfiles(childProfilesData);
           }
@@ -105,6 +124,10 @@ export default function ProgressReport() {
     }
   };
 
+  const handleCreateReportClick = () => {
+    router.push(`/progressReport/create?childID=${selectedChildID}`);
+  };
+
   const handleReportClick = (report) => {
     setSelectedReport(report); // Set selected report details
   };
@@ -124,113 +147,114 @@ export default function ProgressReport() {
         </div>
       );
     } else {
-        return <div><strong>Content:</strong> {content}</div>;
+        return <Typography><strong>Content:</strong> {content}</Typography>;
     }
   }
     return null;
-  };
+  }; 
 
   return (
-    <div className={styles.pageWrapper}>
-      <div className={styles.container}>
-        <h1 className={styles.h1Style}>Progress Reports</h1>
-        <p className={styles.message}>{message}</p>
+    
+    <Container>
+      <Typography variant="h3" gutterBottom>
+        Progress Reports
+      </Typography>
+      <Typography variant="body1" gutterBottom>
+        {message}
+      </Typography>
 
-        <div className={styles.reportsSection}>
-  {selectedChildID ? (
-    <div className={styles.selectedChildWrapper}>
-      <div className={styles.selectedChildHeader}>
-        <h3 className={styles.h3Style}>Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}</h3>
-      </div>
+      <Box>
+        {selectedChildID ? (
+          <Box>
+            <Box display="flex" justifyContent="space-between" alignItems="center"  mb={2}>
+            <Typography variant="h5" gutterBottom>
+              Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}
+            </Typography>
 
-      <div className={styles.reportCardContainer}>
-        {filteredReports.map((report) => (
-          <div
-            key={report.progressReportID}
-            className={styles.reportCard}
-            onClick={(e) => handleReportClick(report)}
-          >
-            <strong>{report.reportTitle}</strong>
-            <p>{parseReportContent(report.content)}</p>
-            <p><em>Created by: {report.createdBy}</em> on {report.datePosted}</p>
-          </div>
-        ))}
-      </div>
+            {userDetails?.accountType === "Staff" && (
+              <Button variant="contained" color="primary" onClick={handleCreateReportClick}>
+                Create Progress Report
+              </Button> 
+            )}
+            </Box>
+            <Box>
+              {filteredReports.map((report) => (
+                <Box
+                  key={report.progressReportID}
+                  onClick={() => handleReportClick(report)}
+                  sx={{
+                    border: '1px solid #ccc',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    marginBottom: '16px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Typography variant="h6">{report.reportTitle}</Typography>
+                  {parseReportContent(report.content)}
+                  <Typography variant="caption">
+                    <em>Created by: {report.createdBy}</em> on {report.datePosted}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
 
-      {/* Show selected report details in a modal or separate section */}
-      <div className={styles.selectedReportsWrapper}>
-      {selectedReport && (
-        <div className={styles.reportDetailModal}>
-          <div className={styles.reportDetailContainer}>
-            <h2>Title: {selectedReport.reportTitle}</h2>
-            
-            {/* Check if the report is detailed or simple */}
-            {selectedReport.content.includes('|') ? (
-              // If detailed report (contains '|')
-              <div>
-                {parseReportContent(selectedReport.content)}
-              </div>
-            ) : (
-              // If simple report (does not contain '|')
-              <div>
-                <strong>Content:</strong> {selectedReport.content}
-              </div>
+            {selectedReport && (
+              <Box>
+                <Typography variant="h4">{selectedReport.reportTitle}</Typography>
+                {selectedReport.content.includes('|') ? (
+                  <Box>{parseReportContent(selectedReport.content)}</Box>
+                ) : (
+                  <Typography variant="body1">{selectedReport.content}</Typography>
+                )}
+                <Typography variant="caption">
+                  <em>Created by: {selectedReport.createdBy}</em> on {selectedReport.datePosted}
+                </Typography>
+              </Box>
             )}
 
-            <p><em>Created by: {selectedReport.createdBy}</em> on {selectedReport.datePosted}</p>
-            <button onClick={() => setSelectedReport(null)} className={styles.closeButton}>
-              Close
-            </button>
-          </div>
-        
-        </div> 
-        
-      )}
-      </div>
+            <Box mt={2}>
+              <Button variant="contained" onClick={handleReset} sx={{ marginRight: 2 }}>
+                Return to Child Profiles
+              </Button>
+              
+            </Box>
+          </Box>
+        ) : (
+          <Box>
+            <Typography variant="h5" gutterBottom>
+              Select a Child Profile
+            </Typography>
 
-      <button onClick={handleReset} className={styles.resetButton}>
-        Return to Child Profiles
-      </button>
-    </div>
-  ) : (
-    <div>
-      <h3 className={styles.h3Style}>Select a Child Profile</h3>
-      <div className={styles.profileContainer}>
-        {childProfiles.map((child) => (
-          <div key={child.childID} className={styles.profileCard}>
-            <h4>{child.firstName} {child.lastName}</h4>
-            <p><strong>Age:</strong> {child.age}</p>
-            <p><strong>Birth Date:</strong> {child.birthDate}</p>
-            <button
-              className={styles.viewReportsButton}
-              onClick={(e) => {
-                e.preventDefault();
-                handleChildClick(child.childID);
-              }}
-            >
-              View Progress Reports
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
-</div>
-
-        
-
-        {showErrorModal && (
-          <div className={styles.overlay}>
-            <div className={styles.modal}>
-              <h3>Error</h3>
-              <p>{errorMessage}</p>
-              <div className={styles.modalButtons}>
-                <button onClick={handleCloseErrorModal}>Close</button>
-              </div>
-            </div>
-          </div>
+            <Box>
+              {childProfiles.map((child) => (
+                <Box key={child.childID} sx={{ marginBottom: 2 }}>
+                  <Typography variant="h6">{child.firstName} {child.lastName}</Typography>
+                  <Typography variant="body2"><strong>Age:</strong> {child.age}</Typography>
+                  <Typography variant="body2"><strong>Birth Date:</strong> {child.birthDate}</Typography>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleChildClick(child.childID)}
+                  >
+                    View Progress Reports
+                  </Button>
+                </Box>
+              ))}
+            </Box>
+          </Box>
         )}
-      </div>
-    </div>
+      </Box>
+
+      {showErrorModal && (
+        <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <Box sx={{ backgroundColor: 'white', padding: '16px', borderRadius: '8px', width: '400px' }}>
+            <Typography variant="h6" gutterBottom>Error</Typography>
+            <Typography variant="body1">{errorMessage}</Typography>
+            <Button variant="contained" color="primary" onClick={handleCloseErrorModal} sx={{ marginTop: '16px' }}>Close</Button>
+          </Box>
+        </Box>
+      )}
+    </Container>
   );
 }
+

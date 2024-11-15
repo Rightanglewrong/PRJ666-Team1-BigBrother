@@ -35,7 +35,8 @@ export default function ProgressReportLanding() {
             }
 
             const children = await retrieveChildrenByLocationID(user.locationID);
-            setChildProfiles(children);
+
+            setChildProfiles(children || []);;
             setMessage("");
           } catch (error) {
             if (error.message.includes("Unauthorized")) {
@@ -116,11 +117,15 @@ return (
                     <MenuItem value="">
                         <em>Select a child</em>
                     </MenuItem>
-                    {childProfiles.map((child) => (
+                    {Array.isArray(childProfiles) && childProfiles.length > 0 ? (
+                      childProfiles.map((child) => (
                         <MenuItem key={child.childID} value={child.childID}>
-                            {child.firstName} {child.lastName}
+                          {child.firstName} {child.lastName}
                         </MenuItem>
-                    ))}
+                      ))
+                    ) : (
+                      <MenuItem disabled>No children available</MenuItem>
+                    )}
                 </Select>
 
               <Button
