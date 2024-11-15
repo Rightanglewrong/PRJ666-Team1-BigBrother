@@ -10,7 +10,7 @@ export const fetchMediaByLocationID = async (locationID) => {
 
   try {
     const response = await fetch(
-      `${BACKEND_URL}v1/media/by-location/${locationID}`,
+      `${BACKEND_URL}v1/media/by-userID/${userID}`,
       {
         method: "GET",
         headers: {
@@ -173,3 +173,38 @@ export const uploadMedia = async (file, childID, description = "") => {
     throw error;
   }
 };
+
+// API call to fetch media by user ID
+export const fetchMediaByUserID = async (userID) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}v1/media/by-userID/${userID}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Error fetching media by user ID: ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    return data.mediaEntries; // mediaEntries now contains metadata including mediaID
+  } catch (error) {
+    console.error("Error fetching media by user ID:", error);
+    throw error;
+  }
+};
+

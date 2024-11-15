@@ -272,7 +272,7 @@ const NavBar = () => {
               )}
 
               <Link
-                href="/media"
+                href="/generalMediaGallery"
                 passHref
                 className={styles.dropdownItem}
                 onClick={handleMenuClose}
@@ -313,6 +313,14 @@ const NavBar = () => {
                     onClick={handleMenuClose}
                   >
                     Crud Testing
+                  </Link>
+                  <Link
+                    href="/admin/adminMedia"
+                    passHref
+                    className={styles.dropdownItem}
+                    onClick={handleMenuClose}
+                  >
+                    Admin Media Upload
                   </Link>
                   <Link
                     href="/admin"
