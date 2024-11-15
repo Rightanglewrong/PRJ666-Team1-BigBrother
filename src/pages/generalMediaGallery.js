@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Button, TextField, Dialog, DialogContent, Typography, DialogActions } from '@mui/material';
+import { Button, Dialog, DialogContent, Typography, DialogActions } from '@mui/material';
 import Image from 'next/image';
-import styles from '../HomePage.module.css';
-import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } from '../../utils/mediaAPI';
+import styles from './HomePage.module.css';
+import { fetchMediaByUserID, fetchPaginatedMedia, deleteMediaByMediaID } from '../utils/mediaAPI';
+import { useRouter } from 'next/router';
 
 const MediaGallery = () => {
-  const [locationID, setLocationID] = useState('');
   const [page, setPage] = useState(1);
   const [mediaEntries, setMediaEntries] = useState([]);
   const [mediaFiles, setMediaFiles] = useState([]);
@@ -16,24 +16,31 @@ const MediaGallery = () => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const pageLimit = 3;
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const userID = decodedToken.userID;
+      if (userID) {
+        handleAutoSubmit(userID);
+      }
+    } else {
+      router.push('/login');
+    }
+  }, [router]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleAutoSubmit = async (userID) => {
     setPage(1);
     try {
-      const uppercaseLocationID = locationID.toUpperCase();
-      setLocationID(uppercaseLocationID);
-  
-      const entries = await fetchMediaByLocationID(uppercaseLocationID);
+      const entries = await fetchMediaByUserID(userID);
       setMediaEntries(entries);
       setShowResults(true);
       fetchPaginatedMediaFiles(entries, 1);
     } catch (err) {
-      console.error("Failed to fetch media by location ID:", err);
+      console.error("Failed to fetch media by user ID:", err);
       setError("Failed to load media files.");
     }
   };
@@ -100,18 +107,6 @@ const MediaGallery = () => {
     <div className={styles.homeContainer}>
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <h1 className={styles.title}>Media Gallery Lookup</h1>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', marginTop: '10px' }}>
-          <TextField
-            label="Location ID"
-            variant="outlined"
-            value={locationID}
-            onChange={(e) => setLocationID(e.target.value)}
-            style={{ width: '300px' }}
-          />
-          <Button type="submit" variant="contained" color="primary">
-            Submit
-          </Button>
-        </form>
 
         {showResults && (
           <div style={{ textAlign: 'center', marginTop: '20px' }}>

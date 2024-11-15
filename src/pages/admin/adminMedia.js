@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { withAuth } from '@/hoc/withAuth';
-import styles from './media.module.css';
-import { getRelationshipByParentID } from '../utils/relationshipAPI';
-import { getCurrentUser } from '../utils/api';
-import { retrieveChildProfileByID } from '../utils/childAPI';
-import { uploadMedia } from '../utils/mediaAPI';
+import styles from './adminMedia.module.css';
+import { getRelationshipByParentID } from '../../utils/relationshipAPI';
+import { getCurrentUser } from '../../utils/api';
+import { retrieveChildProfileByID } from '../../utils/childAPI';
+import { uploadMedia } from '../../utils/mediaAPI';
 import { Select, MenuItem, Dialog, DialogContent, Typography, Button } from '@mui/material';
 
 const MediaUploadPage = () => {
@@ -59,12 +59,12 @@ const MediaUploadPage = () => {
 
   const handleFileUpload = (e) => {
     const selectedFile = e.target.files[0];
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'video/mp4'];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'video/mp4', 'video/x-matroska'];
     const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
   
     if (selectedFile) {
       if (!allowedTypes.includes(selectedFile.type)) {
-        setErrorMessage("Only JPEG, JPG, PNG, and MP4 files are allowed.");
+        setErrorMessage("Only JPEG, JPG, PNG, MP4, and MKV files are allowed.");
         setShowErrorPopup(true);
         setFile(null);
         if (fileInputRef.current) fileInputRef.current.value = ""; // Reset file input field
@@ -83,6 +83,12 @@ const MediaUploadPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
 
     if (description.length > 150) {
       setErrorMessage("Description must be 150 characters or fewer.");
