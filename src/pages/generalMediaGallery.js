@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Button, Dialog, DialogContent, Typography, DialogActions } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+import { Button, Dialog, DialogContent, Typography, DialogActions, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import Image from 'next/image';
 import styles from './HomePage.module.css';
 import { fetchMediaByUserID, fetchPaginatedMedia, deleteMediaByMediaID } from '../utils/mediaAPI';
+import { retrieveChildProfileByID } from '../utils/childAPI';
 import { useRouter } from 'next/router';
 
 const MediaGallery = () => {
@@ -14,19 +15,23 @@ const MediaGallery = () => {
   const [showResults, setShowResults] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-
+  const [childProfiles, setChildProfiles] = useState([]);
+  const [selectedChildID, setSelectedChildID] = useState('');
+  
+  const isInitialMount = useRef(true);
   const pageLimit = 3;
   const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token && isInitialMount.current) {
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
       const userID = decodedToken.userID;
       if (userID) {
         handleAutoSubmit(userID);
       }
+      isInitialMount.current = false; // Mark as not the initial mount
     } else {
       router.push('/login');
     }
@@ -36,13 +41,35 @@ const MediaGallery = () => {
     setPage(1);
     try {
       const entries = await fetchMediaByUserID(userID);
+      console.log(entries);
       setMediaEntries(entries);
       setShowResults(true);
-      fetchPaginatedMediaFiles(entries, 1);
+
+      // Fetch child profiles based on childID
+      const profiles = [];
+      for (const entry of entries) {
+        const profile = await retrieveChildProfileByID(entry.childID);
+        if (profile) {
+          profiles.push({ childID: entry.childID, firstName: profile.child.child.firstName });
+          //console.log(profile.child.child.firstName);
+        }
+      }
+
+      // Remove duplicate child profiles
+      const uniqueProfiles = Array.from(new Set(profiles.map(JSON.stringify))).map(JSON.parse);
+      console.log("Unique Child Profiles:", uniqueProfiles); // Debugging log to see child profiles
+      setChildProfiles(uniqueProfiles);
     } catch (err) {
       console.error("Failed to fetch media by user ID:", err);
       setError("Failed to load media files.");
     }
+  };
+
+  const handleChildSelect = (childID) => {
+    setSelectedChildID(childID);
+    setPage(1);
+    const filteredEntries = mediaEntries.filter(entry => entry.childID === childID);
+    fetchPaginatedMediaFiles(filteredEntries, 1);
   };
 
   const fetchPaginatedMediaFiles = async (entries, pageNumber) => {
@@ -60,14 +87,16 @@ const MediaGallery = () => {
     const nextPage = page + 1;
     if ((nextPage - 1) * pageLimit < mediaEntries.length) {
       setPage(nextPage);
-      fetchPaginatedMediaFiles(mediaEntries, nextPage);
+      const filteredEntries = mediaEntries.filter(entry => entry.childID === selectedChildID);
+      fetchPaginatedMediaFiles(filteredEntries, nextPage);
     }
   };
 
   const handlePreviousPage = () => {
     const prevPage = Math.max(page - 1, 1);
     setPage(prevPage);
-    fetchPaginatedMediaFiles(mediaEntries, prevPage);
+    const filteredEntries = mediaEntries.filter(entry => entry.childID === selectedChildID);
+    fetchPaginatedMediaFiles(filteredEntries, prevPage);
   };
 
   const openMediaModal = (file) => setSelectedMedia(file);
@@ -93,7 +122,8 @@ const MediaGallery = () => {
 
         const newPage = updatedEntries.length < (page - 1) * pageLimit + 1 ? page - 1 : page;
         setPage(newPage);
-        fetchPaginatedMediaFiles(updatedEntries, newPage);
+        const filteredEntries = updatedEntries.filter(entry => entry.childID === selectedChildID);
+        fetchPaginatedMediaFiles(filteredEntries, newPage);
       } catch (error) {
         console.error("Error deleting media:", error);
         setError("Failed to delete media.");
@@ -107,6 +137,24 @@ const MediaGallery = () => {
     <div className={styles.homeContainer}>
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <h1 className={styles.title}>Media Gallery Lookup</h1>
+
+        {childProfiles.length > 0 && (
+          <FormControl style={{ marginBottom: '20px', minWidth: '200px' }}>
+            <InputLabel id="select-child-label">Select Child</InputLabel>
+            <Select
+              labelId="select-child-label"
+              value={selectedChildID}
+              onChange={(e) => handleChildSelect(e.target.value)}
+              label="Select Child"
+            >
+              {childProfiles.map((profile, index) => (
+                <MenuItem key={index} value={profile.childID}>
+                  {profile.firstName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
 
         {showResults && (
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
@@ -155,6 +203,7 @@ const MediaGallery = () => {
         )}
       </div>
 
+      {/* Media Modal */}
       <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
         <DialogContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {selectedMedia && (
@@ -196,6 +245,7 @@ const MediaGallery = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteConfirmOpen} onClose={closeDeleteConfirm}>
         <DialogContent>
           <Typography variant="body1" style={{ textAlign: 'center' }}>
