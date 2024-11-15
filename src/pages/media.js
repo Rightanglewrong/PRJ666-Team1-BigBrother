@@ -59,18 +59,27 @@ const MediaUploadPage = () => {
 
   const handleFileUpload = (e) => {
     const selectedFile = e.target.files[0];
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-
-    if (selectedFile && !allowedTypes.includes(selectedFile.type)) {
-      setErrorMessage("Only JPEG, JPG, and PNG files are allowed.");
-      setShowErrorPopup(true);
-      setFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = ""; // Reset file input field
-    } else {
-      setErrorMessage(null);
-      setFile(selectedFile);
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'video/mp4'];
+    const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
+  
+    if (selectedFile) {
+      if (!allowedTypes.includes(selectedFile.type)) {
+        setErrorMessage("Only JPEG, JPG, PNG, and MP4 files are allowed.");
+        setShowErrorPopup(true);
+        setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = ""; // Reset file input field
+      } else if (selectedFile.size > maxFileSize) {
+        setErrorMessage("File size must be 10MB or less.");
+        setShowErrorPopup(true);
+        setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = ""; // Reset file input field
+      } else {
+        setErrorMessage(null);
+        setFile(selectedFile);
+      }
     }
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();

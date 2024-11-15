@@ -120,10 +120,24 @@ const MediaGallery = () => {
               {mediaFiles.length > 0 ? (
                 mediaFiles.map((file, index) => (
                   <div key={index} className={styles.mediaItem} style={{ textAlign: 'center' }}>
-                    {file.url ? (
-                      <Image src={file.url} alt={`Media ID: ${file.mediaID}`} width={200} height={200} style={{ cursor: 'pointer' }} onClick={() => openMediaModal(file)} />
+                    {file.mediaID.endsWith('.mp4') ? (
+                      <Image
+                        src="/icons/videoIcon.png"
+                        alt={`Media ID: ${file.mediaID}`}
+                        width={200}
+                        height={200}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => openMediaModal(file)}
+                      />
                     ) : (
-                      <p>Image data missing for {file.mediaID}</p>
+                      <Image
+                        src={file.url}
+                        alt={`Media ID: ${file.mediaID}`}
+                        width={200}
+                        height={200}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => openMediaModal(file)}
+                      />
                     )}
                     <p>{file.mediaID.length > 30 ? `${file.mediaID.substring(0, 30)}...` : file.mediaID}</p>
                   </div>
@@ -150,7 +164,14 @@ const MediaGallery = () => {
         <DialogContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {selectedMedia && (
             <>
-              <Image src={selectedMedia.url} alt={`Enlarged Media ID: ${selectedMedia.mediaID}`} width={600} height={700} />
+              {selectedMedia.mediaID.endsWith('.mp4') ? (
+                <video width="600" height="400" controls>
+                  <source src={selectedMedia.url} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <Image src={selectedMedia.url} alt={`Enlarged Media ID: ${selectedMedia.mediaID}`} width={600} height={700} />
+              )}
               <Typography variant="body1" style={{ marginTop: '10px', textAlign: 'center' }}>
                 <strong>Media ID:</strong> {selectedMedia.mediaID}
               </Typography>
