@@ -103,7 +103,7 @@ const MediaGallery = () => {
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <h1 className={styles.title}>Media Gallery Lookup</h1>
 
-        {childProfiles.length > 0 && (
+        {childProfiles.length > 0 ? (
           <FormControl style={{ marginBottom: '20px', minWidth: '200px' }}>
             <InputLabel id="select-child-label">Select Child</InputLabel>
             <Select
@@ -119,6 +119,10 @@ const MediaGallery = () => {
               ))}
             </Select>
           </FormControl>
+        ) : (
+          <Typography variant="body1" color="error" style={{ marginBottom: '20px' }}>
+            No child profile related to this account.
+          </Typography>
         )}
 
         {showResults && (
