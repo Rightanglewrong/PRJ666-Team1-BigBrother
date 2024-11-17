@@ -249,14 +249,6 @@ const NavBar = () => {
               >
                 Calendar
               </Link>
-              <Link
-                href="/contact"
-                passHref
-                className={styles.dropdownItem}
-                onClick={handleMenuClose}
-              >
-                Contact List
-              </Link>
 
               {(accountType === "Parent" || accountType === "Staff") && (
                 <div>
@@ -334,15 +326,6 @@ const NavBar = () => {
               )}
 
               <Divider sx={{ my: 1, backgroundColor: "white" }} />
-
-              <Link
-                href="/examplePage"
-                passHref
-                className={styles.dropdownItem}
-                onClick={handleMenuClose}
-              >
-                Example Page
-              </Link>
 
               <Link
                 href="#"
