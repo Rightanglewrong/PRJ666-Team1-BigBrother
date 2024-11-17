@@ -155,12 +155,24 @@ const ProfilePage = () => {
       </Typography>
 
       {/* Notifications */}
-      <Snackbar open={Boolean(success)} autoHideDuration={6000} onClose={() => setSuccess("")}>
-        <Alert onClose={() => setSuccess("")} severity="success" variant="filled">
+      <Snackbar
+        open={Boolean(success)}
+        autoHideDuration={6000}
+        onClose={() => setSuccess("")}
+      >
+        <Alert
+          onClose={() => setSuccess("")}
+          severity="success"
+          variant="filled"
+        >
           {success}
         </Alert>
       </Snackbar>
-      <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={() => setError("")}>
+      <Snackbar
+        open={Boolean(error)}
+        autoHideDuration={6000}
+        onClose={() => setError("")}
+      >
         <Alert onClose={() => setError("")} severity="error" variant="filled">
           {error}
         </Alert>
@@ -170,8 +182,20 @@ const ProfilePage = () => {
         {/* Left Column: Profile Form */}
         <Grid item xs={12} md={6}>
           <Box component="form" onSubmit={handleUpdateProfile} sx={{ mt: 2 }}>
-            <TextField label="User ID" value={user?.userID || ""} fullWidth disabled margin="normal" />
-            <TextField label="Email" value={user?.email || ""} fullWidth disabled margin="normal" />
+            <TextField
+              label="User ID"
+              value={user?.userID || ""}
+              fullWidth
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Email"
+              value={user?.email || ""}
+              fullWidth
+              disabled
+              margin="normal"
+            />
             <TextField
               label="First Name"
               value={firstName}
@@ -195,56 +219,177 @@ const ProfilePage = () => {
               fullWidth
               margin="normal"
             />
-            <FormControl fullWidth margin="normal">
+            <FormControl fullWidth margin="normal" disabled>
               <InputLabel>Account Type</InputLabel>
-              <Select value={accountType} disabled>
+              <Select value={accountType}>
                 <MenuItem value="Parent">Parent</MenuItem>
                 <MenuItem value="Staff">Staff</MenuItem>
                 <MenuItem value="Admin">Admin</MenuItem>
               </Select>
             </FormControl>
-            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
               Update Info
             </Button>
           </Box>
         </Grid>
 
         {/* Right Column: Contact List */}
-        <Grid item xs={12} md={6}>
-          <Typography variant="h5" gutterBottom>Contacts</Typography>
-          {contacts.map((contact) => (
-            <Card key={contact.contactID} variant="outlined" sx={{ my: 2 }}>
-              <CardContent>
-                <Typography variant="h6">{contact.firstName} {contact.lastName}</Typography>
-                <Typography variant="body2">Phone: {contact.phoneNumber}</Typography>
-                <Typography variant="body2">Relationship: {contact.relationship}</Typography>
-                <Typography variant="body2">Address: {contact.address}</Typography>
-              </CardContent>
-              <CardActions sx={{ justifyContent: "flex-end" }}>
-                <EditButton onClick={() => handleEditContact(contact)}>Edit</EditButton>
-                <DeleteButton onClick={() => handleDeleteContact(contact.contactID)}>Remove</DeleteButton>
-              </CardActions>
-            </Card>
-          ))}
-          {!contacts.length && (
-            <Typography variant="body2" align="center" sx={{ mt: 2 }}>No contacts available.</Typography>
-          )}
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            variant="h5"
+            gutterBottom
+            align="center"
+            sx={{
+              fontWeight: "bold",
+              fontSize: "1.8rem",
+              textTransform: "uppercase",
+              color: "#2c3e50",
+              mb: 0.1,
+              borderBottom: "2px solid #4CAF50",
+              display: "inline-block",
+              paddingBottom: "5px",
+            }}
+          >
+            Contacts
+          </Typography>
+          <Box
+            sx={{
+              my: 2,
+              width: "100%", // Ensure the content doesn't stretch beyond the column
+              maxWidth: "500px", // Optional: Limit the max width of the content
+            }}
+          >
+            {contacts.length > 0 ? (
+              contacts.map((contact) => (
+                <Card
+                  key={contact.contactID}
+                  variant="outlined"
+                  sx={{
+                    my: 2,
+                    backgroundColor: "#f9f9f9",
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <CardContent>
+                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                      {`${contact.firstName} ${contact.lastName}`}
+                    </Typography>
+                    <Typography variant="body2">
+                      Phone: {contact.phoneNumber}
+                    </Typography>
+                    <Typography variant="body2">
+                      Relationship: {contact.relationship}
+                    </Typography>
+                    <Typography variant="body2">
+                      Address: {contact.address}
+                    </Typography>
+                  </CardContent>
+                  <CardActions sx={{ justifyContent: "flex-end" }}>
+                    <EditButton
+                      onClick={() => handleEditContact(contact)}
+                      size="small"
+                    >
+                      Edit
+                    </EditButton>
+                    <DeleteButton
+                      onClick={() => handleDeleteContact(contact.contactID)}
+                      size="small"
+                    >
+                      Remove
+                    </DeleteButton>
+                  </CardActions>
+                </Card>
+              ))
+            ) : (
+              <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+                No contacts available. Use the "Add Contact" button to add one.
+              </Typography>
+            )}
+          </Box>
 
           {/* Add/Edit Contact Form */}
           {isAdding && (
-            <Box component="form" my={3} display="flex" flexDirection="column" gap={2}>
-              <TextField label="First Name" name="firstName" value={newContact.firstName} onChange={handleInputChange} required />
-              <TextField label="Last Name" name="lastName" value={newContact.lastName} onChange={handleInputChange} required />
-              <TextField label="Phone Number" name="phoneNumber" value={newContact.phoneNumber} onChange={handleInputChange} required />
-              <TextField label="Relationship" name="relationship" value={newContact.relationship} onChange={handleInputChange} />
-              <TextField label="Address" name="address" value={newContact.address} onChange={handleInputChange} />
-              <Button variant="contained" color="success" onClick={handleSaveContact} fullWidth sx={{ mt: 2 }}>Save Contact</Button>
-              <Button variant="outlined" color="secondary" onClick={() => resetContactForm()} fullWidth sx={{ mt: 1 }}>Cancel</Button>
+            <Box
+              component="form"
+              my={1}
+              display="flex"
+              flexDirection="column"
+              gap={2}
+              sx={{ width: "100%", maxWidth: "500px" }}
+            >
+              <TextField
+                label="First Name"
+                name="firstName"
+                value={newContact.firstName}
+                onChange={handleInputChange}
+                required
+              />
+              <TextField
+                label="Last Name"
+                name="lastName"
+                value={newContact.lastName}
+                onChange={handleInputChange}
+                required
+              />
+              <TextField
+                label="Phone Number"
+                name="phoneNumber"
+                value={newContact.phoneNumber}
+                onChange={handleInputChange}
+                required
+              />
+              <TextField
+                label="Relationship"
+                name="relationship"
+                value={newContact.relationship}
+                onChange={handleInputChange}
+              />
+              <TextField
+                label="Address"
+                name="address"
+                value={newContact.address}
+                onChange={handleInputChange}
+              />
+              <Box display="flex" justifyContent="flex-end" gap={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSaveContact}
+                >
+                  {editingContact ? "Update Contact" : "Add Contact"}
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={resetContactForm}
+                >
+                  Cancel
+                </Button>
+              </Box>
             </Box>
           )}
 
           {!isAdding && (
-            <AddContactButton fullWidth onClick={() => setIsAdding(true)} sx={{ mt: 3 }}>
+            <AddContactButton
+              fullWidth
+              onClick={() => setIsAdding(true)}
+              sx={{ mt: 3 }}
+            >
               Add Contact
             </AddContactButton>
           )}
