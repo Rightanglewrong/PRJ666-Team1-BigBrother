@@ -84,6 +84,8 @@ const MediaGallery = () => {
     }
   };
 
+  const openMediaModal = (file) => setSelectedMedia(file);
+
   const handleNextPage = () => {
     const nextPage = page + 1;
     if ((nextPage - 1) * pageLimit < filteredMediaEntries.length) {

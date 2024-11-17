@@ -10,7 +10,7 @@ export const fetchMediaByLocationID = async (locationID) => {
 
   try {
     const response = await fetch(
-      `${BACKEND_URL}v1/media/by-userID/${userID}`,
+      `${BACKEND_URL}v1/media/by-location/${locationID}`,
       {
         method: "GET",
         headers: {
@@ -33,6 +33,7 @@ export const fetchMediaByLocationID = async (locationID) => {
     throw error;
   }
 };
+
 
 export const fetchPaginatedMedia = async (mediaEntries, page) => {
   const token = localStorage.getItem("token");
