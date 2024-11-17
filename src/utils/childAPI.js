@@ -179,7 +179,7 @@ export const retrieveChildrenByLocationID = async (locationID) => {
     const data = await response.json();
     return data.entries;
   } catch (error) {
-    console.error("Error retrieving Children by Location ID:", error);
+    console.error("Error retrieving Children by Location ID");
     throw new Error(error.message);
   }
 };

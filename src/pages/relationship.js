@@ -6,8 +6,8 @@ import {
   deleteRelationshipFromDynamoDB,
   getRelationshipByChildID,
   getRelationshipByParentID
-} from '../../utils/relationshipAPI';
-import styles from "../crudTester.module.css";
+} from '../utils/relationshipAPI'; 
+import styles from "./crudTester.module.css";
 
 export default function RelationshipCrudTest() {
   const [relationship, setRelationship] = useState({});
@@ -23,7 +23,6 @@ export default function RelationshipCrudTest() {
   const [message, setMessage] = useState('');
   const [fetchedRelationship, setFetchedRelationship] = useState(null);
 
-  // Handle creating a relationship
   const handleCreateRelationship = async (e) => {
     e.preventDefault();
     if (!relationship.childID || !relationship.parentID || !createChildRelation || !createParentRelation) {

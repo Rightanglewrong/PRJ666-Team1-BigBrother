@@ -1,12 +1,12 @@
 const BACKEND_URL = "https://big-brother-be-3d6ad173758c.herokuapp.com/"; 
 
-export const retrieveUserByIDInDynamoDB = async (item) => {
+export const retrieveUserByIDInDynamoDB = async (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("No Token Found");
     }
     try {
-        const response = await fetch(`${BACKEND_URL}v1/user/by-ID/${item.id}`, {
+        const response = await fetch(`${BACKEND_URL}v1/user/by-ID/${id}`, {
             method: "GET",
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -102,7 +102,7 @@ export const getUsersByAccountTypeAndLocation = async (accountType, locationID) 
         return data;  // Success response with users
 
     } catch (error) {
-        console.error("Error fetching users by accountType and locationID", error);
+        console.error("Error fetching users by accountType and locationID");
         throw new Error(error.message);
     }
 };

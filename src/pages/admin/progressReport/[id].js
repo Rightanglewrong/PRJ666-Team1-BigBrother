@@ -5,7 +5,6 @@ import {
     updateProgressReportInDynamoDB,
     deleteProgressReportFromDynamoDB,
 } from "../../../utils/progressReportAPI"
-import { useUser } from "@/components/authenticate";
 import {
   Container,
   Typography,
@@ -23,7 +22,6 @@ import {
 
 
 export default function ViewProgressReportsPage() {
-    const user = useUser();
     const router = useRouter();
     const [childID, setChildID] = useState("");
     const [childReports, setChildReports] = useState([]);
