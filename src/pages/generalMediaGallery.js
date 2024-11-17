@@ -9,16 +9,15 @@ import { useRouter } from 'next/router';
 const MediaGallery = () => {
   const [page, setPage] = useState(1);
   const [mediaEntries, setMediaEntries] = useState([]);
-  const [filteredMediaEntries, setFilteredMediaEntries] = useState([]); // New state for filtered entries
+  const [filteredMediaEntries, setFilteredMediaEntries] = useState([]);
   const [mediaFiles, setMediaFiles] = useState([]);
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [childProfiles, setChildProfiles] = useState([]);
   const [selectedChildID, setSelectedChildID] = useState('');
-  
+
   const isInitialMount = useRef(true);
   const pageLimit = 3;
   const router = useRouter();
@@ -42,11 +41,9 @@ const MediaGallery = () => {
     setPage(1);
     try {
       const entries = await fetchMediaByUserID(userID);
-      console.log(entries);
       setMediaEntries(entries);
       setShowResults(true);
 
-      // Fetch child profiles based on childID
       const profiles = [];
       for (const entry of entries) {
         const profile = await retrieveChildProfileByID(entry.childID);
@@ -55,9 +52,7 @@ const MediaGallery = () => {
         }
       }
 
-      // Remove duplicate child profiles
       const uniqueProfiles = Array.from(new Set(profiles.map(JSON.stringify))).map(JSON.parse);
-      console.log("Unique Child Profiles:", uniqueProfiles); // Debugging log to see child profiles
       setChildProfiles(uniqueProfiles);
     } catch (err) {
       console.error("Failed to fetch media by user ID:", err);
@@ -69,7 +64,7 @@ const MediaGallery = () => {
     setSelectedChildID(childID);
     setPage(1);
     const filteredEntries = mediaEntries.filter(entry => entry.childID === childID);
-    setFilteredMediaEntries(filteredEntries); // Update filtered entries
+    setFilteredMediaEntries(filteredEntries);
     fetchPaginatedMediaFiles(filteredEntries, 1);
   };
 
@@ -84,7 +79,13 @@ const MediaGallery = () => {
     }
   };
 
-  const openMediaModal = (file) => setSelectedMedia(file);
+  const openMediaModal = (file) => {
+    setSelectedMedia(file);
+  };
+
+  const closeMediaModal = () => {
+    setSelectedMedia(null);
+  };
 
   const handleNextPage = () => {
     const nextPage = page + 1;
@@ -173,6 +174,29 @@ const MediaGallery = () => {
           </div>
         )}
       </div>
+
+      <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
+        <DialogContent>
+          {selectedMedia && (
+            <>
+              {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
+                <video width="600" height="400" controls>
+                  <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <Image src={selectedMedia.url} alt={`Enlarged Media ID: ${selectedMedia.mediaID}`} width={600} height={700} />
+              )}
+              <Typography variant="body1" style={{ marginTop: '10px', textAlign: 'center' }}>
+                <strong>Media ID:</strong> {selectedMedia.mediaID}
+              </Typography>
+              <Typography variant="body1" style={{ textAlign: 'center' }}>
+                <strong>Description:</strong> {selectedMedia.description || 'No description available'}
+              </Typography>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import styles from '../HomePage.module.css';
 import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } from '../../utils/mediaAPI';
 
-const MediaGallery = () => {
+const AdminMediaGallery = () => {
   const [locationID, setLocationID] = useState('');
   const [page, setPage] = useState(1);
   const [mediaEntries, setMediaEntries] = useState([]);
@@ -220,4 +220,4 @@ const MediaGallery = () => {
   );
 };
 
-export default MediaGallery;
+export default AdminMediaGallery;
