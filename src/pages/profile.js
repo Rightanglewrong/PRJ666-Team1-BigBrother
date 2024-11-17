@@ -31,7 +31,6 @@ import { styled } from "@mui/system";
 const AddContactButton = styled(Button)({
   backgroundColor: "#4CAF50",
   color: "white",
-  fontSize: "16px",
   "&:hover": { backgroundColor: "#45a049" },
 });
 
@@ -148,11 +147,45 @@ const ProfilePage = () => {
     setNewContact({ ...newContact, [e.target.name]: e.target.value });
   };
 
+  const titleStyle = {
+    fontWeight: "bold",
+    fontSize: "1.8rem",
+    textTransform: "uppercase",
+    color: "#2c3e50",
+    mb: 0.1,
+    borderBottom: "2px solid #4CAF50",
+    display: "inline-block",
+    paddingBottom: "5px",
+  };
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h4" component="h1" textAlign="center" gutterBottom>
-        Profile
-      </Typography>
+
+{/* Profile and Contacts Titles */}
+<Grid container spacing={4}>
+      {/* Left Column: Profile Title */}
+      <Grid item xs={12} md={6}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          align="center"
+          sx={titleStyle}
+        >
+          Profile
+        </Typography>
+      </Grid>
+
+      {/* Right Column: Contacts Title */}
+      <Grid item xs={12} md={6} >
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={titleStyle}
+        >
+          Contacts
+        </Typography>
+      </Grid>
+    </Grid>
 
       {/* Notifications */}
       <Snackbar
@@ -250,23 +283,6 @@ const ProfilePage = () => {
             alignItems: "center",
           }}
         >
-          <Typography
-            variant="h5"
-            gutterBottom
-            align="center"
-            sx={{
-              fontWeight: "bold",
-              fontSize: "1.8rem",
-              textTransform: "uppercase",
-              color: "#2c3e50",
-              mb: 0.1,
-              borderBottom: "2px solid #4CAF50",
-              display: "inline-block",
-              paddingBottom: "5px",
-            }}
-          >
-            Contacts
-          </Typography>
           <Box
             sx={{
               my: 2,
@@ -386,9 +402,11 @@ const ProfilePage = () => {
 
           {!isAdding && (
             <AddContactButton
-              fullWidth
               onClick={() => setIsAdding(true)}
-              sx={{ mt: 3 }}
+              sx={{
+                width: "100%", // Matches the container width
+                maxWidth: "500px", // Matches the container's maxWidth
+              }}
             >
               Add Contact
             </AddContactButton>
