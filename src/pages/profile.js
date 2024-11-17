@@ -317,7 +317,7 @@ const ProfilePage = () => {
               ))
             ) : (
               <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-                No contacts available. Use the "Add Contact" button to add one.
+                No contacts available. Use the Add Contact button to add one.
               </Typography>
             )}
           </Box>
