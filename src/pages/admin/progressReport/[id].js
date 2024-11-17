@@ -173,6 +173,9 @@ export default function ViewProgressReportsPage() {
                 <Typography variant="body1">
                 {parseReportContent(report.content)}
                 </Typography>
+                <Typography variant="body1"> Creation Date:  
+                {report.datePosted}
+                </Typography>
                 <Typography variant="body1"> Created By:  
                 {report.createdBy}
                 </Typography>
