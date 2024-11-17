@@ -365,7 +365,7 @@ const AdminUserService = () => {
       ))
     ) : (
       <Typography variant="body2" color="textSecondary" align="center">
-        No contacts available for this user. Add one using the "Add Contact" button below.
+        No contacts available for this user. Add one using the Add Contact button below.
       </Typography>
     )}
     {/* Add/Edit Contact Form */}
