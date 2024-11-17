@@ -6,7 +6,7 @@ import {
   deleteRelationshipFromDynamoDB,
   getRelationshipByChildID,
   getRelationshipByParentID
-} from '../utils/relationshipAPI';
+} from '../utils/relationshipAPI'; 
 import styles from "../crudTester.module.css";
 
 export default function RelationshipCrudTest() {
