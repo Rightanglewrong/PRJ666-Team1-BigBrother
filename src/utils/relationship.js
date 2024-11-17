@@ -23,7 +23,6 @@ export default function RelationshipCrudTest() {
   const [message, setMessage] = useState('');
   const [fetchedRelationship, setFetchedRelationship] = useState(null);
 
-  // Handle creating a relationship
   const handleCreateRelationship = async (e) => {
     e.preventDefault();
     if (!relationship.childID || !relationship.parentID || !createChildRelation || !createParentRelation) {
