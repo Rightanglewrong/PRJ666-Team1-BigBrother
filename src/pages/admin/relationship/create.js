@@ -120,7 +120,7 @@ export default function CreateRelationshipPage() {
       <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {/* Parent Selection */}
         <FormControl fullWidth required>
-        <InputLabel>Parent</InputLabel>
+        <InputLabel>Adult</InputLabel>
         <Select
             label="Select Parent"
             value={parentID}
@@ -136,7 +136,7 @@ export default function CreateRelationshipPage() {
                     </MenuItem>
                 ))
             ) : (
-                <MenuItem disabled>No parents available</MenuItem>
+                <MenuItem disabled>No Adults available</MenuItem>
             )}
         </Select>
         </FormControl>
@@ -166,7 +166,7 @@ export default function CreateRelationshipPage() {
         </FormControl>
 
         <TextField
-          label="Parent Relation"
+          label="Adult Relation"
           value={parentRelation}
           onChange={(e) => setParentRelation(e.target.value)}
           required

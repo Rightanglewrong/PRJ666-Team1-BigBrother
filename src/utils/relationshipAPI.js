@@ -94,14 +94,14 @@ export const updateRelationshipInDynamoDB = async (id, updateData) => {
 };
 
 // Delete an Relationship from DynamoDB
-export const deleteRelationshipFromDynamoDB = async (item) => {
+export const deleteRelationshipFromDynamoDB = async (id) => {
   const token = localStorage.getItem('token');
 
   if (!token) {
       throw new Error("No token found");
   }
   try {
-    const response = await fetch(`${BACKEND_URL}v1/relationship/${item.id}`, {
+    const response = await fetch(`${BACKEND_URL}v1/relationship/${id}`, {
       method: "DELETE",
       headers: {
         'Authorization': `Bearer ${token}`, 
