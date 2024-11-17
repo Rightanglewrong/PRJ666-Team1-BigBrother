@@ -160,32 +160,22 @@ const ProfilePage = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
+      {/* Profile and Contacts Titles */}
+      <Grid container spacing={4} alignItems="center">
+        {/* Left Column: Profile Title */}
+        <Grid item xs={12} md={6}>
+          <Typography variant="h4" gutterBottom align="center" sx={titleStyle}>
+            Profile
+          </Typography>
+        </Grid>
 
-{/* Profile and Contacts Titles */}
-<Grid container spacing={4}>
-      {/* Left Column: Profile Title */}
-      <Grid item xs={12} md={6}>
-        <Typography
-          variant="h4"
-          gutterBottom
-          align="center"
-          sx={titleStyle}
-        >
-          Profile
-        </Typography>
+        {/* Right Column: Contacts Title */}
+        <Grid item xs={12} md={6}>
+          <Typography variant="h4" gutterBottom align="center" sx={titleStyle}>
+            Contacts
+          </Typography>
+        </Grid>
       </Grid>
-
-      {/* Right Column: Contacts Title */}
-      <Grid item xs={12} md={6} >
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={titleStyle}
-        >
-          Contacts
-        </Typography>
-      </Grid>
-    </Grid>
 
       {/* Notifications */}
       <Snackbar
@@ -273,16 +263,7 @@ const ProfilePage = () => {
         </Grid>
 
         {/* Right Column: Contact List */}
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
+        <Grid item xs={12} md={6}>
           <Box
             sx={{
               my: 2,
