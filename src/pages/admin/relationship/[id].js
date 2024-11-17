@@ -210,16 +210,16 @@ export default function Relationships() {
                     {type === "child" ? (
                         <>
                             <Typography variant="body2" color="textSecondary">
-                                Child's Relation: {relation.childRelation || "No relation available"}
+                                Child&apos;s Relation: {relation.childRelation || "No relation available"}
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
-                                Adult's Relation: {relation.parentRelation || "No relation available"}
+                                Adult&apos;s Relation: {relation.parentRelation || "No relation available"}
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
-                                Adult's Email: {relation.email || "No email available"}
+                                Adult&apos;s Email: {relation.email || "No email available"}
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
-                                Adult's Phone: {relation.phoneNumber || "No phone available"}
+                                Adult&apos;s Phone: {relation.phoneNumber || "No phone available"}
                             </Typography>
                         </>
                     ) : (
@@ -229,10 +229,10 @@ export default function Relationships() {
                                 Class ID: {relation.classID || "No class available"}
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
-                                Adult's Relation: {relation.parentRelation || "No relation available"}
+                                Adult&apos;s Relation: {relation.parentRelation || "No relation available"}
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
-                                Child's Relation: {relation.childRelation || "No relation available"}
+                                Child&apos;s Relation: {relation.childRelation || "No relation available"}
                             </Typography>
                         </>
                     )}

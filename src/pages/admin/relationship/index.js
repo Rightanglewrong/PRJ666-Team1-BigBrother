@@ -139,7 +139,7 @@ export default function ParentAccountsLanding() {
                     onClick={handleViewParentRelation}
                     sx={{ textTransform: "none" }}
                 >
-                    View Parent's Relationships
+                    View Adult&apos;s Relationships
                 </Button>
 
                 <Select
@@ -170,7 +170,7 @@ export default function ParentAccountsLanding() {
                     onClick={handleViewChildRelation}
                     sx={{ textTransform: "none" }}
                 >
-                    View Child's Relationships
+                    View Child&apos;s Relationships
                 </Button>
 
                 
