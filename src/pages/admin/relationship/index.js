@@ -65,7 +65,11 @@ export default function ParentAccountsLanding() {
             return;
         }
         setErrorMessage(""); // Clear previous errors
-        router.push(`/admin/relationship/${parentID}?type=parent`);
+        if (user.accountType === "Admin"){
+            router.push(`/admin/relationship/${parentID}?type=parent`);
+        } else if (user.accountType === "Staff") {
+            router.push(`/relationship/${parentID}?type=parent`);
+        }
     };
 
     const handleViewChildRelation = (e) => {
@@ -76,7 +80,11 @@ export default function ParentAccountsLanding() {
             return;
         }
         setErrorMessage(""); // Clear previous errors
-        router.push(`/admin/relationship/${childID}?type=child`);
+        if (user.accountType === "Admin"){
+            router.push(`/admin/relationship/${childID}?type=child`);
+        } else if (user.accountType === "Staff") {
+            router.push(`/relationship/${childID}?type=child`);
+        }
     };
 
     const handleCloseModal = () => {
@@ -120,7 +128,7 @@ export default function ParentAccountsLanding() {
                     required
                 >
                     <MenuItem value="">
-                        <em>Select a parent</em>
+                        <em>Select an adult</em>
                     </MenuItem>
                     {Array.isArray(parentProfiles) && parentProfiles.length > 0 ? (
                         parentProfiles.map((parent) => (
