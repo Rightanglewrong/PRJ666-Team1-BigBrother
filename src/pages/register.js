@@ -90,10 +90,17 @@ export default function RegisterPage() {
 
     try {
       await signup(signupData);
-      setSuccess("Registration successful!");
+      if (accountType == "Admin" || accountType == "Staff") {
+        setSuccess(
+          "Registration successful! If registering for an existing Location, please wait to be approved before logging in."
+        );
+      } else {
+        setSuccess("Registration successful!");
+      }
+
       setTimeout(() => {
         router.push("/login");
-      }, 1000);
+      }, 1500);
     } catch (error) {
       setError("Registration failed. Please try again.");
     }

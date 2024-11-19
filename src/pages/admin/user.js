@@ -47,6 +47,7 @@ const AdminUserService = () => {
     firstName: "",
     lastName: "",
     accountType: "",
+    accStatus: ""
   });
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -166,6 +167,7 @@ const AdminUserService = () => {
         email: "",
         locationID: "",
         accountType: "",
+        accStatus: ""
       });
       setUserID(null);
     } catch (error) {
@@ -182,6 +184,7 @@ const AdminUserService = () => {
       email: user.email,
       locationID: user.locationID,
       accountType: user.accountType,
+      accStatus: user.accStatus
     });
   };
 
@@ -201,10 +204,10 @@ const AdminUserService = () => {
       setUserToViewContacts(user);
       setIsContactModalOpen(true);
     } catch (error) {
-        console.error("Error fetching contacts:", error);
-        setContacts([]); // Set contacts to an empty array if there's an error
-        setUserToViewContacts(user); // Still show the dialog with an empty list
-        setIsContactModalOpen(true); // Open the modal even if there are no contacts
+      console.error("Error fetching contacts:", error);
+      setContacts([]); // Set contacts to an empty array if there's an error
+      setUserToViewContacts(user); // Still show the dialog with an empty list
+      setIsContactModalOpen(true); // Open the modal even if there are no contacts
     }
   };
 
@@ -322,118 +325,151 @@ const AdminUserService = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} maxWidth="md" fullWidth>
-  <DialogTitle>{`Contacts for ${userToViewContacts?.firstName} ${userToViewContacts?.lastName}`}</DialogTitle>
-  <DialogContent>
-    {contacts.length > 0 ? (
-      contacts.map((contact) => (
-        <Card
-          key={contact.contactID}
-          variant="outlined"
-          sx={{ my: 2, backgroundColor: "#f9f9f9", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
-        >
-          <CardContent>
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              {`${contact.firstName} ${contact.lastName}`}
+      <Dialog
+        open={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>{`Contacts for ${userToViewContacts?.firstName} ${userToViewContacts?.lastName}`}</DialogTitle>
+        <DialogContent>
+          {contacts.length > 0 ? (
+            contacts.map((contact) => (
+              <Card
+                key={contact.contactID}
+                variant="outlined"
+                sx={{
+                  my: 2,
+                  backgroundColor: "#f9f9f9",
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                    {`${contact.firstName} ${contact.lastName}`}
+                  </Typography>
+                  <Typography>Phone: {contact.phoneNumber}</Typography>
+                  <Typography>Relationship: {contact.relationship}</Typography>
+                  <Typography>Address: {contact.address}</Typography>
+                </CardContent>
+                <CardActions sx={{ justifyContent: "flex-end" }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      setIsAdding(true);
+                      setContactToEdit(contact);
+                      setNewContact(contact);
+                    }}
+                    sx={{ mr: 1 }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => handleDeleteContact(contact.contactID)}
+                  >
+                    Delete
+                  </Button>
+                </CardActions>
+              </Card>
+            ))
+          ) : (
+            <Typography variant="body2" color="textSecondary" align="center">
+              No contacts available for this user. Add one using the Add Contact
+              button below.
             </Typography>
-            <Typography>Phone: {contact.phoneNumber}</Typography>
-            <Typography>Relationship: {contact.relationship}</Typography>
-            <Typography>Address: {contact.address}</Typography>
-          </CardContent>
-          <CardActions sx={{ justifyContent: "flex-end" }}>
+          )}
+          {/* Add/Edit Contact Form */}
+          {isAdding && (
+            <Box
+              component="form"
+              my={3}
+              display="flex"
+              flexDirection="column"
+              gap={2}
+            >
+              <TextField
+                label="First Name"
+                value={newContact.firstName}
+                onChange={(e) =>
+                  setNewContact({ ...newContact, firstName: e.target.value })
+                }
+                required
+              />
+              <TextField
+                label="Last Name"
+                value={newContact.lastName}
+                onChange={(e) =>
+                  setNewContact({ ...newContact, lastName: e.target.value })
+                }
+                required
+              />
+              <TextField
+                label="Phone Number"
+                value={newContact.phoneNumber}
+                onChange={(e) =>
+                  setNewContact({ ...newContact, phoneNumber: e.target.value })
+                }
+                required
+              />
+              <TextField
+                label="Relationship"
+                value={newContact.relationship}
+                onChange={(e) =>
+                  setNewContact({ ...newContact, relationship: e.target.value })
+                }
+              />
+              <TextField
+                label="Address"
+                value={newContact.address}
+                onChange={(e) =>
+                  setNewContact({ ...newContact, address: e.target.value })
+                }
+              />
+              <Box display="flex" justifyContent="flex-end" gap={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSaveContact}
+                >
+                  {contactToEdit ? "Update Contact" : "Add Contact"}
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    setIsAdding(false);
+                    resetContactForm();
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Box>
+            </Box>
+          )}
+          {!isAdding && (
             <Button
               variant="contained"
               color="primary"
               onClick={() => {
                 setIsAdding(true);
-                setContactToEdit(contact);
-                setNewContact(contact);
+                resetContactForm();
               }}
-              sx={{ mr: 1 }}
             >
-              Edit
+              Add Contact
             </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => handleDeleteContact(contact.contactID)}
-            >
-              Delete
-            </Button>
-          </CardActions>
-        </Card>
-      ))
-    ) : (
-      <Typography variant="body2" color="textSecondary" align="center">
-        No contacts available for this user. Add one using the Add Contact button below.
-      </Typography>
-    )}
-    {/* Add/Edit Contact Form */}
-    {isAdding && (
-      <Box component="form" my={3} display="flex" flexDirection="column" gap={2}>
-        <TextField
-          label="First Name"
-          value={newContact.firstName}
-          onChange={(e) => setNewContact({ ...newContact, firstName: e.target.value })}
-          required
-        />
-        <TextField
-          label="Last Name"
-          value={newContact.lastName}
-          onChange={(e) => setNewContact({ ...newContact, lastName: e.target.value })}
-          required
-        />
-        <TextField
-          label="Phone Number"
-          value={newContact.phoneNumber}
-          onChange={(e) => setNewContact({ ...newContact, phoneNumber: e.target.value })}
-          required
-        />
-        <TextField
-          label="Relationship"
-          value={newContact.relationship}
-          onChange={(e) => setNewContact({ ...newContact, relationship: e.target.value })}
-        />
-        <TextField
-          label="Address"
-          value={newContact.address}
-          onChange={(e) => setNewContact({ ...newContact, address: e.target.value })}
-        />
-        <Box display="flex" justifyContent="flex-end" gap={2}>
-          <Button variant="contained" color="primary" onClick={handleSaveContact}>
-            {contactToEdit ? "Update Contact" : "Add Contact"}
-          </Button>
+          )}
+        </DialogContent>
+        <DialogActions>
           <Button
-            variant="outlined"
-            onClick={() => {
-              setIsAdding(false);
-              resetContactForm();
-            }}
+            onClick={() => setIsContactModalOpen(false)}
+            color="secondary"
           >
-            Cancel
+            Close
           </Button>
-        </Box>
-      </Box>
-    )}
-    {!isAdding && (
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          setIsAdding(true);
-          resetContactForm();
-        }}
-      >
-        Add Contact
-      </Button>
-    )}
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setIsContactModalOpen(false)} color="secondary">
-      Close
-    </Button>
-  </DialogActions>
-</Dialog>
+        </DialogActions>
+      </Dialog>
 
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6">User List</Typography>
@@ -571,6 +607,13 @@ const AdminUserService = () => {
                   <MenuItem value="Parent">Parent</MenuItem>
                 </Select>
               </FormControl>
+              <TextField
+                label="Account Status"
+                variant="outlined"
+                value={updateData.accStatus}
+                disabled // Disable to make it read-only
+                fullWidth
+              />
               <Button
                 variant="contained"
                 color="secondary"

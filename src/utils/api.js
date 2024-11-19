@@ -67,6 +67,10 @@ export async function login(email, password) {
       body: JSON.stringify({ email, password }),
     });
 
+    if(response.status === 403) {
+      throw new Error("Account has not yet been Approved by daycare admin.")
+    }
+
     if (!response.ok) {
       throw new Error("Login failed");
     }
@@ -87,7 +91,7 @@ export async function signup(signupData) {
     },
     body: JSON.stringify(signupData), // Send user data to backend
   });
-
+  
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || "Registration failed");
