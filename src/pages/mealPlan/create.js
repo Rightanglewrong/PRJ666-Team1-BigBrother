@@ -40,7 +40,7 @@ export default function CreateMealPlanPage() {
       localStorage.removeItem("token");
       router.push("/login");
     }
-  }, [router]);
+  }, [router, user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
