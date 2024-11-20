@@ -183,23 +183,27 @@ export default function ParentAccountsLanding() {
 
                 
             </Box>
-            <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() => router.push("/admin")}
-                sx={{ textTransform: "none", mt: 2 }}
-            >
-                Back to Admin
-            </Button>
+            <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+              {user.accountType === "Admin" && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => router.push("/admin")}
+                  sx={{ textTransform: "none", mt: 2 }}
+                >
+                  Back to Admin
+                </Button>
+              )}
 
-            <Button
+              <Button
                 variant="contained"
-                color="success"  
+                color="success"
                 onClick={() => router.push("/admin/relationship/create")}  // Redirect to create relationship page
-                sx={{ textTransform: "none", mt: 2, ml: 32.8 }}
-            >
+                sx={{ textTransform: "none", mt: 2 }}
+              >
                 Create Relationship
-            </Button>
+              </Button>
+            </Box>
 
             {/* Modal for error message */}
             <Dialog open={openModal} onClose={handleCloseModal}>
