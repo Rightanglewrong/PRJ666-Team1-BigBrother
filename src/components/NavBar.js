@@ -261,6 +261,23 @@ const NavBar = () => {
                     Progress Report
                   </Link>
                 </div>
+
+                
+              )}
+
+              {(accountType === "Staff") && (
+                <div>
+                  <Link
+                    href="/relationship"
+                    passHref
+                    className={styles.dropdownItem}
+                    onClick={handleMenuClose}
+                  >
+                    Relationships
+                  </Link>
+                </div>
+
+                
               )}
 
               <Link

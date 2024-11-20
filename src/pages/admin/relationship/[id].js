@@ -238,23 +238,28 @@ export default function Relationships() {
                     )}
                 </CardContent>
                 <CardActions>
-                    {/* Update Button */}
-                    <Button
+                  {/* Render buttons only if user.accountType is "Admin" */}
+                  {user.accountType === "Admin" && (
+                    <>
+                      {/* Update Button */}
+                      <Button
                         size="small"
                         color="primary"
                         onClick={() => handleUpdate(relation)}
-                    >
+                      >
                         Update
-                    </Button>
+                      </Button>
 
-                    {/* Delete Button */}
-                    <Button
+                      {/* Delete Button */}
+                      <Button
                         size="small"
                         color="secondary"
                         onClick={() => handleDeleteClick(relation.relationshipID)}
-                    >
+                      >
                         Delete
-                    </Button>
+                      </Button>
+                    </>
+                  )}
                 </CardActions>
             </Card>
         ))

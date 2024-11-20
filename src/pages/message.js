@@ -1,285 +1,362 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  createMessageInDynamoDB,
-  retrieveMessageFromDynamoDB,
+  Container,
+  Typography,
+  Box,
+  Tabs,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Snackbar,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import {
   retrieveMessageByReceiverID,
   retrieveMessageBySenderID,
   markMessageAsDeletedByReceiver,
   markMessageAsDeletedBySender,
+  createMessageInDynamoDB
 } from "../utils/messageAPI";
 import { getCurrentUser } from "../utils/api";
-import styles from "./message.module.css";
+import { 
+  retrieveUserByIDInDynamoDB,
+  getUsersByAccountTypeAndLocation
+} from "../utils/userAPI";
 
-export default function Message() {
-  const [messageTitle, setMessageTitle] = useState("");
-  const [messageContent, setMessageContent] = useState("");
-  const [createReceiverID, setCreateReceiverID] = useState("");
-  const [senderID, setSenderID] = useState("");
-  const [filterReceiverID, setFilterReceiverID] = useState("");
-  const [retrieveMessageID, setRetrieveMessageID] = useState("");
-  const [deleteReceiverMessageID, setDeleteReceiverMessageID] = useState("");
-  const [deleteSenderMessageID, setDeleteSenderMessageID] = useState("");
-  const [retrievedMessage, setRetrievedMessage] = useState(null);
-  const [filteredMessages, setFilteredMessages] = useState([]);
-  const [userId, setUserId] = useState("");
-  const [message, setMessage] = useState("");
+export default function Messages() {
+  const [userDetails, setUserDetails] = useState(null);
+  const [incomingMessages, setIncomingMessages] = useState([]);
+  const [outgoingMessages, setOutgoingMessages] = useState([]);
+  const [selectedTab, setSelectedTab] = useState(0);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [deleteType, setDeleteType] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [newMessage, setNewMessage] = useState({
+    title: "",
+    content: "",
+    receiver: "",
+    sender: "",
+  });
+
+  const [usersList, setUsersList] = useState([]);
+  const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
+
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const userData = await getCurrentUser();
-        if (userData) {
-          setUserId(userData.userID);
-          setIsAuthorized(
-            userData.accountType === "Admin" || userData.accountType === "Staff"
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setErrorMessage("Failed to load user details. Please log in again.");
-        setShowErrorModal(true);
-      }
-    };
 
-    fetchUserDetails();
+    fetchMessages();
   }, []);
 
-  const handleCreateMessage = async (e) => {
-    e.preventDefault();
+  const fetchMessages = async () => {
     try {
-      const newMessage = {
-        title: messageTitle,
-        content: messageContent,
-        sender: userId,
-        receiver: createReceiverID,
-      };
+      const userData = await getCurrentUser();
+      setUserDetails(userData);
 
-      const data = await createMessageInDynamoDB(newMessage);
-      setMessage(`Message created successfully: ${JSON.stringify(data.item)}`);
-      setMessageTitle("");
-      setMessageContent("");
-      setCreateReceiverID("");
-    } catch (error) {
-      setMessage(`Error creating message: ${error.message}`);
-    }
-  };
+      const receivedMessages = await retrieveMessageByReceiverID(userData.userID);
+      const sentMessages = await retrieveMessageBySenderID(userData.userID);
 
-  const handleRetrieveMessage = async (e) => {
-    e.preventDefault();
-    try {
-      const data = await retrieveMessageFromDynamoDB(retrieveMessageID);
-      if (data.item) {
-        setRetrievedMessage(data.item);
-        setMessage(
-          `Message retrieved successfully: ${JSON.stringify(data.item)}`
-        );
-      } else {
-        setMessage("No message found with the provided ID.");
-      }
+      const uniqueUserIDs = [
+        ...new Set([ ...receivedMessages.map((msg) => msg.sender), ...sentMessages.map((msg) => msg.receiver), ])
+      ];
 
-      setRetrieveMessageID("");
-    } catch (error) {
-      setMessage(`Error retrieving message: ${error.message}`);
-    }
-  };
+      const userDetailsMap = new Map();
+      const userPromises = uniqueUserIDs.map(async (userID) => {
+        try {
+          const user = await retrieveUserByIDInDynamoDB(userID);
+          userDetailsMap.set(userID, `${user.user.user.firstName} ${user.user.user.lastName}`);
+        } catch (error) {
+          console.error(`Failed to fetch user for userID: ${userID}`, error);
+          userDetailsMap.set(userID, "Unknown User");
+        }
+      });
 
-  const handleDeleteReceiverMessage = async (e) => {
-    e.preventDefault();
+      await Promise.all(userPromises);
 
-    try {
-      const existingMessageData = await retrieveMessageFromDynamoDB(
-        deleteReceiverMessageID
+      const receivedMessagesWithNames = receivedMessages.map((msg) => ({
+        ...msg,
+        senderName: userDetailsMap.get(msg.sender) || "Unknown User",
+      }));
+
+      const sentMessagesWithNames = sentMessages.map((msg) => ({
+        ...msg,
+        receiverName: userDetailsMap.get(msg.receiver) || "Unknown User",
+      }));
+
+      setIncomingMessages(receivedMessagesWithNames);
+      setOutgoingMessages(sentMessagesWithNames);
+
+      let users = [];
+      const accountTypes = ["Admin", "Staff", "Parent"];
+      const promises = accountTypes.map((type) =>
+        getUsersByAccountTypeAndLocation(type, userData.locationID)
       );
-      if (!existingMessageData.item) {
-        setMessage("Message ID does not exist.");
+      const responses = await Promise.all(promises);
+
+      responses.forEach((response) => {
+        if (response.status === "ok" && response.users) {
+          users = users.concat(response.users);
+        }
+      });
+
+    const filteredUsers = users.filter((user) => user.userID !== userData.userID);
+      setUsersList(filteredUsers);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      setErrorMessage("Failed to load messages. Please try again later.");
+    }
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
+
+  const handleOpenModal = (message, type) => {
+    setSelectedMessage(message);
+    setDeleteType(type);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedMessage(null);
+    setDeleteType(null);
+  };
+
+  const handleDelete = async () => {
+    if (selectedMessage && deleteType) {
+      try {
+        if (deleteType === "incoming") {
+          await markMessageAsDeletedByReceiver(selectedMessage.messageID);
+        } else if (deleteType === "outgoing") {
+          await markMessageAsDeletedBySender(selectedMessage.messageID);
+        }
+        setSuccessMessage("Message deleted successfully.");
+        fetchMessages();
+      } catch (error) {
+        console.error("Error deleting message:", error);
+        setErrorMessage("Failed to delete the message. Please try again.");
+      } finally {
+        handleCloseModal();
+      }
+    }
+  };
+  
+  const handleCreateMessage = async () => {
+    try {
+      if (!newMessage.title || !newMessage.content || !newMessage.receiver) {
+        setErrorMessage("All fields are required.");
         return;
       }
-      await markMessageAsDeletedByReceiver(deleteReceiverMessageID);
-      setMessage("Message deleted successfully");
-      setDeleteReceiverMessageID("");
+      
+      newMessage.sender = userDetails.userID;
+      console.log(newMessage);
+
+      await createMessageInDynamoDB(newMessage);
+      setSuccessMessage("Message sent successfully.");
+      setNewMessage({ title: "", content: "", receiver: "", sender: "" });
+      setIsCreateFormVisible(false);
+      fetchMessages();
+
     } catch (error) {
-      setMessage(`Error deleting message: ${error.message}`);
+      console.error("Error creating message:", error);
+      setErrorMessage("Failed to send the message. Please try again.");
     }
   };
 
-  const handleDeleteSenderMessage = async (e) => {
-    e.preventDefault();
-    try {
-      const existingMessageData = await retrieveMessageFromDynamoDB(
-        deleteSenderMessageID
-      );
-
-      if (!existingMessageData.item) {
-        setMessage("Message ID does not exist.");
-        return;
-      }
-      await markMessageAsDeletedBySender(deleteSenderMessageID);
-      setMessage("Message deleted successfully");
-      setDeleteSenderMessageID("");
-    } catch (error) {
-      setMessage(`Error deleting message: ${error.message}`);
-    }
-  };
-
-  const handleFilterMessagesByReceiver = async (e) => {
-    e.preventDefault();
-    try {
-      const messages = await retrieveMessageByReceiverID(filterReceiverID);
-      setFilteredMessages(messages);
-      setMessage(
-        `Found ${messages.length} messages for receiver ID: ${filterReceiverID}`
-      );
-      setFilterReceiverID("");
-    } catch (error) {
-      setMessage(`Error fetching messages: ${error.message}`);
-    }
-  };
-
-  const handleFilterMessagesBySender = async (e) => {
-    e.preventDefault();
-    try {
-      const messages = await retrieveMessageBySenderID(senderID);
-      setFilteredMessages(messages);
-      setMessage(
-        `Found ${messages.length} messages for sender ID: ${senderID}`
-      );
-      setSenderID("");
-    } catch (error) {
-      setMessage(`Error fetching messages: ${error.message}`);
-    }
-  };
-
-  const handleCloseErrorModal = () => {
-    setShowErrorModal(false);
+  const toggleCreateForm = () => {
+    setIsCreateFormVisible((prev) => !prev); // Toggle form visibility
   };
 
   return (
-    <div className={styles.pageWrapper}>
-      <div className={styles.container}>
-        <h1>Message CRUD Test Page</h1>
-        <p>{message}</p>
+    <Container>
+      <Typography variant="h3" gutterBottom>
+        Messages
+      </Typography>
 
-        {/* Create Message */}
-        <h3>Create Message</h3>
-        <form onSubmit={handleCreateMessage}>
-          <input
-            type="text"
-            value={messageTitle}
-            placeholder="Message Title"
-            onChange={(e) => setMessageTitle(e.target.value)}
-          />
-          <input
-            type="text"
-            value={messageContent}
-            placeholder="Message Content"
-            onChange={(e) => setMessageContent(e.target.value)}
-          />
-          <input
-            type="text"
-            value={createReceiverID}
-            placeholder="Receiver ID"
-            onChange={(e) => setCreateReceiverID(e.target.value)}
-          />
-          <button type="submit">Create Message</button>
-        </form>
-
-        {/* Retrieve Message */}
-        <h3>Retrieve Message</h3>
-        <input
-          type="text"
-          value={retrieveMessageID}
-          placeholder="Message ID"
-          onChange={(e) => setRetrieveMessageID(e.target.value)}
+      <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
+        <Tabs value={selectedTab} onChange={handleTabChange}>
+          <Tab label="Incoming Messages" />
+          <Tab label="Outgoing Messages" />
+        </Tabs>
+      </Box>
+      <Box sx={{ marginBottom: 2 }}>
+      {selectedTab === 0 && (
+        <MessageTable
+          messages={incomingMessages}
+          type="incoming"
+          handleOpenModal={handleOpenModal}
         />
-        <button onClick={handleRetrieveMessage} disabled={!retrieveMessageID}>
-          Retrieve Message
-        </button>
-        {retrievedMessage && (
-          <p>Retrieved Message: {JSON.stringify(retrievedMessage)}</p>
-        )}
-
-        {/* Delete For Receiver Message */}
-        <h3>Delete For Receiver</h3>
-        <input
-          type="text"
-          value={deleteReceiverMessageID}
-          placeholder="Message ID"
-          onChange={(e) => setDeleteReceiverMessageID(e.target.value)}
+      )}
+      {selectedTab === 1 && (
+        <MessageTable
+          messages={outgoingMessages}
+          type="outgoing"
+          handleOpenModal={handleOpenModal}
         />
-        <button
-          onClick={handleDeleteReceiverMessage}
-          disabled={!deleteReceiverMessageID}
+      )}
+      </Box>
+      
+
+       {isCreateFormVisible && (
+
+       <Box sx={{ marginBottom: 4 }}>
+        <Typography variant="h6">Create New Message</Typography>
+
+        <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
+          <InputLabel>Receiver</InputLabel>
+          <Select
+            value={newMessage.receiver}
+            onChange={(e) => setNewMessage({ ...newMessage, receiver: e.target.value })}
+          >
+            {usersList.map((user) => (
+              <MenuItem key={user.userID} value={user.userID}>
+                {user.firstName} {user.lastName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
+          <TextField
+            label="Title"
+            value={newMessage.title}
+            onChange={(e) => setNewMessage({ ...newMessage, title: e.target.value })}
+          />
+        </FormControl>
+        <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
+          <TextField
+            label="Content"
+            value={newMessage.content}
+            onChange={(e) => setNewMessage({ ...newMessage, content: e.target.value })}
+            multiline
+            rows={4}
+          />
+        </FormControl>
+        
+        <Button variant="contained" color="primary" onClick={handleCreateMessage}>
+          Send Message
+        </Button>
+
+        <Typography variant="body2" color="textSecondary" sx={{ marginTop: 2 }}>
+          * Once sent, messages cannot be unsent or edited.
+        </Typography>
+      </Box>
+      )}
+      <Button variant="contained" color="primary" onClick={toggleCreateForm}>
+        {isCreateFormVisible ? "Cancel Message Creation" : "Create Message"}
+      </Button>
+      {/* Error and Success Snackbar */}
+      {errorMessage && (
+        <Snackbar
+          open={Boolean(errorMessage)}
+          autoHideDuration={6000}
+          onClose={() => setErrorMessage(null)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
-          Delete Message
-        </button>
+          <Paper>
+            <Typography variant="body1" sx={{ padding: 2 }}>
+              {errorMessage}
+            </Typography>
+          </Paper>
+        </Snackbar>
+      )}
 
-        {/* Delete for Sender Message */}
-        <h3>Delete For Sender</h3>
-        <input
-          type="text"
-          value={deleteSenderMessageID}
-          placeholder="Message ID"
-          onChange={(e) => setDeleteSenderMessageID(e.target.value)}
-        />
-        <button
-          onClick={handleDeleteSenderMessage}
-          disabled={!deleteSenderMessageID}
+      {successMessage && (
+        <Snackbar
+          open={Boolean(successMessage)}
+          autoHideDuration={6000}
+          onClose={() => setSuccessMessage(null)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
-          Delete Message
-        </button>
+          <Paper>
+            <Typography variant="body1" sx={{ padding: 2 }}>
+              {successMessage}
+            </Typography>
+          </Paper>
+        </Snackbar>
+      )}
 
-        {/* Filter Messages by Receiver */}
-        <h3>Filter Messages by Receiver</h3>
-        <form onSubmit={handleFilterMessagesByReceiver}>
-          <input
-            type="text"
-            value={filterReceiverID}
-            placeholder="Receiver ID"
-            onChange={(e) => setFilterReceiverID(e.target.value)}
-          />
-          <button type="submit">Filter Messages</button>
-        </form>
-
-        {/* Filter Messages by Sender */}
-        <h3>Filter Messages by Sender</h3>
-        <form onSubmit={handleFilterMessagesBySender}>
-          <input
-            type="text"
-            value={senderID}
-            placeholder="Sender ID"
-            onChange={(e) => setSenderID(e.target.value)}
-          />
-          <button type="submit">Filter Messages</button>
-        </form>
-
-        {filteredMessages.length > 0 && (
-          <div>
-            <h4>Filtered Messages</h4>
-            <ul>
-              {filteredMessages.map((msg) => (
-                <li key={msg.messageID}>
-                  <strong>{msg.title}</strong>: {msg.content} (Sent by:{" "}
-                  {msg.sender})
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {showErrorModal && (
-          <div className={styles.overlay}>
-            <div className={styles.modal}>
-              <h3>Error</h3>
-              <p>{errorMessage}</p>
-              <div className={styles.modalButtons}>
-                <button onClick={handleCloseErrorModal}>Close</button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+      {/* Delete Confirmation Modal */}
+      <Dialog open={modalOpen} onClose={handleCloseModal}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Are you sure you want to delete this message?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="secondary">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
 }
+
+function MessageTable({ messages, type, handleOpenModal }) {
+  return (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell><strong>Subject</strong></TableCell>
+            {type === "incoming" && <TableCell><strong>From</strong></TableCell>}
+            {type === "outgoing" && <TableCell><strong>To</strong></TableCell>}
+            <TableCell><strong>Content</strong></TableCell>
+            <TableCell><strong>Date</strong></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {messages.map((message) => (
+            <TableRow key={message.messageID}>
+              <TableCell>{message.title}</TableCell>
+              {type === "incoming" ? (
+                <TableCell>{message.senderName}</TableCell>
+              ) : (
+                <TableCell>{message.receiverName}</TableCell>
+              )}
+              <TableCell>{message.content}</TableCell>
+              <TableCell>{message.datePosted}</TableCell>
+              <TableCell>
+                <button
+                  onClick={() => handleOpenModal(message, type)}
+                  style={{
+                    color: "white",
+                    backgroundColor: "red",
+                    border: "none",
+                    padding: "5px 10px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Delete
+                </button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
+
