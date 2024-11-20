@@ -18,15 +18,24 @@ import {
   DialogContent,
   DialogTitle,
   Button,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   retrieveMessageByReceiverID,
   retrieveMessageBySenderID,
   markMessageAsDeletedByReceiver,
   markMessageAsDeletedBySender,
+  createMessageInDynamoDB
 } from "../utils/messageAPI";
 import { getCurrentUser } from "../utils/api";
-import { retrieveUserByIDInDynamoDB } from "../utils/userAPI";
+import { 
+  retrieveUserByIDInDynamoDB,
+  getUsersByAccountTypeAndLocation
+} from "../utils/userAPI";
 
 export default function Messages() {
   const [userDetails, setUserDetails] = useState(null);
@@ -39,53 +48,80 @@ export default function Messages() {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [deleteType, setDeleteType] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [newMessage, setNewMessage] = useState({
+    title: "",
+    content: "",
+    receiver: "",
+    sender: "",
+  });
+
+  const [usersList, setUsersList] = useState([]);
+  const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
+
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const userData = await getCurrentUser();
-        setUserDetails(userData);
-
-        const receivedMessages = await retrieveMessageByReceiverID(userData.userID);
-        const sentMessages = await retrieveMessageBySenderID(userData.userID);
-
-        const uniqueUserIDs = [
-          ...new Set([ ...receivedMessages.map((msg) => msg.sender), ...sentMessages.map((msg) => msg.receiver), ])
-        ];
-
-        const userDetailsMap = new Map();
-        const userPromises = uniqueUserIDs.map(async (userID) => {
-          try {
-            const user = await retrieveUserByIDInDynamoDB(userID);
-            userDetailsMap.set(userID, `${user.user.user.firstName} ${user.user.user.lastName}`);
-          } catch (error) {
-            console.error(`Failed to fetch user for userID: ${userID}`, error);
-            userDetailsMap.set(userID, "Unknown User");
-          }
-        });
-
-        await Promise.all(userPromises);
-
-        const receivedMessagesWithNames = receivedMessages.map((msg) => ({
-          ...msg,
-          senderName: userDetailsMap.get(msg.sender) || "Unknown User",
-        }));
-
-        const sentMessagesWithNames = sentMessages.map((msg) => ({
-          ...msg,
-          receiverName: userDetailsMap.get(msg.receiver) || "Unknown User",
-        }));
-
-        setIncomingMessages(receivedMessagesWithNames);
-        setOutgoingMessages(sentMessagesWithNames);
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-        setErrorMessage("Failed to load messages. Please try again later.");
-      }
-    };
 
     fetchMessages();
   }, []);
+
+  const fetchMessages = async () => {
+    try {
+      const userData = await getCurrentUser();
+      setUserDetails(userData);
+
+      const receivedMessages = await retrieveMessageByReceiverID(userData.userID);
+      const sentMessages = await retrieveMessageBySenderID(userData.userID);
+
+      const uniqueUserIDs = [
+        ...new Set([ ...receivedMessages.map((msg) => msg.sender), ...sentMessages.map((msg) => msg.receiver), ])
+      ];
+
+      const userDetailsMap = new Map();
+      const userPromises = uniqueUserIDs.map(async (userID) => {
+        try {
+          const user = await retrieveUserByIDInDynamoDB(userID);
+          userDetailsMap.set(userID, `${user.user.user.firstName} ${user.user.user.lastName}`);
+        } catch (error) {
+          console.error(`Failed to fetch user for userID: ${userID}`, error);
+          userDetailsMap.set(userID, "Unknown User");
+        }
+      });
+
+      await Promise.all(userPromises);
+
+      const receivedMessagesWithNames = receivedMessages.map((msg) => ({
+        ...msg,
+        senderName: userDetailsMap.get(msg.sender) || "Unknown User",
+      }));
+
+      const sentMessagesWithNames = sentMessages.map((msg) => ({
+        ...msg,
+        receiverName: userDetailsMap.get(msg.receiver) || "Unknown User",
+      }));
+
+      setIncomingMessages(receivedMessagesWithNames);
+      setOutgoingMessages(sentMessagesWithNames);
+
+      let users = [];
+      const accountTypes = ["Admin", "Staff", "Parent"];
+      const promises = accountTypes.map((type) =>
+        getUsersByAccountTypeAndLocation(type, userData.locationID)
+      );
+      const responses = await Promise.all(promises);
+
+      responses.forEach((response) => {
+        if (response.status === "ok" && response.users) {
+          users = users.concat(response.users);
+        }
+      });
+
+    const filteredUsers = users.filter((user) => user.userID !== userData.userID);
+      setUsersList(filteredUsers);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      setErrorMessage("Failed to load messages. Please try again later.");
+    }
+  };
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -112,7 +148,7 @@ export default function Messages() {
           await markMessageAsDeletedBySender(selectedMessage.messageID);
         }
         setSuccessMessage("Message deleted successfully.");
-        window.location.reload(); // You might want to optimize this and only reload the message list instead of the whole page
+        fetchMessages();
       } catch (error) {
         console.error("Error deleting message:", error);
         setErrorMessage("Failed to delete the message. Please try again.");
@@ -120,6 +156,32 @@ export default function Messages() {
         handleCloseModal();
       }
     }
+  };
+  
+  const handleCreateMessage = async () => {
+    try {
+      if (!newMessage.title || !newMessage.content || !newMessage.receiver) {
+        setErrorMessage("All fields are required.");
+        return;
+      }
+      
+      newMessage.sender = userDetails.userID;
+      console.log(newMessage);
+
+      await createMessageInDynamoDB(newMessage);
+      setSuccessMessage("Message sent successfully.");
+      setNewMessage({ title: "", content: "", receiver: "", sender: "" });
+      setIsCreateFormVisible(false);
+      fetchMessages();
+
+    } catch (error) {
+      console.error("Error creating message:", error);
+      setErrorMessage("Failed to send the message. Please try again.");
+    }
+  };
+
+  const toggleCreateForm = () => {
+    setIsCreateFormVisible((prev) => !prev); // Toggle form visibility
   };
 
   return (
@@ -134,7 +196,7 @@ export default function Messages() {
           <Tab label="Outgoing Messages" />
         </Tabs>
       </Box>
-
+      <Box sx={{ marginBottom: 2 }}>
       {selectedTab === 0 && (
         <MessageTable
           messages={incomingMessages}
@@ -149,7 +211,56 @@ export default function Messages() {
           handleOpenModal={handleOpenModal}
         />
       )}
+      </Box>
+      
 
+       {isCreateFormVisible && (
+
+       <Box sx={{ marginBottom: 4 }}>
+        <Typography variant="h6">Create New Message</Typography>
+
+        <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
+          <InputLabel>Receiver</InputLabel>
+          <Select
+            value={newMessage.receiver}
+            onChange={(e) => setNewMessage({ ...newMessage, receiver: e.target.value })}
+          >
+            {usersList.map((user) => (
+              <MenuItem key={user.userID} value={user.userID}>
+                {user.firstName} {user.lastName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
+          <TextField
+            label="Title"
+            value={newMessage.title}
+            onChange={(e) => setNewMessage({ ...newMessage, title: e.target.value })}
+          />
+        </FormControl>
+        <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
+          <TextField
+            label="Content"
+            value={newMessage.content}
+            onChange={(e) => setNewMessage({ ...newMessage, content: e.target.value })}
+            multiline
+            rows={4}
+          />
+        </FormControl>
+        
+        <Button variant="contained" color="primary" onClick={handleCreateMessage}>
+          Send Message
+        </Button>
+
+        <Typography variant="body2" color="textSecondary" sx={{ marginTop: 2 }}>
+          * Once sent, messages cannot be unsent or edited.
+        </Typography>
+      </Box>
+      )}
+      <Button variant="contained" color="primary" onClick={toggleCreateForm}>
+        {isCreateFormVisible ? "Cancel Message Creation" : "Create Message"}
+      </Button>
       {/* Error and Success Snackbar */}
       {errorMessage && (
         <Snackbar
@@ -247,3 +358,5 @@ function MessageTable({ messages, type, handleOpenModal }) {
     </TableContainer>
   );
 }
+
+
