@@ -16,24 +16,16 @@ import {
   TextField,
   Select,
   MenuItem,
-  List,
-  ListItem,
-  ListItemText,
   Paper,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   FormControl,
   InputLabel,
-  Card,
-  CardContent,
-  CardActions,
 } from '@mui/material';
 import { addContact, fetchContacts, updateContact, deleteContact } from '@/utils/contactApi'; // Import contact-related APIs
 import ConfirmationModal from '@/components/Modal/ConfirmationModal';
 import ErrorModal from '@/components/Modal/ErrorModal';
+import UserList from '@/components/List/UserList';
+import ContactManagementModal from '@/components/Modal/ContactManagementModal';
+import UpdateUserForm from '@/components/Input/UpdateUserForm';
 
 const AdminUserService = () => {
   const router = useRouter();
@@ -55,7 +47,7 @@ const AdminUserService = () => {
   const [errorModalOpen, setErrorModalOpen] = useState(false);
 
   // Delete modal
-  const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState(false);
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -84,6 +76,7 @@ const AdminUserService = () => {
     checkAdmin();
   }, []);
 
+  // Error Modal Ops
   const showError = (message) => {
     setError(message);
     setErrorModalOpen(true);
@@ -93,6 +86,7 @@ const AdminUserService = () => {
     setErrorModalOpen(false);
   };
 
+  // Update User Op
   const handleUpdateUser = async () => {
     try {
       const response = await updateUserInDynamoDB(userID, updateData);
@@ -104,23 +98,24 @@ const AdminUserService = () => {
     }
   };
 
-  const handleDeleteUser = async () => {
+  // Delete User op
+  const handleDeleteUser = async (user) => {
     if (updateData.accountType === 'Admin') {
       showError('Cannot delete an Admin user.');
       return;
     }
-    setOpenDeleteConfirmationDialog(true);
-    setUserToDelete(userID);
+    setUserToDelete(user);
+    setDeleteConfirmationModal(true);
   };
 
   const handleConfirmDelete = async () => {
     if (!userToDelete) return;
     try {
-      const response = await deleteUserInDynamoDB(userToDelete);
+      const response = await deleteUserInDynamoDB(userToDelete.userID);
       setResult(response.message);
       setError(null);
       await handleGetUsersByAccountTypeAndLocation();
-      setOpenDeleteConfirmationDialog(false);
+      setDeleteConfirmationModal(false);
       setUserID(null);
       setIsDeleting(false);
     } catch (error) {
@@ -128,6 +123,12 @@ const AdminUserService = () => {
     }
   };
 
+  const handleDeleteModalClose = () => {
+    setDeleteConfirmationModal(false);
+    setUserToDelete(null); // Reset the user to delete
+  };
+
+  // Users retrieval
   const handleGetUsersByAccountTypeAndLocation = async () => {
     try {
       let users = await fetchUsers(accountType, locationID);
@@ -136,12 +137,12 @@ const AdminUserService = () => {
 
       if (users.length > 0) {
         setUsersList(filteredUsers);
-        setError(null); 
-        setErrorModalOpen(false); 
+        setError(null);
+        setErrorModalOpen(false);
       } else {
         showError('No users found for selected location');
       }
-  
+
       setUpdateData({
         firstName: '',
         lastName: '',
@@ -151,100 +152,97 @@ const AdminUserService = () => {
         accStatus: '',
       });
       setUserID(null);
-  
     } catch (error) {
       showError('Failed to retrieve users.');
-    }
-  };
-
-  const fetchUsersByAccountTypeAndLocation = async (accountType, locationID) => {
-    try {
-      const response = await getUsersByAccountTypeAndLocation(accountType, locationID);
-      if (response.status === "ok" && response.users) {
-        return response.users;
-      }
-      return []; 
-    } catch (error) {
-      console.error("Failed to fetch users by account type and location:", error);
-      return [];
-    }
-  };
-
-  const fetchUsersByLocation = async (locationID) => {
-    try {
-      
-      const admins = await fetchAdminUsers(locationID);
-      const staff = await fetchStaffUsers(locationID);
-      const parents = await fetchParentUsers(locationID);
-
-      const results = admins.concat(staff, parents);
-     return results;
-
-    } catch (error) {
-      console.error("Failed to fetch users by location:", error);
-      return [];
     }
   };
 
   const fetchUsers = async (accountType, locationID) => {
     try {
       let users = [];
-  
       if (!accountType) {
         users = await fetchUsersByLocation(locationID);
       } else {
         users = await fetchUsersByAccountTypeAndLocation(accountType, locationID);
       }
-  
+
       return users;
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      console.error('Failed to fetch users:', error);
+      return [];
+    }
+  };
+
+  const fetchUsersByAccountTypeAndLocation = async (accountType, locationID) => {
+    try {
+      const response = await getUsersByAccountTypeAndLocation(accountType, locationID);
+      if (response.status === 'ok' && response.users) {
+        return response.users;
+      }
+      return [];
+    } catch (error) {
+      console.error('Failed to fetch users by account type and location:', error.message);
+      return [];
+    }
+  };
+
+  const fetchUsersByLocation = async (locationID) => {
+    try {
+      const admins = await fetchAdminUsers(locationID);
+      const staff = await fetchStaffUsers(locationID);
+      const parents = await fetchParentUsers(locationID);
+
+      const results = admins.concat(staff, parents);
+      return results;
+    } catch (error) {
+      console.error('Failed to fetch users by location:', error);
       return [];
     }
   };
 
   const fetchAdminUsers = async (locationID) => {
     try {
-      const response = await getUsersByAccountTypeAndLocation("Admin", locationID);
-      if (response.status === "ok" && Array.isArray(response.users) && response.users.length > 0) {
+      const response = await getUsersByAccountTypeAndLocation('Admin', locationID);
+      if (response.status === 'ok' && Array.isArray(response.users) && response.users.length > 0) {
         return response.users;
       } else {
-        return []; 
+        return [];
       }
     } catch (error) {
-      console.error("Error fetching Admin users:", error);
+      console.error('Error fetching Admin users:', error);
       return [];
     }
   };
-  
+
   const fetchStaffUsers = async (locationID) => {
     try {
-      const response = await getUsersByAccountTypeAndLocation("Staff", locationID);
-      if (response.status === "ok" && Array.isArray(response.users) && response.users.length > 0) {
+      const response = await getUsersByAccountTypeAndLocation('Staff', locationID);
+      if (response.status === 'ok' && Array.isArray(response.users) && response.users.length > 0) {
         return response.users;
       } else {
-        return []; 
+        return [];
       }
     } catch (error) {
-      console.error("Error fetching Staff users:", error);
-      return []; 
-    }
-  };
-  
-  const fetchParentUsers = async (locationID) => {
-    try {
-      const response = await getUsersByAccountTypeAndLocation("Parent", locationID);
-      if (response.status === "ok" && Array.isArray(response.users) && response.users.length > 0) {
-        return response.users;
-      } else {
-        return []; 
-      }
-    } catch (error) {
-      console.error("Error fetching Parent users:", error);
-      return []; 
+      console.error('Error fetching Staff users:', error);
+      return [];
     }
   };
 
+  const fetchParentUsers = async (locationID) => {
+    try {
+      const response = await getUsersByAccountTypeAndLocation('Parent', locationID);
+      if (response.status === 'ok' && Array.isArray(response.users) && response.users.length > 0) {
+        return response.users;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      // console.error('Error fetching Parent users:', error);
+      return [];
+    }
+  };
+
+  // Handle the selection of users and populating of state data
   const handleUserSelect = (user) => {
     setUserID(user.userID);
     setUpdateData({
@@ -257,11 +255,7 @@ const AdminUserService = () => {
     });
   };
 
-  const handleDialogClose = () => {
-    setOpenDeleteConfirmationDialog(false); // Close dialog if user cancels
-    setUserToDelete(null); // Reset the user to delete
-  };
-
+  // COntact functionality
   const handleViewContacts = async (user) => {
     try {
       const fetchedContacts = await fetchContacts(user.userID);
@@ -269,7 +263,7 @@ const AdminUserService = () => {
       setUserToViewContacts(user);
       setIsContactModalOpen(true);
     } catch (error) {
-      console.error('Error fetching contacts:', error);
+      // console.error('Error fetching contacts:', error);
       setContacts([]); // Set contacts to an empty array if there's an error
       setUserToViewContacts(user); // Still show the dialog with an empty list
       setIsContactModalOpen(true); // Open the modal even if there are no contacts
@@ -290,6 +284,12 @@ const AdminUserService = () => {
   const handleDeleteContact = async (contactID) => {
     try {
       await deleteContact(contactID);
+
+      if (!userToViewContacts?.userID) {
+        console.error('Invalid user context');
+        throw new Error('User context is invalid.');
+      }
+
       const updatedContacts = await fetchContacts(userToViewContacts.userID);
       setContacts(updatedContacts);
     } catch (error) {
@@ -331,7 +331,7 @@ const AdminUserService = () => {
               onChange={(e) => setAccountType(e.target.value)}
               fullWidth
             >
-              <MenuItem value={null}>All</MenuItem>
+              <MenuItem value={''}>All</MenuItem>
               <MenuItem value="Admin">Admin</MenuItem>
               <MenuItem value="Staff">Staff</MenuItem>
               <MenuItem value="Parent">Parent</MenuItem>
@@ -358,291 +358,55 @@ const AdminUserService = () => {
       <ErrorModal open={errorModalOpen} onClose={closeErrorModal} errorMessage={error} />
 
       {/* Confirmation Dialog */}
-      <Dialog open={openDeleteConfirmationDialog} onClose={handleDialogClose}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          Are you sure you want to delete the user{' '}
-          <strong>
-            {userToDelete?.firstName} {userToDelete?.lastName}
-          </strong>
-          ?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDelete} color="error">
-            Confirm Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmationModal
+        open={deleteConfirmationModal}
+        title="Confirm Delete"
+        description={`Are you sure you want to delete ${
+          userToDelete ? `${userToDelete.firstName} ${userToDelete.lastName}` : ''
+        }?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleDeleteModalClose}
+      />
 
-      <Dialog
+      <ContactManagementModal
         open={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>{`Contacts for ${userToViewContacts?.firstName} ${userToViewContacts?.lastName}`}</DialogTitle>
-        <DialogContent>
-          {contacts.length > 0 ? (
-            contacts.map((contact) => (
-              <Card
-                key={contact.contactID}
-                variant="outlined"
-                sx={{
-                  my: 2,
-                  backgroundColor: '#f9f9f9',
-                  boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                    {`${contact.firstName} ${contact.lastName}`}
-                  </Typography>
-                  <Typography>Phone: {contact.phoneNumber}</Typography>
-                  <Typography>Relationship: {contact.relationship}</Typography>
-                  <Typography>Address: {contact.address}</Typography>
-                </CardContent>
-                <CardActions sx={{ justifyContent: 'flex-end' }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      setIsAdding(true);
-                      setContactToEdit(contact);
-                      setNewContact(contact);
-                    }}
-                    sx={{ mr: 1 }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDeleteContact(contact.contactID)}
-                  >
-                    Delete
-                  </Button>
-                </CardActions>
-              </Card>
-            ))
-          ) : (
-            <Typography variant="body2" color="textSecondary" align="center">
-              No contacts available for this user. Add one using the Add Contact button below.
-            </Typography>
-          )}
-          {/* Add/Edit Contact Form */}
-          {isAdding && (
-            <Box component="form" my={3} display="flex" flexDirection="column" gap={2}>
-              <TextField
-                label="First Name"
-                value={newContact.firstName}
-                onChange={(e) => setNewContact({ ...newContact, firstName: e.target.value })}
-                required
-              />
-              <TextField
-                label="Last Name"
-                value={newContact.lastName}
-                onChange={(e) => setNewContact({ ...newContact, lastName: e.target.value })}
-                required
-              />
-              <TextField
-                label="Phone Number"
-                value={newContact.phoneNumber}
-                onChange={(e) => setNewContact({ ...newContact, phoneNumber: e.target.value })}
-                required
-              />
-              <TextField
-                label="Relationship"
-                value={newContact.relationship}
-                onChange={(e) => setNewContact({ ...newContact, relationship: e.target.value })}
-              />
-              <TextField
-                label="Address"
-                value={newContact.address}
-                onChange={(e) => setNewContact({ ...newContact, address: e.target.value })}
-              />
-              <Box display="flex" justifyContent="flex-end" gap={2}>
-                <Button variant="contained" color="primary" onClick={handleSaveContact}>
-                  {contactToEdit ? 'Update Contact' : 'Add Contact'}
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setIsAdding(false);
-                    resetContactForm();
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Box>
-            </Box>
-          )}
-          {!isAdding && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                setIsAdding(true);
-                resetContactForm();
-              }}
-            >
-              Add Contact
-            </Button>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsContactModalOpen(false)} color="secondary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+        user={userToViewContacts}
+        contacts={contacts}
+        isAdding={isAdding}
+        setIsAdding={setIsAdding}
+        newContact={newContact}
+        setNewContact={setNewContact}
+        contactToEdit={contactToEdit}
+        setContactToEdit={setContactToEdit}
+        onSaveContact={handleSaveContact}
+        onDeleteContact={handleDeleteContact}
+        resetContactForm={resetContactForm}
+      />
 
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6">User List</Typography>
         <Paper elevation={2} sx={{ maxHeight: 300, overflow: 'auto', mt: 2, p: 2 }}>
-          {usersList.length > 0 ? (
-            <List>
-              {usersList.map((user) => (
-                <ListItem
-                  key={user.userID}
-                  selected={userID === user.userID}
-                  onClick={() => handleUserSelect(user)}
-                  sx={{
-                    backgroundColor:
-                      userID === user.userID ? 'rgba(0, 0, 255, 0.1)' : 'transparent',
-                    '&:hover': { backgroundColor: 'rgba(0, 0, 255, 0.1)' },
-                    cursor: 'pointer',
-                  }}
-                >
-                  <ListItemText
-                    primary={
-                      <>
-                        <Typography variant="body1" component="span">
-                          {`${user.firstName} ${user.lastName}`}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary" component="div">
-                          {user.email}
-                        </Typography>
-                      </>
-                    }
-                    secondary={
-                      <>
-                        <Typography variant="caption" color="textSecondary" component="span">
-                          {user.accountType}
-                        </Typography>
-                      </>
-                    }
-                  />
-                  <Button
-                    color="info"
-                    onClick={() => handleViewContacts(user)}
-                    sx={{ marginRight: 1 }}
-                  >
-                    View Contacts
-                  </Button>
-                  <Button
-                    color="secondary"
-                    onClick={() => {
-                      handleUserSelect(user);
-                      setIsDeleting(false);
-                    }}
-                    sx={{ marginRight: 1 }}
-                  >
-                    Update
-                  </Button>
-                  <Button
-                    color="error"
-                    onClick={() => {
-                      setIsDeleting(true);
-                      handleDeleteUser(user);
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Typography variant="body2" color="textSecondary">
-              No users found
-            </Typography>
-          )}
+          <UserList
+            users={usersList}
+            selectedUserId={userID}
+            onSelect={handleUserSelect}
+            onViewContacts={handleViewContacts}
+            onDelete={(user) => {
+              setIsDeleting(true);
+              handleDeleteUser(user);
+            }}
+          />
         </Paper>
       </Box>
 
       {isAdmin && userID && !isDeleting && (
-        <>
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6">Update User</Typography>
-            <Box display="flex" flexDirection="column" gap={2} mt={2}>
-              <TextField
-                disabled={updateData.accountType === 'Admin'}
-                label="First Name"
-                variant="outlined"
-                value={updateData.firstName}
-                onChange={(e) =>
-                  setUpdateData((prev) => ({
-                    ...prev,
-                    firstName: e.target.value,
-                  }))
-                }
-                fullWidth
-              />
-              <TextField
-                disabled={updateData.accountType === 'Admin'}
-                label="Last Name"
-                variant="outlined"
-                value={updateData.lastName}
-                onChange={(e) =>
-                  setUpdateData((prev) => ({
-                    ...prev,
-                    lastName: e.target.value,
-                  }))
-                }
-                fullWidth
-              />
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Account Type</InputLabel>
-                <Select
-                  disabled={updateData.accountType === 'Admin'} // Disable if the accountType is Admin
-                  label="Account Type"
-                  value={updateData.accountType}
-                  onChange={(e) =>
-                    setUpdateData((prev) => ({
-                      ...prev,
-                      accountType: e.target.value,
-                    }))
-                  }
-                  fullWidth
-                >
-                  <MenuItem value="Admin">Admin</MenuItem>
-                  <MenuItem value="Staff">Staff</MenuItem>
-                  <MenuItem value="Parent">Parent</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                label="Account Status"
-                variant="outlined"
-                value={updateData.accStatus}
-                disabled // Disable to make it read-only
-                fullWidth
-              />
-              <Button variant="contained" color="secondary" onClick={handleUpdateUser}>
-                Update User
-              </Button>
-              <Button
-                variant="outlined"
-                color="default"
-                onClick={() => setUserID(null)}
-                style={{ marginTop: '10px' }}
-              >
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </>
+        <UpdateUserForm
+          updateData={updateData}
+          setUpdateData={setUpdateData}
+          handleUpdateUser={handleUpdateUser}
+          onCancel={() => setUserID(null)}
+        />
       )}
 
       <Button
