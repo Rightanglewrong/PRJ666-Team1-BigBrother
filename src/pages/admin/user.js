@@ -130,34 +130,18 @@ const AdminUserService = () => {
 
   const handleGetUsersByAccountTypeAndLocation = async () => {
     try {
-      let users = [];
-
-      if (!accountType) {
-        const accountTypes = ['Admin', 'Staff', 'Parent'];
-        const promises = accountTypes.map((type) =>
-          getUsersByAccountTypeAndLocation(type, locationID)
-        );
-        const responses = await Promise.all(promises);
-
-        responses.forEach((response) => {
-          if (response.status === 'ok' && response.users) {
-            users = users.concat(response.users);
-          }
-        });
-      } else {
-        const response = await getUsersByAccountTypeAndLocation(accountType, locationID);
-        if (response.status === 'ok' && response.users) {
-          users = response.users;
-        }
-      }
+      let users = await fetchUsers(accountType, locationID);
+      const current = await getCurrentUser();
+      const filteredUsers = users.filter((user) => user.userID !== current.userID);
 
       if (users.length > 0) {
-        setUsersList(users);
-        setError(null);
+        setUsersList(filteredUsers);
+        setError(null); 
+        setErrorModalOpen(false); 
       } else {
         showError('No users found for selected location');
       }
-
+  
       setUpdateData({
         firstName: '',
         lastName: '',
@@ -167,8 +151,97 @@ const AdminUserService = () => {
         accStatus: '',
       });
       setUserID(null);
+  
     } catch (error) {
       showError('Failed to retrieve users.');
+    }
+  };
+
+  const fetchUsersByAccountTypeAndLocation = async (accountType, locationID) => {
+    try {
+      const response = await getUsersByAccountTypeAndLocation(accountType, locationID);
+      if (response.status === "ok" && response.users) {
+        return response.users;
+      }
+      return []; 
+    } catch (error) {
+      console.error("Failed to fetch users by account type and location:", error);
+      return [];
+    }
+  };
+
+  const fetchUsersByLocation = async (locationID) => {
+    try {
+      
+      const admins = await fetchAdminUsers(locationID);
+      const staff = await fetchStaffUsers(locationID);
+      const parents = await fetchParentUsers(locationID);
+
+      const results = admins.concat(staff, parents);
+     return results;
+
+    } catch (error) {
+      console.error("Failed to fetch users by location:", error);
+      return [];
+    }
+  };
+
+  const fetchUsers = async (accountType, locationID) => {
+    try {
+      let users = [];
+  
+      if (!accountType) {
+        users = await fetchUsersByLocation(locationID);
+      } else {
+        users = await fetchUsersByAccountTypeAndLocation(accountType, locationID);
+      }
+  
+      return users;
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      return [];
+    }
+  };
+
+  const fetchAdminUsers = async (locationID) => {
+    try {
+      const response = await getUsersByAccountTypeAndLocation("Admin", locationID);
+      if (response.status === "ok" && Array.isArray(response.users) && response.users.length > 0) {
+        return response.users;
+      } else {
+        return []; 
+      }
+    } catch (error) {
+      console.error("Error fetching Admin users:", error);
+      return [];
+    }
+  };
+  
+  const fetchStaffUsers = async (locationID) => {
+    try {
+      const response = await getUsersByAccountTypeAndLocation("Staff", locationID);
+      if (response.status === "ok" && Array.isArray(response.users) && response.users.length > 0) {
+        return response.users;
+      } else {
+        return []; 
+      }
+    } catch (error) {
+      console.error("Error fetching Staff users:", error);
+      return []; 
+    }
+  };
+  
+  const fetchParentUsers = async (locationID) => {
+    try {
+      const response = await getUsersByAccountTypeAndLocation("Parent", locationID);
+      if (response.status === "ok" && Array.isArray(response.users) && response.users.length > 0) {
+        return response.users;
+      } else {
+        return []; 
+      }
+    } catch (error) {
+      console.error("Error fetching Parent users:", error);
+      return []; 
     }
   };
 
@@ -258,6 +331,7 @@ const AdminUserService = () => {
               onChange={(e) => setAccountType(e.target.value)}
               fullWidth
             >
+              <MenuItem value={null}>All</MenuItem>
               <MenuItem value="Admin">Admin</MenuItem>
               <MenuItem value="Staff">Staff</MenuItem>
               <MenuItem value="Parent">Parent</MenuItem>
