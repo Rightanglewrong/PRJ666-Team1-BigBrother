@@ -230,7 +230,7 @@ const AdminUserService = () => {
       if (contactToEdit) {
         await updateContact(contactToEdit.contactID, newContact);
       } else {
-        await addContact({ userID: userToViewContacts.userID, ...newContact });
+        await addContact(userToViewContacts.userID, newContact);
       }
       const updatedContacts = await fetchContacts(userToViewContacts.userID);
       setContacts(updatedContacts);
