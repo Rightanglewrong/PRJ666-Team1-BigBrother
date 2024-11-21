@@ -13,14 +13,21 @@ export const fetchContacts = async (userID) => {
     });
 
     if (!response.ok) {
-      throw new Error(`No contacts available.`);
+      const errorData = await response.json();
+
+      if (errorData.error.message === 'No Contacts found for the specified User ID') {
+        return []; // Gracefully return an empty array if no contacts found
+      } else {
+        console.warn('Error Fetching Contacts:', errorData.error.message || 'Unknown error');
+        return [];
+      }
     }
 
     const data = await response.json();
-    return data.entries;
+    return data.entries || [];
   } catch (error) {
     console.error('Error fetching contacts:', error);
-    throw error;
+    return [];
   }
 };
 
@@ -32,7 +39,7 @@ export const addContact = async (userID, newContact) => {
     }
 
     const contactData = {
-      userID, 
+      userID,
       firstName: newContact.firstName,
       lastName: newContact.lastName,
       phoneNumber: newContact.phoneNumber,
