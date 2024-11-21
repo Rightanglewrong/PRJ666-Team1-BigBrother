@@ -1,6 +1,6 @@
 // components/List/UserList.js
-import React from "react";
-import { List, ListItem, ListItemText, Typography, Button, Box } from "@mui/material";
+import React from 'react';
+import { List, ListItem, ListItemText, Typography, Button, Box } from '@mui/material';
 
 const UserList = ({ users, selectedUserId, onSelect, onViewContacts, onDelete }) => {
   if (!users || users.length === 0) {
@@ -19,9 +19,10 @@ const UserList = ({ users, selectedUserId, onSelect, onViewContacts, onDelete })
           selected={selectedUserId === user.userID}
           onClick={() => onSelect(user)}
           sx={{
-            backgroundColor: selectedUserId === user.userID ? "rgba(0, 0, 255, 0.1)" : "transparent",
-            "&:hover": { backgroundColor: "rgba(0, 0, 255, 0.1)" },
-            cursor: "pointer",
+            backgroundColor:
+              selectedUserId === user.userID ? 'rgba(0, 0, 255, 0.1)' : 'transparent',
+            '&:hover': { backgroundColor: 'rgba(0, 0, 255, 0.1)' },
+            cursor: 'pointer',
           }}
         >
           <ListItemText
@@ -52,16 +53,6 @@ const UserList = ({ users, selectedUserId, onSelect, onViewContacts, onDelete })
             >
               View Contacts
             </Button>
-            {/* <Button
-              color="secondary"
-              onClick={(e) => {
-                e.stopPropagation();
-                onUpdate(user);
-              }}
-              sx={{ marginRight: 1 }}
-            >
-              Update
-            </Button> */}
             <Button
               color="error"
               onClick={(e) => {
