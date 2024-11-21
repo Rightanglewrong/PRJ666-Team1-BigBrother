@@ -1,5 +1,4 @@
 // src/pages/mealPlan/recent.js
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -19,6 +18,7 @@ import {
   Alert,
   Divider,
 } from "@mui/material";
+import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 
 export default function RecentMealPlans() {
   const user = useUser();
@@ -26,6 +26,8 @@ export default function RecentMealPlans() {
   const [mealPlans, setMealPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [mealPlanToDelete, setMealPlanToDelete] = useState(null);
 
   // Fetch the recent meal plans by location
   useEffect(() => {
@@ -51,17 +53,32 @@ export default function RecentMealPlans() {
     fetchMealPlans();
   }, [user, router]);
 
-  const handleDeleteMealPlan = async (mealPlanID) => {
+  const handleDeleteMealPlan = async () => {
     const token = localStorage.getItem("token");
 
     try {
-      await deleteMealPlan(token, mealPlanID);
-      setMealPlans(mealPlans.filter((plan) => plan.mealPlanID !== mealPlanID));
+      await deleteMealPlan(token, mealPlanToDelete);
+      setMealPlans(
+        mealPlans.filter((plan) => plan.mealPlanID !== mealPlanToDelete)
+      );
       setErrorMessage("Meal plan deleted successfully");
     } catch (error) {
       setErrorMessage("Failed to delete meal plan");
       console.error("Error deleting meal plan:", error);
+    } finally {
+      setConfirmationModalOpen(false);
+      setMealPlanToDelete(null);
     }
+  };
+
+  const openConfirmationModal = (mealPlanID) => {
+    setMealPlanToDelete(mealPlanID);
+    setConfirmationModalOpen(true);
+  };
+
+  const closeConfirmationModal = () => {
+    setConfirmationModalOpen(false);
+    setMealPlanToDelete(null);
   };
 
   return (
@@ -146,7 +163,7 @@ export default function RecentMealPlans() {
                     <Button
                       variant="contained"
                       color="error"
-                      onClick={() => handleDeleteMealPlan(plan.mealPlanID)}
+                      onClick={() => openConfirmationModal(plan.mealPlanID)}
                     >
                       Delete
                     </Button>
@@ -163,6 +180,15 @@ export default function RecentMealPlans() {
           </Typography>
         </Box>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        open={confirmationModalOpen}
+        title="Confirm Delete"
+        description="Are you sure you want to delete this meal plan? This action cannot be undone."
+        onConfirm={handleDeleteMealPlan}
+        onCancel={closeConfirmationModal}
+      />
     </Container>
   );
 }
