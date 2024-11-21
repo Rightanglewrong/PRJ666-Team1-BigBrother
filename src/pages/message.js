@@ -60,20 +60,50 @@ export default function Messages() {
 
 
   useEffect(() => {
-
+    fetchUsers();
     fetchMessages();
   }, []);
 
+  const fetchUsers = async () => {
+    try {
+      const userData = await getCurrentUser();
+      const users = [];
+      const results = await Promise.allSettled([
+        fetchAdminUsers(userData.locationID),
+        fetchStaffUsers(userData.locationID),
+        fetchParentUsers(userData.locationID),
+      ]);
+
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled" && Array.isArray(result.value) && result.value.length > 0) {
+          users.push(...result.value); // Only add users if the result is a non-empty array
+        } else {
+          console.log(`No users found for account type ${["Admin", "Staff", "Parent"][index]}`);
+        }
+      });
+
+      const filteredUsers = users.filter((user) => user.userID !== userData.userID);
+      setUsersList(filteredUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setErrorMessage("Failed to load users. Please try again.");
+    }
+  };
   const fetchMessages = async () => {
     try {
       const userData = await getCurrentUser();
       setUserDetails(userData);
 
-      const receivedMessages = await retrieveMessageByReceiverID(userData.userID);
-      const sentMessages = await retrieveMessageBySenderID(userData.userID);
+      const [receivedMessages, sentMessages] = await Promise.all([
+        fetchReceivedMessages(userData.userID),
+        fetchSentMessages(userData.userID),
+      ]);
 
       const uniqueUserIDs = [
-        ...new Set([ ...receivedMessages.map((msg) => msg.sender), ...sentMessages.map((msg) => msg.receiver), ])
+        ...new Set([
+          ...receivedMessages.map((msg) => msg.sender),
+          ...sentMessages.map((msg) => msg.receiver),
+        ]),
       ];
 
       const userDetailsMap = new Map();
@@ -89,39 +119,89 @@ export default function Messages() {
 
       await Promise.all(userPromises);
 
-      const receivedMessagesWithNames = receivedMessages.map((msg) => ({
-        ...msg,
-        senderName: userDetailsMap.get(msg.sender) || "Unknown User",
-      }));
+    const receivedMessagesWithNames = receivedMessages.map((msg) => ({
+      ...msg,
+      senderName: userDetailsMap.get(msg.sender) || "Unknown User",
+    }));
 
-      const sentMessagesWithNames = sentMessages.map((msg) => ({
-        ...msg,
-        receiverName: userDetailsMap.get(msg.receiver) || "Unknown User",
-      }));
+    const sentMessagesWithNames = sentMessages.map((msg) => ({
+      ...msg,
+      receiverName: userDetailsMap.get(msg.receiver) || "Unknown User",
+    }));
 
-      setIncomingMessages(receivedMessagesWithNames);
-      setOutgoingMessages(sentMessagesWithNames);
+      setIncomingMessages(receivedMessagesWithNames || []);
+      setOutgoingMessages(sentMessagesWithNames || []);
 
-      let users = [];
-      const accountTypes = ["Admin", "Staff", "Parent"];
-      const promises = accountTypes.map((type) =>
-        getUsersByAccountTypeAndLocation(type, userData.locationID)
-      );
-      const responses = await Promise.all(promises);
-
-      responses.forEach((response) => {
-        if (response.status === "ok" && response.users) {
-          users = users.concat(response.users);
-        }
-      });
-
-    const filteredUsers = users.filter((user) => user.userID !== userData.userID);
-      setUsersList(filteredUsers);
+      
     } catch (error) {
       console.error("Error fetching messages:", error);
+      setIncomingMessages([]); 
+      setOutgoingMessages([]); 
       setErrorMessage("Failed to load messages. Please try again later.");
     }
   };
+
+const fetchAdminUsers = async (locationID) => {
+  try {
+    const response = await getUsersByAccountTypeAndLocation("Admin", locationID);
+    if (response.status === "ok" && Array.isArray(response.users) && response.users.length > 0) {
+      return response.users;
+    } else {
+      return []; 
+    }
+  } catch (error) {
+    console.error("Error fetching Admin users:", error);
+    return [];
+  }
+};
+
+const fetchStaffUsers = async (locationID) => {
+  try {
+    const response = await getUsersByAccountTypeAndLocation("Staff", locationID);
+    if (response.status === "ok" && Array.isArray(response.users) && response.users.length > 0) {
+      return response.users;
+    } else {
+      return []; 
+    }
+  } catch (error) {
+    console.error("Error fetching Staff users:", error);
+    return []; 
+  }
+};
+
+const fetchParentUsers = async (locationID) => {
+  try {
+    const response = await getUsersByAccountTypeAndLocation("Parent", locationID);
+    if (response.status === "ok" && Array.isArray(response.users) && response.users.length > 0) {
+      return response.users;
+    } else {
+      return []; 
+    }
+  } catch (error) {
+    console.error("Error fetching Parent users:", error);
+    return []; 
+  }
+};
+
+const fetchReceivedMessages = async (userID) => {
+  try {
+    const receivedMessages = await retrieveMessageByReceiverID(userID || []);
+    return receivedMessages; 
+  } catch (error) {
+    console.error("Error fetching received messages:", error);
+    return []; 
+  }
+};
+
+const fetchSentMessages = async (userID) => {
+  try {
+    const sentMessages = await retrieveMessageBySenderID(userID || []);
+    return sentMessages; 
+  } catch (error) {
+    console.error("Error fetching sent messages:", error);
+    return []; 
+  }
+};
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);

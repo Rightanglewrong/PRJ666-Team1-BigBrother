@@ -109,13 +109,7 @@ export default function CreateRelationshipPage() {
         Create Relationship
       </Typography>
 
-      {message && (
-        <Snackbar open={Boolean(message)} autoHideDuration={6000} onClose={() => setMessage("")}>
-          <Alert severity="info" onClose={() => setMessage("")}>
-            {message}
-          </Alert>
-        </Snackbar>
-      )}
+      
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {/* Parent Selection */}
