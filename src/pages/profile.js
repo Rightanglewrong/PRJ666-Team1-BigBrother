@@ -25,7 +25,6 @@ import {
   CardContent,
   CardActions,
 } from "@mui/material";
-import styles from "./Profile.module.css";
 import { styled } from "@mui/system";
 
 const AddContactButton = styled(Button)({
