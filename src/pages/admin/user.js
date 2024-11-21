@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import {
   updateUserInDynamoDB,
   deleteUserInDynamoDB,
   getUsersByAccountTypeAndLocation,
-} from "../../utils/userAPI";
-import { getCurrentUser } from "@/utils/api";
+} from '../../utils/userAPI';
+import { getCurrentUser } from '@/utils/api';
 import {
   Container,
   Typography,
@@ -30,32 +30,32 @@ import {
   Card,
   CardContent,
   CardActions,
-} from "@mui/material";
-import {
-  addContact,
-  fetchContacts,
-  updateContact,
-  deleteContact,
-} from "@/utils/contactApi"; // Import contact-related APIs
+} from '@mui/material';
+import { addContact, fetchContacts, updateContact, deleteContact } from '@/utils/contactApi'; // Import contact-related APIs
+import ConfirmationModal from '@/components/Modal/ConfirmationModal';
+import ErrorModal from '@/components/Modal/ErrorModal';
 
 const AdminUserService = () => {
   const router = useRouter();
-  const [userID, setUserID] = useState("");
-  const [accountType, setAccountType] = useState("");
-  const [locationID, setLocationID] = useState("");
+  const [userID, setUserID] = useState('');
+  const [accountType, setAccountType] = useState('');
+  const [locationID, setLocationID] = useState('');
   const [updateData, setUpdateData] = useState({
-    firstName: "",
-    lastName: "",
-    accountType: "",
-    accStatus: ""
+    firstName: '',
+    lastName: '',
+    accountType: '',
+    accStatus: '',
   });
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
-  const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [usersList, setUsersList] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] =
-    useState(false);
+  const [result, setResult] = useState(null);
+
+  // Error Modal
+  const [error, setError] = useState(null);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+
+  // Delete modal
+  const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -64,11 +64,11 @@ const AdminUserService = () => {
   const [userToViewContacts, setUserToViewContacts] = useState(null);
   const [contactToEdit, setContactToEdit] = useState(null);
   const [newContact, setNewContact] = useState({
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
-    relationship: "",
-    address: "",
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    relationship: '',
+    address: '',
   });
   const [isAdding, setIsAdding] = useState(false);
 
@@ -76,17 +76,22 @@ const AdminUserService = () => {
     const checkAdmin = async () => {
       try {
         const currentUser = await getCurrentUser();
-        if (currentUser.accountType === "Admin") {
-          setIsAdmin(true);
-        } else if (currentUser.accountType === "Staff") {
-          setIsAdmin(false);
-        }
+        setIsAdmin(currentUser.accountType === 'Admin');
       } catch (error) {
-        console.error("Error verifying Admin Status:", error);
+        showError('Error verifying Admin Status');
       }
     };
     checkAdmin();
   }, []);
+
+  const showError = (message) => {
+    setError(message);
+    setErrorModalOpen(true);
+  };
+
+  const closeErrorModal = () => {
+    setErrorModalOpen(false);
+  };
 
   const handleUpdateUser = async () => {
     try {
@@ -95,21 +100,19 @@ const AdminUserService = () => {
       setError(null);
       await handleGetUsersByAccountTypeAndLocation();
     } catch (error) {
-      const errorMessage = "Error Updating User";
-      setError(errorMessage);
-      setErrorModalOpen(true);
+      showError('Error Updating User');
     }
   };
 
   const handleDeleteUser = async () => {
-    if (updateData.accountType === "Admin") {
-      setError("Cannot delete an Admin user.");
-      setErrorModalOpen(true);
+    if (updateData.accountType === 'Admin') {
+      showError('Cannot delete an Admin user.');
       return;
     }
     setOpenDeleteConfirmationDialog(true);
     setUserToDelete(userID);
   };
+
   const handleConfirmDelete = async () => {
     if (!userToDelete) return;
     try {
@@ -121,9 +124,7 @@ const AdminUserService = () => {
       setUserID(null);
       setIsDeleting(false);
     } catch (error) {
-      const errorMessage = "Error Deleting User";
-      setError(errorMessage);
-      setErrorModalOpen(true);
+      showError('Error deleting user.');
     }
   };
 
@@ -132,23 +133,20 @@ const AdminUserService = () => {
       let users = [];
 
       if (!accountType) {
-        const accountTypes = ["Admin", "Staff", "Parent"];
+        const accountTypes = ['Admin', 'Staff', 'Parent'];
         const promises = accountTypes.map((type) =>
           getUsersByAccountTypeAndLocation(type, locationID)
         );
         const responses = await Promise.all(promises);
 
         responses.forEach((response) => {
-          if (response.status === "ok" && response.users) {
+          if (response.status === 'ok' && response.users) {
             users = users.concat(response.users);
           }
         });
       } else {
-        const response = await getUsersByAccountTypeAndLocation(
-          accountType,
-          locationID
-        );
-        if (response.status === "ok" && response.users) {
+        const response = await getUsersByAccountTypeAndLocation(accountType, locationID);
+        if (response.status === 'ok' && response.users) {
           users = response.users;
         }
       }
@@ -157,22 +155,20 @@ const AdminUserService = () => {
         setUsersList(users);
         setError(null);
       } else {
-        setError("No users found for the selected location.");
-        setErrorModalOpen(true);
+        showError('No users found for selected location');
       }
 
       setUpdateData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        locationID: "",
-        accountType: "",
-        accStatus: ""
+        firstName: '',
+        lastName: '',
+        email: '',
+        locationID: '',
+        accountType: '',
+        accStatus: '',
       });
       setUserID(null);
     } catch (error) {
-      setError("Failed to retrieve users.");
-      setErrorModalOpen(true);
+      showError('Failed to retrieve users.');
     }
   };
 
@@ -184,12 +180,8 @@ const AdminUserService = () => {
       email: user.email,
       locationID: user.locationID,
       accountType: user.accountType,
-      accStatus: user.accStatus
+      accStatus: user.accStatus,
     });
-  };
-
-  const closeErrorModal = () => {
-    setErrorModalOpen(false);
   };
 
   const handleDialogClose = () => {
@@ -204,7 +196,7 @@ const AdminUserService = () => {
       setUserToViewContacts(user);
       setIsContactModalOpen(true);
     } catch (error) {
-      console.error("Error fetching contacts:", error);
+      console.error('Error fetching contacts:', error);
       setContacts([]); // Set contacts to an empty array if there's an error
       setUserToViewContacts(user); // Still show the dialog with an empty list
       setIsContactModalOpen(true); // Open the modal even if there are no contacts
@@ -214,11 +206,11 @@ const AdminUserService = () => {
   const resetContactForm = () => {
     setContactToEdit(null);
     setNewContact({
-      firstName: "",
-      lastName: "",
-      phoneNumber: "",
-      relationship: "",
-      address: "",
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      relationship: '',
+      address: '',
     });
   };
 
@@ -228,9 +220,8 @@ const AdminUserService = () => {
       const updatedContacts = await fetchContacts(userToViewContacts.userID);
       setContacts(updatedContacts);
     } catch (error) {
-      console.error("Error deleting contact:", error);
-      setError("Failed to delete contact. Please try again.");
-      setErrorModalOpen(true);
+      console.error('Error deleting contact:', error);
+      showError('Failed to delete contact. Please try again.');
     }
   };
 
@@ -246,9 +237,8 @@ const AdminUserService = () => {
       resetContactForm();
       setIsAdding(false); // Close the Add/Edit Contact Form
     } catch (error) {
-      console.error("Error saving contact:", error);
-      setError("Failed to save contact. Please try again.");
-      setErrorModalOpen(true);
+      console.error('Error saving contact:', error);
+      showError('Failed to save contact. Please try again.');
     }
   };
 
@@ -258,12 +248,10 @@ const AdminUserService = () => {
         User Management
       </Typography>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h6">
-          Get Users by Account Type and Location
-        </Typography>
+        <Typography variant="h6">Get Users by Account Type and Location</Typography>
         <Box display="flex" alignItems="center" gap={2} mt={2}>
           <FormControl fullWidth variant="outlined">
-            <InputLabel>Account Type</InputLabel>{" "}
+            <InputLabel>Account Type</InputLabel>{' '}
             <Select
               label="Account Type"
               value={accountType}
@@ -293,23 +281,13 @@ const AdminUserService = () => {
       </Box>
 
       {/* Error Modal */}
-      <Dialog open={errorModalOpen} onClose={closeErrorModal}>
-        <DialogTitle>Error</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{error}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeErrorModal} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ErrorModal open={errorModalOpen} onClose={closeErrorModal} errorMessage={error} />
 
       {/* Confirmation Dialog */}
       <Dialog open={openDeleteConfirmationDialog} onClose={handleDialogClose}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete the user{" "}
+          Are you sure you want to delete the user{' '}
           <strong>
             {userToDelete?.firstName} {userToDelete?.lastName}
           </strong>
@@ -340,19 +318,19 @@ const AdminUserService = () => {
                 variant="outlined"
                 sx={{
                   my: 2,
-                  backgroundColor: "#f9f9f9",
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: '#f9f9f9',
+                  boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
                 }}
               >
                 <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                     {`${contact.firstName} ${contact.lastName}`}
                   </Typography>
                   <Typography>Phone: {contact.phoneNumber}</Typography>
                   <Typography>Relationship: {contact.relationship}</Typography>
                   <Typography>Address: {contact.address}</Typography>
                 </CardContent>
-                <CardActions sx={{ justifyContent: "flex-end" }}>
+                <CardActions sx={{ justifyContent: 'flex-end' }}>
                   <Button
                     variant="contained"
                     color="primary"
@@ -377,64 +355,43 @@ const AdminUserService = () => {
             ))
           ) : (
             <Typography variant="body2" color="textSecondary" align="center">
-              No contacts available for this user. Add one using the Add Contact
-              button below.
+              No contacts available for this user. Add one using the Add Contact button below.
             </Typography>
           )}
           {/* Add/Edit Contact Form */}
           {isAdding && (
-            <Box
-              component="form"
-              my={3}
-              display="flex"
-              flexDirection="column"
-              gap={2}
-            >
+            <Box component="form" my={3} display="flex" flexDirection="column" gap={2}>
               <TextField
                 label="First Name"
                 value={newContact.firstName}
-                onChange={(e) =>
-                  setNewContact({ ...newContact, firstName: e.target.value })
-                }
+                onChange={(e) => setNewContact({ ...newContact, firstName: e.target.value })}
                 required
               />
               <TextField
                 label="Last Name"
                 value={newContact.lastName}
-                onChange={(e) =>
-                  setNewContact({ ...newContact, lastName: e.target.value })
-                }
+                onChange={(e) => setNewContact({ ...newContact, lastName: e.target.value })}
                 required
               />
               <TextField
                 label="Phone Number"
                 value={newContact.phoneNumber}
-                onChange={(e) =>
-                  setNewContact({ ...newContact, phoneNumber: e.target.value })
-                }
+                onChange={(e) => setNewContact({ ...newContact, phoneNumber: e.target.value })}
                 required
               />
               <TextField
                 label="Relationship"
                 value={newContact.relationship}
-                onChange={(e) =>
-                  setNewContact({ ...newContact, relationship: e.target.value })
-                }
+                onChange={(e) => setNewContact({ ...newContact, relationship: e.target.value })}
               />
               <TextField
                 label="Address"
                 value={newContact.address}
-                onChange={(e) =>
-                  setNewContact({ ...newContact, address: e.target.value })
-                }
+                onChange={(e) => setNewContact({ ...newContact, address: e.target.value })}
               />
               <Box display="flex" justifyContent="flex-end" gap={2}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSaveContact}
-                >
-                  {contactToEdit ? "Update Contact" : "Add Contact"}
+                <Button variant="contained" color="primary" onClick={handleSaveContact}>
+                  {contactToEdit ? 'Update Contact' : 'Add Contact'}
                 </Button>
                 <Button
                   variant="outlined"
@@ -462,10 +419,7 @@ const AdminUserService = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setIsContactModalOpen(false)}
-            color="secondary"
-          >
+          <Button onClick={() => setIsContactModalOpen(false)} color="secondary">
             Close
           </Button>
         </DialogActions>
@@ -473,10 +427,7 @@ const AdminUserService = () => {
 
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6">User List</Typography>
-        <Paper
-          elevation={2}
-          sx={{ maxHeight: 300, overflow: "auto", mt: 2, p: 2 }}
-        >
+        <Paper elevation={2} sx={{ maxHeight: 300, overflow: 'auto', mt: 2, p: 2 }}>
           {usersList.length > 0 ? (
             <List>
               {usersList.map((user) => (
@@ -486,11 +437,9 @@ const AdminUserService = () => {
                   onClick={() => handleUserSelect(user)}
                   sx={{
                     backgroundColor:
-                      userID === user.userID
-                        ? "rgba(0, 0, 255, 0.1)"
-                        : "transparent",
-                    "&:hover": { backgroundColor: "rgba(0, 0, 255, 0.1)" },
-                    cursor: "pointer",
+                      userID === user.userID ? 'rgba(0, 0, 255, 0.1)' : 'transparent',
+                    '&:hover': { backgroundColor: 'rgba(0, 0, 255, 0.1)' },
+                    cursor: 'pointer',
                   }}
                 >
                   <ListItemText
@@ -499,22 +448,14 @@ const AdminUserService = () => {
                         <Typography variant="body1" component="span">
                           {`${user.firstName} ${user.lastName}`}
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          color="textSecondary"
-                          component="div"
-                        >
+                        <Typography variant="body2" color="textSecondary" component="div">
                           {user.email}
                         </Typography>
                       </>
                     }
                     secondary={
                       <>
-                        <Typography
-                          variant="caption"
-                          color="textSecondary"
-                          component="span"
-                        >
+                        <Typography variant="caption" color="textSecondary" component="span">
                           {user.accountType}
                         </Typography>
                       </>
@@ -563,7 +504,7 @@ const AdminUserService = () => {
             <Typography variant="h6">Update User</Typography>
             <Box display="flex" flexDirection="column" gap={2} mt={2}>
               <TextField
-                disabled={updateData.accountType === "Admin"}
+                disabled={updateData.accountType === 'Admin'}
                 label="First Name"
                 variant="outlined"
                 value={updateData.firstName}
@@ -576,7 +517,7 @@ const AdminUserService = () => {
                 fullWidth
               />
               <TextField
-                disabled={updateData.accountType === "Admin"}
+                disabled={updateData.accountType === 'Admin'}
                 label="Last Name"
                 variant="outlined"
                 value={updateData.lastName}
@@ -591,7 +532,7 @@ const AdminUserService = () => {
               <FormControl fullWidth variant="outlined">
                 <InputLabel>Account Type</InputLabel>
                 <Select
-                  disabled={updateData.accountType === "Admin"} // Disable if the accountType is Admin
+                  disabled={updateData.accountType === 'Admin'} // Disable if the accountType is Admin
                   label="Account Type"
                   value={updateData.accountType}
                   onChange={(e) =>
@@ -614,18 +555,14 @@ const AdminUserService = () => {
                 disabled // Disable to make it read-only
                 fullWidth
               />
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleUpdateUser}
-              >
+              <Button variant="contained" color="secondary" onClick={handleUpdateUser}>
                 Update User
               </Button>
               <Button
                 variant="outlined"
                 color="default"
                 onClick={() => setUserID(null)}
-                style={{ marginTop: "10px" }}
+                style={{ marginTop: '10px' }}
               >
                 Cancel
               </Button>
@@ -637,23 +574,15 @@ const AdminUserService = () => {
       <Button
         variant="outlined"
         color="primary"
-        onClick={() => router.push("/admin")} // Navigates to the admin page
-        sx={{ textTransform: "none", mt: 2 }}
+        onClick={() => router.push('/admin')} // Navigates to the admin page
+        sx={{ textTransform: 'none', mt: 2 }}
       >
         Back to Admin
       </Button>
 
       {result && (
-        <Snackbar
-          open={true}
-          autoHideDuration={6000}
-          onClose={() => setResult(null)}
-        >
-          <Alert
-            onClose={() => setResult(null)}
-            severity="success"
-            sx={{ width: "100%" }}
-          >
+        <Snackbar open={true} autoHideDuration={6000} onClose={() => setResult(null)}>
+          <Alert onClose={() => setResult(null)} severity="success" sx={{ width: '100%' }}>
             {result}
           </Alert>
         </Snackbar>
