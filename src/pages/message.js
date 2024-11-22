@@ -78,7 +78,7 @@ export default function Messages() {
         if (result.status === "fulfilled" && Array.isArray(result.value) && result.value.length > 0) {
           users.push(...result.value); // Only add users if the result is a non-empty array
         } else {
-          console.log(`No users found for account type ${["Admin", "Staff", "Parent"][index]}`);
+          console.error(`No users found for account type ${["Admin", "Staff", "Parent"][index]}`);
         }
       });
 
@@ -246,7 +246,6 @@ const fetchSentMessages = async (userID) => {
       }
       
       newMessage.sender = userDetails.userID;
-      console.log(newMessage);
 
       await createMessageInDynamoDB(newMessage);
       setSuccessMessage("Message sent successfully.");
