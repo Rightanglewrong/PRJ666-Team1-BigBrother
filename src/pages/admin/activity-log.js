@@ -24,7 +24,7 @@ import {
   Radio,
 } from "@mui/material";
 import CustomButton from "../../components/Button/CustomButton";
-import CustomInput from "../../components/Input/CustomInput";
+import CustomInput from "../../../Input/CustomInput";
 import styles from "./ActivityLogPage.module.css";
 import { useUser } from "@/components/authenticate";
 
