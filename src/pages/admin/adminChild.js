@@ -157,7 +157,9 @@ const AdminChild = () => {
     }
   };
   
-  
+  const handleHideSearchResults = () => {
+    setSearchResult(null);
+  };
 
   const handleDeleteClick = (childID) => {
     setDeleteChildID(childID);
@@ -343,6 +345,15 @@ const AdminChild = () => {
                   onChange={handlePageChange}
                   color="primary"
                 />
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleHideSearchResults}
+                >
+                  Clear Search Results
+                </Button>
               </Box>
             </>
           )}
