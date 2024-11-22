@@ -58,12 +58,29 @@ export default function Messages() {
   const [usersList, setUsersList] = useState([]);
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
   const [allMessages, setAllMessages] = useState([]);
+  const [filteredMessages, setFilteredMessages] = useState([]);
+  const [filterUserID, setFilterUserID] = useState(null);  
+  const [filterFirstName, setFilterFirstName] = useState(null);  
+  const [filterLastName, setFilterLastName] = useState(null);  
+
 
 
   useEffect(() => {
     fetchUsers();
     fetchMessages();
   }, []);
+
+  useEffect(() => {
+    if (filterUserID) {
+      const filtered = allMessages.filter((msg) => 
+        msg.sender === filterUserID || msg.receiver === filterUserID
+      );
+      setFilteredMessages(filtered);
+    } else {
+      setFilteredMessages(allMessages);  
+    }
+  }, [filterUserID, allMessages]);
+
 
   const fetchUsers = async () => {
     try {
@@ -77,7 +94,7 @@ export default function Messages() {
 
       results.forEach((result, index) => {
         if (result.status === "fulfilled" && Array.isArray(result.value) && result.value.length > 0) {
-          users.push(...result.value); // Only add users if the result is a non-empty array
+          users.push(...result.value); 
         } else {
         }
       });
@@ -129,10 +146,12 @@ export default function Messages() {
       messageType: "Outgoing",
 
     }));
-
+      const allMessagesList = [...receivedMessagesWithNames, ...sentMessagesWithNames]
       setIncomingMessages(receivedMessagesWithNames || []);
       setOutgoingMessages(sentMessagesWithNames || []);
-      setAllMessages([...receivedMessagesWithNames, ...sentMessagesWithNames]);
+      
+      setAllMessages(allMessagesList);
+      setFilteredMessages(allMessagesList);
       
     } catch (error) {
       setIncomingMessages([]); 
@@ -257,6 +276,13 @@ const fetchSentMessages = async (userID) => {
     setIsCreateFormVisible((prev) => !prev); // Toggle form visibility
   };
 
+  const handleNameClick = async (userID) => {
+    const user = await retrieveUserByIDInDynamoDB(userID);
+    setFilterUserID(userID); // Filter messages based on clicked user ID
+    setFilterFirstName(user.user.user.firstName);
+    setFilterLastName(user.user.user.lastName);
+  };
+
   return (
     <Container>
       <Typography variant="h3" gutterBottom>
@@ -273,26 +299,63 @@ const fetchSentMessages = async (userID) => {
       <Box sx={{ marginBottom: 2 }}>
       {selectedTab === 0 && (
         <MessageTable
-          messages={incomingMessages}
+        messages={filteredMessages.filter((msg) => msg.messageType === "Incoming")}
+
           type="incoming"
           handleOpenModal={handleOpenModal}
+          handleNameClick={handleNameClick}
+
         />
       )}
       {selectedTab === 1 && (
         <MessageTable
-          messages={outgoingMessages}
-          type="outgoing"
+        messages={filteredMessages.filter((msg) => msg.messageType === "Outgoing")}
+        type="outgoing"
           handleOpenModal={handleOpenModal}
+          handleNameClick={handleNameClick}
+
         />
       )}
        {selectedTab === 2 && ( // Render the All Messages tab
         <MessageTable
-          messages={allMessages}
+          messages={filteredMessages}
           type="all"
           handleOpenModal={handleOpenModal}
+          handleNameClick={handleNameClick}
+
         />
       )}
-      </Box>
+        {!filterUserID && ( 
+        <Typography variant="body1">
+            *Select a name to filter messages
+            </Typography>
+        )}
+        <Box sx={{ marginTop: 2}}>
+
+          {filterFirstName && filterLastName ? (
+            <Typography variant="body1">
+              Sort By User: {filterFirstName} {filterLastName}
+            </Typography>
+          ) : (
+            <Typography variant="body1"></Typography>
+          )}
+        </Box>
+
+        {filterUserID && (  
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => {
+            setFilterUserID(null); 
+            setFilterFirstName(null);
+            setFilterLastName(null); 
+          }}  
+          sx={{marginTop: 2 }}
+        >
+          Clear Filter
+        </Button>
+        )}
+    </Box>
       
 
        {isCreateFormVisible && (
@@ -394,7 +457,7 @@ const fetchSentMessages = async (userID) => {
   );
 }
 
-function MessageTable({ messages, type, handleOpenModal }) {
+function MessageTable({ messages, type, handleOpenModal, handleNameClick }) {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -420,10 +483,24 @@ function MessageTable({ messages, type, handleOpenModal }) {
             <TableRow key={message.messageID}>
               <TableCell>{message.title}</TableCell>
               {type !== "outgoing" && (
-                <TableCell>{message.senderName}</TableCell>
+                <TableCell>
+                <span
+                  onClick={() => handleNameClick(message.sender)} 
+                  style={{ cursor: 'pointer', color: 'blue' }}
+                >
+                  {message.senderName}
+                </span>
+              </TableCell>
               )}
               {type !== "incoming" && (
-                <TableCell>{message.receiverName}</TableCell>
+                <TableCell>
+                <span
+                  onClick={() => handleNameClick(message.receiver)} 
+                  style={{ cursor: 'pointer', color: 'blue' }}
+                >
+                  {message.receiverName}
+                </span>
+              </TableCell>
               )}
               {type === "all" && (
                 <TableCell>{message.messageType}</TableCell>
