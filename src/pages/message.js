@@ -78,14 +78,12 @@ export default function Messages() {
         if (result.status === "fulfilled" && Array.isArray(result.value) && result.value.length > 0) {
           users.push(...result.value); // Only add users if the result is a non-empty array
         } else {
-          console.error(`No users found for account type ${["Admin", "Staff", "Parent"][index]}`);
         }
       });
 
       const filteredUsers = users.filter((user) => user.userID !== userData.userID);
       setUsersList(filteredUsers);
     } catch (error) {
-      console.error("Error fetching users:", error);
       setErrorMessage("Failed to load users. Please try again.");
     }
   };
@@ -112,7 +110,6 @@ export default function Messages() {
           const user = await retrieveUserByIDInDynamoDB(userID);
           userDetailsMap.set(userID, `${user.user.user.firstName} ${user.user.user.lastName}`);
         } catch (error) {
-          console.error(`Failed to fetch user for userID: ${userID}`, error);
           userDetailsMap.set(userID, "Unknown User");
         }
       });
@@ -134,7 +131,6 @@ export default function Messages() {
 
       
     } catch (error) {
-      console.error("Error fetching messages:", error);
       setIncomingMessages([]); 
       setOutgoingMessages([]); 
       setErrorMessage("Failed to load messages. Please try again later.");
@@ -150,7 +146,6 @@ const fetchAdminUsers = async (locationID) => {
       return []; 
     }
   } catch (error) {
-    console.error("Error fetching Admin users:", error);
     return [];
   }
 };
@@ -164,7 +159,6 @@ const fetchStaffUsers = async (locationID) => {
       return []; 
     }
   } catch (error) {
-    console.error("Error fetching Staff users:", error);
     return []; 
   }
 };
@@ -178,7 +172,6 @@ const fetchParentUsers = async (locationID) => {
       return []; 
     }
   } catch (error) {
-    console.error("Error fetching Parent users:", error);
     return []; 
   }
 };
@@ -188,7 +181,6 @@ const fetchReceivedMessages = async (userID) => {
     const receivedMessages = await retrieveMessageByReceiverID(userID || []);
     return receivedMessages; 
   } catch (error) {
-    console.error("Error fetching received messages:", error);
     return []; 
   }
 };
@@ -198,7 +190,6 @@ const fetchSentMessages = async (userID) => {
     const sentMessages = await retrieveMessageBySenderID(userID || []);
     return sentMessages; 
   } catch (error) {
-    console.error("Error fetching sent messages:", error);
     return []; 
   }
 };
@@ -230,7 +221,6 @@ const fetchSentMessages = async (userID) => {
         setSuccessMessage("Message deleted successfully.");
         fetchMessages();
       } catch (error) {
-        console.error("Error deleting message:", error);
         setErrorMessage("Failed to delete the message. Please try again.");
       } finally {
         handleCloseModal();
@@ -254,7 +244,6 @@ const fetchSentMessages = async (userID) => {
       fetchMessages();
 
     } catch (error) {
-      console.error("Error creating message:", error);
       setErrorMessage("Failed to send the message. Please try again.");
     }
   };
