@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@/components/authenticate";
-import Link from "next/link";
-import CustomCard from "../../components/Card/CustomCard";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/components/authenticate';
+import Link from 'next/link';
+import CustomCard from '../../components/Card/CustomCard';
 import {
   Button,
   Typography,
@@ -15,12 +15,14 @@ import {
   List,
   ListItem,
   ListItemText,
-} from "@mui/material";
+  Box,
+} from '@mui/material';
 import {
   getUsersByAccountTypeAndLocation,
   approveUser,
-} from "../../utils/userAPI";
-import styles from "../HomePage.module.css";
+  deleteUserInDynamoDB,
+} from '../../utils/userAPI';
+import styles from '../HomePage.module.css';
 
 const AdminPage = () => {
   const user = useUser();
@@ -33,40 +35,47 @@ const AdminPage = () => {
   useEffect(() => {
     const fetchPendingUsers = async () => {
       try {
-        const response = await getUsersByAccountTypeAndLocation(
-          "Staff",
-          user.locationID
+        const accountTypes = ['Staff', 'Admin']; // Include both Staff and Admin
+        const promises = accountTypes.map((type) =>
+          getUsersByAccountTypeAndLocation(type, user.locationID)
         );
-        if (response?.users) {
-          const pending = response.users.filter(
-            (u) => u.accStatus === "PENDING"
-          );
-          setPendingUsers(pending);
-          if (pending.length > 0) {
-            setIsModalOpen(true); // Open modal if there are pending users
-          }
+
+        const responses = await Promise.all(promises);
+
+        // Consolidate users from all responses
+        const allUsers = responses.flatMap((response) => (response?.users ? response.users : []));
+
+        // Filter users with PENDING status
+        const pending = allUsers.filter((u) => u.accStatus === 'PENDING');
+
+        setPendingUsers(pending);
+
+        // Open modal if there are pending users
+        if (pending.length > 0) {
+          setIsModalOpen(true);
         }
       } catch (error) {
-        console.log(error.message)
-        if (error.message == `Error fetching users: {"message":"Invalid or expired token"}`) {
-          localStorage.removeItem("token");
-          router.push("/login");
+        console.error('Error fetching pending users:', error);
+
+        // Handle invalid or expired token
+        if (error.message === `Error fetching users: {"message":"Invalid or expired token"}`) {
+          localStorage.removeItem('token');
+          router.push('/login');
         }
-        console.error("Error fetching pending users:", error);
       }
     };
 
-    if (user && user.accountType === "Admin") {
+    if (user && user.accountType === 'Admin') {
       fetchPendingUsers();
     }
   }, [user, router]);
 
   useEffect(() => {
     if (!user) {
-      localStorage.removeItem("token");
-      router.push("/login");
-    } else if (user.accountType !== "Admin") {
-      router.push("/");
+      localStorage.removeItem('token');
+      router.push('/login');
+    } else if (user.accountType !== 'Admin') {
+      router.push('/');
     }
   }, [user, router]);
 
@@ -75,13 +84,22 @@ const AdminPage = () => {
       await approveUser(userID);
       setPendingUsers((prev) => prev.filter((u) => u.userID !== userID));
     } catch (error) {
-      console.error("Error approving user:", error);
+      console.error('Error approving user:', error);
+    }
+  };
+
+  const handleDenyUser = async (userID) => {
+    try {
+      await deleteUserInDynamoDB(userID);
+      setPendingUsers((prev) => prev.filter((u) => u.userID !== userID));
+    } catch (error) {
+      console.error('Error denying user:', error);
     }
   };
 
   const handleCloseModal = () => setIsModalOpen(false);
 
-  if (!user || user.accountType !== "Admin") {
+  if (!user || user.accountType !== 'Admin') {
     return (
       <Typography variant="h5" className={styles.error}>
         Unauthorized Access
@@ -92,15 +110,22 @@ const AdminPage = () => {
   return (
     <div className={styles.homeContainer}>
       <div className={styles.floatingCard}>
+        {/* Button to trigger the Pending Users Modal */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => setIsModalOpen(true)}
+            disabled={pendingUsers.length === 0}
+            sx={{ mt: 2 }}
+          >
+            {`Show Pending Users ${pendingUsers.length > 0 ? `(${pendingUsers.length})` : ''}`}
+          </Button>
+        </Box>
         <h1 className={styles.title}>Admin Dashboard</h1>
 
         {/* Pending Users Modal */}
-        <Dialog
-          open={isModalOpen}
-          onClose={handleCloseModal}
-          maxWidth="sm"
-          fullWidth
-        >
+        <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="sm" fullWidth>
           <DialogTitle>Pending Users</DialogTitle>
           <DialogContent>
             {pendingUsers.length > 0 ? (
@@ -108,16 +133,36 @@ const AdminPage = () => {
                 {pendingUsers.map((user) => (
                   <ListItem key={user.userID} divider>
                     <ListItemText
-                      primary={`${user.firstName} ${user.lastName}`}
-                      secondary={`Email: ${user.email}`}
+                      primary={
+                        <>
+                          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                            User Role: {user.accountType}
+                          </Typography>
+                          <Typography variant="body1">
+                            Name: {user.firstName} {user.lastName}
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            Email: {user.email}
+                          </Typography>
+                        </>
+                      }
                     />
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleApproveUser(user.userID)}
-                    >
-                      Approve
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleApproveUser(user.userID)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleDenyUser(user.userID)}
+                      >
+                        Deny
+                      </Button>
+                    </Box>
                   </ListItem>
                 ))}
               </List>
