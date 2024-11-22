@@ -237,7 +237,7 @@ const AdminPage = () => {
             title="Children"
             content="View and manage children profiles."
             actions={
-              <Link href="/admin/children">
+              <Link href="/admin/adminChild">
                 <Button size="small" color="primary">
                   Go to Children
                 </Button>
