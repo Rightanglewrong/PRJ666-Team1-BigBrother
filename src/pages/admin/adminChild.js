@@ -29,6 +29,7 @@ import {
   retrieveChildrenByLocationID,
   updateChildProfileInDynamoDB,
   deleteChildProfileFromDynamoDB,
+  createChildProfileInDynamoDB,
 } from "../../utils/childAPI"; // Adjust the path if necessary
 
 const AdminChild = () => {
@@ -39,10 +40,12 @@ const AdminChild = () => {
   const [expandedCard, setExpandedCard] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
+  const [createData, setCreateData] = useState({});
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteChildID, setDeleteChildID] = useState(null);
   const [deleteInput, setDeleteInput] = useState("");
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [showCreateForm, setShowCreateForm]= useState(false);
   const resultsPerPage = 3;
 
   const handleSearchOptionChange = (event) => {
@@ -89,6 +92,14 @@ const AdminChild = () => {
     setIsEditing(false);
   };
 
+  const handleCreateButtonClick = () => {
+    setShowCreateForm(true); // Toggle the visibility of the create form
+  };
+
+  const handleCancelCreateButtonClick = () => {
+    setShowCreateForm(false); // Toggle the visibility of the create form
+  };
+
   const handleEditClick = (item) => {
     setEditData({
       childID: item.childID,
@@ -105,6 +116,27 @@ const AdminChild = () => {
   const handleInputChange = (field, value) => {
     setEditData((prev) => ({ ...prev, [field]: value }));
   };
+
+  const handleCreateInputChange = (field, value) => {
+    setCreateData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreate = async () => {
+    try{ 
+      await createChildProfileInDynamoDB(createData);
+      setSnackbar({ open: true, message: "Child created successfully!", severity: "success" });
+      setCreateData({}); 
+      handleSearch();
+      setShowCreateForm(false);
+
+    }catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Error creating profile. Please check all fields.",
+        severity: "error",
+      });
+    }
+  }
 
   const handleSave = async (childID) => {
     try {
@@ -162,6 +194,8 @@ const AdminChild = () => {
     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
       <Typography variant="h4" component="h1">Search for Child Profile</Typography>
 
+      
+
       <FormControl sx={{ width: "50%" }}>
         <InputLabel>Search By</InputLabel>
         <Select value={searchOption} onChange={handleSearchOptionChange}>
@@ -183,6 +217,14 @@ const AdminChild = () => {
       <Button variant="contained" color="primary" onClick={handleSearch} disabled={!searchTerm}>
         Search
       </Button>
+
+      {!showCreateForm && (
+      <Button variant="contained" color="primary" onClick={handleCreateButtonClick}>
+        Create Child Profile
+      </Button>
+      )}
+
+      
 
       {searchResult && (
         <Box sx={{ mt: 4, width: "50%" }}>
@@ -307,6 +349,73 @@ const AdminChild = () => {
         </Box>
       )}
 
+{showCreateForm && (
+        <Box sx={{ width: "50%", mt: 3 }}>
+          <Typography variant="h5">Create New Child Profile</Typography>
+          <TextField
+            label="First Name"
+            value={createData.firstName || ""}
+            onChange={(e) => handleCreateInputChange("firstName", e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Last Name"
+            value={createData.lastName || ""}
+            onChange={(e) => handleCreateInputChange("lastName", e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Class ID"
+            value={createData.classID || ""}
+            onChange={(e) => handleCreateInputChange("classID", e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Location ID"
+            value={createData.locationID || ""}
+            onChange={(e) => handleCreateInputChange("locationID", e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Birth Date"
+            value={createData.birthDate || ""}
+            onChange={(e) => handleCreateInputChange("birthDate", e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Age"
+            value={createData.age || ""}
+            onChange={(e) => handleCreateInputChange("age", e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+      {showCreateForm && (
+        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2, marginBottom : 4 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCancelCreateButtonClick}
+          >
+            Cancel Creation
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handleCreate}
+          >
+            Confirm Create
+          </Button>
+        </Box>
+      )}
+
+      </Box>
+     )}
+
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
           {snackbar.message}
@@ -339,18 +448,6 @@ const AdminChild = () => {
     </Box>
   );
 };
-const handleSave = async (childID) => {
-  try {
-    const updatedData = { ...editData };
-    delete updatedData.childID; // Ensure childID is not sent to the API if unnecessary
 
-    await updateChildProfileInDynamoDB(childID, updatedData);
-    setSnackbar({ open: true, message: "Profile updated successfully!", severity: "success" }); // Success notification
-    setIsEditing(false); // Exit edit mode
-    handleSearch(); // Refresh the search results
-  } catch (error) {
-    setSnackbar({ open: true, message: `Error updating profile: ${error.message}`, severity: "error" }); // Error notification
-  }
-};
 
 export default AdminChild;
