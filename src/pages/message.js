@@ -57,6 +57,7 @@ export default function Messages() {
 
   const [usersList, setUsersList] = useState([]);
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
+  const [allMessages, setAllMessages] = useState([]);
 
 
   useEffect(() => {
@@ -119,20 +120,24 @@ export default function Messages() {
     const receivedMessagesWithNames = receivedMessages.map((msg) => ({
       ...msg,
       senderName: userDetailsMap.get(msg.sender) || "Unknown User",
+      messageType: "Incoming",
     }));
 
     const sentMessagesWithNames = sentMessages.map((msg) => ({
       ...msg,
       receiverName: userDetailsMap.get(msg.receiver) || "Unknown User",
+      messageType: "Outgoing",
+
     }));
 
       setIncomingMessages(receivedMessagesWithNames || []);
       setOutgoingMessages(sentMessagesWithNames || []);
-
+      setAllMessages([...receivedMessagesWithNames, ...sentMessagesWithNames]);
       
     } catch (error) {
       setIncomingMessages([]); 
       setOutgoingMessages([]); 
+      setAllMessages([]);
       setErrorMessage("Failed to load messages. Please try again later.");
     }
   };
@@ -262,6 +267,7 @@ const fetchSentMessages = async (userID) => {
         <Tabs value={selectedTab} onChange={handleTabChange}>
           <Tab label="Incoming Messages" />
           <Tab label="Outgoing Messages" />
+          <Tab label="All Messages" />
         </Tabs>
       </Box>
       <Box sx={{ marginBottom: 2 }}>
@@ -276,6 +282,13 @@ const fetchSentMessages = async (userID) => {
         <MessageTable
           messages={outgoingMessages}
           type="outgoing"
+          handleOpenModal={handleOpenModal}
+        />
+      )}
+       {selectedTab === 2 && ( // Render the All Messages tab
+        <MessageTable
+          messages={allMessages}
+          type="all"
           handleOpenModal={handleOpenModal}
         />
       )}
@@ -390,6 +403,14 @@ function MessageTable({ messages, type, handleOpenModal }) {
             <TableCell><strong>Subject</strong></TableCell>
             {type === "incoming" && <TableCell><strong>From</strong></TableCell>}
             {type === "outgoing" && <TableCell><strong>To</strong></TableCell>}
+            {type === "all" && (
+              <>
+                <TableCell><strong>From</strong></TableCell>
+                <TableCell><strong>To</strong></TableCell>
+                <TableCell><strong>Type</strong></TableCell>
+              </>
+            )}
+            
             <TableCell><strong>Content</strong></TableCell>
             <TableCell><strong>Date</strong></TableCell>
           </TableRow>
@@ -398,10 +419,14 @@ function MessageTable({ messages, type, handleOpenModal }) {
           {messages.map((message) => (
             <TableRow key={message.messageID}>
               <TableCell>{message.title}</TableCell>
-              {type === "incoming" ? (
+              {type !== "outgoing" && (
                 <TableCell>{message.senderName}</TableCell>
-              ) : (
+              )}
+              {type !== "incoming" && (
                 <TableCell>{message.receiverName}</TableCell>
+              )}
+              {type === "all" && (
+                <TableCell>{message.messageType}</TableCell>
               )}
               <TableCell>{message.content}</TableCell>
               <TableCell>{message.datePosted}</TableCell>
