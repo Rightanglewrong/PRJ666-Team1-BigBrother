@@ -25,7 +25,7 @@ import ConfirmationModal from '@/components/Modal/ConfirmationModal';
 import ErrorModal from '@/components/Modal/ErrorModal';
 import UserList from '@/components/List/UserList';
 import ContactManagementModal from '@/components/Modal/ContactManagementModal';
-import UpdateUserForm from '@/components/Input/UpdateUserForm';
+import UpdateUserForm from '../../../Input/UpdateUserForm';
 
 const AdminUserService = () => {
   const router = useRouter();
