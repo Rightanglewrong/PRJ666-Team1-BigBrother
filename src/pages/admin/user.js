@@ -100,12 +100,24 @@ const AdminUserService = () => {
 
   // Delete User op
   const handleDeleteUser = async (user) => {
-    if (updateData.accountType === 'Admin') {
-      showError('Cannot delete an Admin user.');
-      return;
+    try {
+      // Fetch user details to ensure we have the latest accountType
+      const fetchedUser = usersList.find((u) => u.userID === user.userID) || user;
+
+      // Check if the user is an Admin
+      if (fetchedUser.accountType === 'Admin') {
+        showError('Cannot delete an Admin user.');
+        setIsDeleting(false);
+        return;
+      }
+
+      // Proceed with setting the user for deletion and showing the confirmation modal
+      setUserToDelete(fetchedUser);
+      setDeleteConfirmationModal(true);
+    } catch (error) {
+      showError('Error validating user details for deletion.');
+      console.error('Error in handleDeleteUser:', error);
     }
-    setUserToDelete(user);
-    setDeleteConfirmationModal(true);
   };
 
   const handleConfirmDelete = async () => {
