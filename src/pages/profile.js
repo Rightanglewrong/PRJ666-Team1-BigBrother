@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@/components/authenticate';
-import { updateUserProfile } from '../utils/api';
+import { updateUserProfile, getCurrentUser } from '../utils/api';
 import { addContact, fetchContacts, updateContact, deleteContact } from '@/utils/contactApi';
 import { withAuth } from '@/hoc/withAuth';
 import {
@@ -79,12 +79,41 @@ const ProfilePage = () => {
   // Update profile handler
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
-    const updatedData = { firstName, lastName, locationID, accountType };
+    // Only include fields that have been changed
+    const updatedData = {};
+    if (firstName !== user.firstName) updatedData.firstName = firstName;
+    if (lastName !== user.lastName) updatedData.lastName = lastName;
+    if (locationID !== user.locationID) updatedData.locationID = locationID;
+    if (accountType !== user.accountType) updatedData.accountType = accountType;
+
+    // Check if there are any updates
+    if (Object.keys(updatedData).length === 0) {
+      setError('No changes to update');
+      return;
+    }
     try {
-      await updateUserProfile(updatedData);
+      const response = await updateUserProfile(updatedData);
+      const token = response.token;
+
+      if (token) {
+        // Update the token in localStorage
+        localStorage.setItem('token', token);
+      }
+
+      // Check the updated user profile for accStatus
+      const updatedUser = await getCurrentUser(); 
+      if (updatedUser.accStatus === 'PENDING') {
+        setError('Your account is now pending reapproval. You will be logged out.');
+        localStorage.removeItem('token');
+        setTimeout(() => {
+          window.location.href = '/login'; 
+        }, 3000); // Provide time for the user to read the message
+        return;
+      }
+
       setSuccess('Profile updated successfully');
     } catch (err) {
-      setError('Failed to update profile');
+      setError(`Failed to update profile: ${err}`);
     }
   };
 
@@ -224,6 +253,13 @@ const ProfilePage = () => {
                 <MenuItem value="Admin">Admin</MenuItem>
               </Select>
             </FormControl>
+            <TextField
+              label="Account Status"
+              value={user?.accStatus || console.log(user)}
+              fullWidth
+              disabled
+              margin="normal"
+            />
             <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
               Update Info
             </Button>

@@ -39,6 +39,7 @@ export default function Authenticate({ children }) {
               firstName: decodedToken.firstName,
               lastName: decodedToken.lastName,
               email: decodedToken.email,
+              accStatus: decodedToken.accStatus
             });
             setLoading(false); // Token is valid with a correct account type
           } else {
