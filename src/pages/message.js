@@ -57,12 +57,30 @@ export default function Messages() {
 
   const [usersList, setUsersList] = useState([]);
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
+  const [allMessages, setAllMessages] = useState([]);
+  const [filteredMessages, setFilteredMessages] = useState([]);
+  const [filterUserID, setFilterUserID] = useState(null);  
+  const [filterFirstName, setFilterFirstName] = useState(null);  
+  const [filterLastName, setFilterLastName] = useState(null);  
+
 
 
   useEffect(() => {
     fetchUsers();
     fetchMessages();
   }, []);
+
+  useEffect(() => {
+    if (filterUserID) {
+      const filtered = allMessages.filter((msg) => 
+        msg.sender === filterUserID || msg.receiver === filterUserID
+      );
+      setFilteredMessages(filtered);
+    } else {
+      setFilteredMessages(allMessages);  
+    }
+  }, [filterUserID, allMessages]);
+
 
   const fetchUsers = async () => {
     try {
@@ -76,16 +94,14 @@ export default function Messages() {
 
       results.forEach((result, index) => {
         if (result.status === "fulfilled" && Array.isArray(result.value) && result.value.length > 0) {
-          users.push(...result.value); // Only add users if the result is a non-empty array
+          users.push(...result.value); 
         } else {
-          console.log(`No users found for account type ${["Admin", "Staff", "Parent"][index]}`);
         }
       });
 
       const filteredUsers = users.filter((user) => user.userID !== userData.userID);
       setUsersList(filteredUsers);
     } catch (error) {
-      console.error("Error fetching users:", error);
       setErrorMessage("Failed to load users. Please try again.");
     }
   };
@@ -112,7 +128,6 @@ export default function Messages() {
           const user = await retrieveUserByIDInDynamoDB(userID);
           userDetailsMap.set(userID, `${user.user.user.firstName} ${user.user.user.lastName}`);
         } catch (error) {
-          console.error(`Failed to fetch user for userID: ${userID}`, error);
           userDetailsMap.set(userID, "Unknown User");
         }
       });
@@ -122,21 +137,26 @@ export default function Messages() {
     const receivedMessagesWithNames = receivedMessages.map((msg) => ({
       ...msg,
       senderName: userDetailsMap.get(msg.sender) || "Unknown User",
+      messageType: "Incoming",
     }));
 
     const sentMessagesWithNames = sentMessages.map((msg) => ({
       ...msg,
       receiverName: userDetailsMap.get(msg.receiver) || "Unknown User",
-    }));
+      messageType: "Outgoing",
 
+    }));
+      const allMessagesList = [...receivedMessagesWithNames, ...sentMessagesWithNames]
       setIncomingMessages(receivedMessagesWithNames || []);
       setOutgoingMessages(sentMessagesWithNames || []);
-
+      
+      setAllMessages(allMessagesList);
+      setFilteredMessages(allMessagesList);
       
     } catch (error) {
-      console.error("Error fetching messages:", error);
       setIncomingMessages([]); 
       setOutgoingMessages([]); 
+      setAllMessages([]);
       setErrorMessage("Failed to load messages. Please try again later.");
     }
   };
@@ -150,7 +170,6 @@ const fetchAdminUsers = async (locationID) => {
       return []; 
     }
   } catch (error) {
-    console.error("Error fetching Admin users:", error);
     return [];
   }
 };
@@ -164,7 +183,6 @@ const fetchStaffUsers = async (locationID) => {
       return []; 
     }
   } catch (error) {
-    console.error("Error fetching Staff users:", error);
     return []; 
   }
 };
@@ -178,7 +196,6 @@ const fetchParentUsers = async (locationID) => {
       return []; 
     }
   } catch (error) {
-    console.error("Error fetching Parent users:", error);
     return []; 
   }
 };
@@ -188,7 +205,6 @@ const fetchReceivedMessages = async (userID) => {
     const receivedMessages = await retrieveMessageByReceiverID(userID || []);
     return receivedMessages; 
   } catch (error) {
-    console.error("Error fetching received messages:", error);
     return []; 
   }
 };
@@ -198,7 +214,6 @@ const fetchSentMessages = async (userID) => {
     const sentMessages = await retrieveMessageBySenderID(userID || []);
     return sentMessages; 
   } catch (error) {
-    console.error("Error fetching sent messages:", error);
     return []; 
   }
 };
@@ -230,7 +245,6 @@ const fetchSentMessages = async (userID) => {
         setSuccessMessage("Message deleted successfully.");
         fetchMessages();
       } catch (error) {
-        console.error("Error deleting message:", error);
         setErrorMessage("Failed to delete the message. Please try again.");
       } finally {
         handleCloseModal();
@@ -246,7 +260,6 @@ const fetchSentMessages = async (userID) => {
       }
       
       newMessage.sender = userDetails.userID;
-      console.log(newMessage);
 
       await createMessageInDynamoDB(newMessage);
       setSuccessMessage("Message sent successfully.");
@@ -255,13 +268,19 @@ const fetchSentMessages = async (userID) => {
       fetchMessages();
 
     } catch (error) {
-      console.error("Error creating message:", error);
       setErrorMessage("Failed to send the message. Please try again.");
     }
   };
 
   const toggleCreateForm = () => {
     setIsCreateFormVisible((prev) => !prev); // Toggle form visibility
+  };
+
+  const handleNameClick = async (userID) => {
+    const user = await retrieveUserByIDInDynamoDB(userID);
+    setFilterUserID(userID); // Filter messages based on clicked user ID
+    setFilterFirstName(user.user.user.firstName);
+    setFilterLastName(user.user.user.lastName);
   };
 
   return (
@@ -274,24 +293,69 @@ const fetchSentMessages = async (userID) => {
         <Tabs value={selectedTab} onChange={handleTabChange}>
           <Tab label="Incoming Messages" />
           <Tab label="Outgoing Messages" />
+          <Tab label="All Messages" />
         </Tabs>
       </Box>
       <Box sx={{ marginBottom: 2 }}>
       {selectedTab === 0 && (
         <MessageTable
-          messages={incomingMessages}
+        messages={filteredMessages.filter((msg) => msg.messageType === "Incoming")}
+
           type="incoming"
           handleOpenModal={handleOpenModal}
+          handleNameClick={handleNameClick}
+
         />
       )}
       {selectedTab === 1 && (
         <MessageTable
-          messages={outgoingMessages}
-          type="outgoing"
+        messages={filteredMessages.filter((msg) => msg.messageType === "Outgoing")}
+        type="outgoing"
           handleOpenModal={handleOpenModal}
+          handleNameClick={handleNameClick}
+
         />
       )}
-      </Box>
+       {selectedTab === 2 && ( // Render the All Messages tab
+        <MessageTable
+          messages={filteredMessages}
+          type="all"
+          handleOpenModal={handleOpenModal}
+          handleNameClick={handleNameClick}
+
+        />
+      )}
+        {!filterUserID && ( 
+        <Typography variant="body1">
+            *Select a name to filter messages
+            </Typography>
+        )}
+        <Box sx={{ marginTop: 2}}>
+
+          {filterFirstName && filterLastName ? (
+            <Typography variant="body1">
+              Sort By User: {filterFirstName} {filterLastName}
+            </Typography>
+          ) : (
+            <Typography variant="body1"></Typography>
+          )}
+        </Box>
+
+        {filterUserID && (  
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => {
+            setFilterUserID(null); 
+            setFilterFirstName(null);
+            setFilterLastName(null); 
+          }}  
+          sx={{marginTop: 2 }}
+        >
+          Clear Filter
+        </Button>
+        )}
+    </Box>
       
 
        {isCreateFormVisible && (
@@ -393,7 +457,7 @@ const fetchSentMessages = async (userID) => {
   );
 }
 
-function MessageTable({ messages, type, handleOpenModal }) {
+function MessageTable({ messages, type, handleOpenModal, handleNameClick }) {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -402,6 +466,14 @@ function MessageTable({ messages, type, handleOpenModal }) {
             <TableCell><strong>Subject</strong></TableCell>
             {type === "incoming" && <TableCell><strong>From</strong></TableCell>}
             {type === "outgoing" && <TableCell><strong>To</strong></TableCell>}
+            {type === "all" && (
+              <>
+                <TableCell><strong>From</strong></TableCell>
+                <TableCell><strong>To</strong></TableCell>
+                <TableCell><strong>Type</strong></TableCell>
+              </>
+            )}
+            
             <TableCell><strong>Content</strong></TableCell>
             <TableCell><strong>Date</strong></TableCell>
           </TableRow>
@@ -410,10 +482,28 @@ function MessageTable({ messages, type, handleOpenModal }) {
           {messages.map((message) => (
             <TableRow key={message.messageID}>
               <TableCell>{message.title}</TableCell>
-              {type === "incoming" ? (
-                <TableCell>{message.senderName}</TableCell>
-              ) : (
-                <TableCell>{message.receiverName}</TableCell>
+              {type !== "outgoing" && (
+                <TableCell>
+                <span
+                  onClick={() => handleNameClick(message.sender)} 
+                  style={{ cursor: 'pointer', color: 'blue' }}
+                >
+                  {message.senderName}
+                </span>
+              </TableCell>
+              )}
+              {type !== "incoming" && (
+                <TableCell>
+                <span
+                  onClick={() => handleNameClick(message.receiver)} 
+                  style={{ cursor: 'pointer', color: 'blue' }}
+                >
+                  {message.receiverName}
+                </span>
+              </TableCell>
+              )}
+              {type === "all" && (
+                <TableCell>{message.messageType}</TableCell>
               )}
               <TableCell>{message.content}</TableCell>
               <TableCell>{message.datePosted}</TableCell>
