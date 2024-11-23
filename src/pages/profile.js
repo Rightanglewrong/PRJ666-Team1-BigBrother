@@ -91,6 +91,7 @@ const ProfilePage = () => {
       setError('No changes to update');
       return;
     }
+    
     try {
       const response = await updateUserProfile(updatedData);
       const token = response.token;
