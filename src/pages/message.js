@@ -68,7 +68,7 @@ export default function Messages() {
   useEffect(() => {
     fetchUsers();
     fetchMessages();
-  }, []);
+  }, [fetchMessages, fetchUsers]);
 
   useEffect(() => {
     if (filterUserID) {
@@ -82,7 +82,7 @@ export default function Messages() {
   }, [filterUserID, allMessages]);
 
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallBack(async () => {
     try {
       const userData = await getCurrentUser();
       const users = [];
@@ -104,8 +104,9 @@ export default function Messages() {
     } catch (error) {
       setErrorMessage("Failed to load users. Please try again.");
     }
-  };
-  const fetchMessages = async () => {
+  }, []);
+
+  const fetchMessages = useCallback(async () => {
     try {
       const userData = await getCurrentUser();
       setUserDetails(userData);
@@ -159,7 +160,7 @@ export default function Messages() {
       setAllMessages([]);
       setErrorMessage("Failed to load messages. Please try again later.");
     }
-  };
+  }, []);
 
 const fetchAdminUsers = async (locationID) => {
   try {
