@@ -41,7 +41,7 @@ export default function ViewProgressReportsPage() {
 
     
         
-    const fetchReportsByChildID = useCallBack(async () => { 
+    const fetchReportsByChildID = async () => { 
       if (childID) {
         try{
             const childReportData = await retrieveProgressReportByChildID(childID);
@@ -50,11 +50,11 @@ export default function ViewProgressReportsPage() {
             setMessage(`Error fetching child reports: ${error.message}`);
         }
       };        
-    }, [childID]);
+    };
 
     useEffect(() => {
       fetchReportsByChildID();
-    }, [fetchReportsByChildID, childID]);
+    }, [childID]);
        
 
     const parseReportContent = (content) => {

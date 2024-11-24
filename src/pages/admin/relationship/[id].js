@@ -45,7 +45,7 @@ export default function Relationships() {
             fetchEntityName();
             fetchRelationships();
         }
-    }, [fetchEntityName, fetchRelationships, id, type]);
+    }, [id, type]);
 
     useEffect(() => {
         const fetchProfilesData = async () => {
@@ -67,7 +67,7 @@ export default function Relationships() {
         fetchProfilesData();
     }, [user]);
 
-    const fetchEntityName = useCallback(async () => {
+    const fetchEntityName = async () => {
         try {
             if (type === "parent") {
                 const parent = await retrieveUserByIDInDynamoDB(id);
@@ -79,9 +79,9 @@ export default function Relationships() {
         } catch (error) {
             console.error("Error loading entity name:", error); 
         }
-    },[id, type]);
+    };
 
-    const fetchRelationships = useCallback(async () => {
+    const fetchRelationships = async () => {
         try {
             let data = [];
             if (type === "parent") {
@@ -116,7 +116,7 @@ export default function Relationships() {
         } catch (error) {
             console.error("Error loading relationships. Please try again.");
         }
-    }, [id, type]);
+    };
 
     const handleDeleteClick = (relationshipID) => {
         setDeleteRelation(relationshipID);
