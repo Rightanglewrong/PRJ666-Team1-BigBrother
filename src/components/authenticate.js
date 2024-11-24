@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import jwt from "jsonwebtoken";
 
 export const UserContext = createContext(null);
-const publicPaths = ["/login", "/register", "/"];
+const publicPaths = ["/login", "/register", "/", "/forgot-password"];
 
 export function useUser() {
   return useContext(UserContext);
