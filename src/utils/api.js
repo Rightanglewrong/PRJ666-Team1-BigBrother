@@ -201,7 +201,7 @@ export const deleteFileFromS3 = async (fileKey) => {
 
 export async function forgotPassword(email) {
   const response = await fetch(`${BACKEND_URL}auth/forgot-password`, {
-    method: "PUT",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
