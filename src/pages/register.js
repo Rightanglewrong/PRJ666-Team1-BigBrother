@@ -197,7 +197,7 @@ export default function RegisterPage() {
             label="Location ID"
             type="text"
             value={locationID}
-            onChange={(e) => setLocationID(e.target.value)}
+            onChange={(e) => setLocationID(e.target.value.toUpperCase())}
             fullWidth
             required
           />

@@ -197,3 +197,23 @@ export const deleteFileFromS3 = async (fileKey) => {
   const data = await res.json();
   return data;
 };
+
+
+export async function forgotPassword(email) {
+  const response = await fetch(`${BACKEND_URL}auth/forgot-password`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }), // Include the email in the request body
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to send password reset email.");
+  }
+
+  const data = await response.json();
+  return data;
+}
+
