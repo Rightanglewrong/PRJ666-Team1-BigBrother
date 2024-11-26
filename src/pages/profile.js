@@ -8,19 +8,17 @@ import {
   Container,
   Typography,
   TextField,
-  Select,
-  MenuItem,
   Button,
   Snackbar,
   Alert,
-  FormControl,
-  InputLabel,
-  Grid,
+  Stack,
   Card,
   CardContent,
   CardActions,
 } from '@mui/material';
 import { styled } from '@mui/system';
+import ProfileEditor from '@/components/Form/ProfileEditor';
+import ContactList from '@/components/List/ContactList';
 
 const AddContactButton = styled(Button)({
   backgroundColor: '#4CAF50',
@@ -77,44 +75,26 @@ const ProfilePage = () => {
   }, [user]);
 
   // Update profile handler
-  const handleUpdateProfile = async (e) => {
-    e.preventDefault();
-    // Only include fields that have been changed
-    const updatedData = {};
-    if (firstName !== user.firstName) updatedData.firstName = firstName;
-    if (lastName !== user.lastName) updatedData.lastName = lastName;
-    if (locationID !== user.locationID) updatedData.locationID = locationID;
-    if (accountType !== user.accountType) updatedData.accountType = accountType;
-
-    // Check if there are any updates
-    if (Object.keys(updatedData).length === 0) {
-      setError('No changes to update');
-      return;
-    }
-    
+  const handleUpdateProfile = async (updatedData) => {
     try {
       const response = await updateUserProfile(updatedData);
-      const token = response.token;
 
-      if (token) {
-        // Update the token in localStorage
-        localStorage.setItem('token', token);
+      if (response.token) {
+        localStorage.setItem('token', response.token);
       }
 
-      // Check the updated user profile for accStatus
-      const updatedUser = await getCurrentUser(); 
+      const updatedUser = await getCurrentUser();
+
       if (updatedUser.accStatus === 'PENDING') {
         setError('Your account is now pending reapproval. You will be logged out.');
         localStorage.removeItem('token');
-        setTimeout(() => {
-          window.location.href = '/login'; 
-        }, 3000); // Provide time for the user to read the message
+        setTimeout(() => (window.location.href = '/login'), 3000);
         return;
       }
 
       setSuccess('Profile updated successfully');
     } catch (err) {
-      setError(`Failed to update profile: ${err}`);
+      setError(`Failed to update profile: ${err.message}`);
     }
   };
 
@@ -182,23 +162,6 @@ const ProfilePage = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      {/* Profile and Contacts Titles */}
-      <Grid container spacing={4} alignItems="center">
-        {/* Left Column: Profile Title */}
-        <Grid item xs={12} md={6}>
-          <Typography variant="h4" gutterBottom align="center" sx={titleStyle}>
-            Profile
-          </Typography>
-        </Grid>
-
-        {/* Right Column: Contacts Title */}
-        <Grid item xs={12} md={6}>
-          <Typography variant="h4" gutterBottom align="center" sx={titleStyle}>
-            Contacts
-          </Typography>
-        </Grid>
-      </Grid>
-
       {/* Notifications */}
       <Snackbar open={Boolean(success)} autoHideDuration={6000} onClose={() => setSuccess('')}>
         <Alert onClose={() => setSuccess('')} severity="success" variant="filled">
@@ -211,177 +174,42 @@ const ProfilePage = () => {
         </Alert>
       </Snackbar>
 
-      <Grid container spacing={4}>
-        {/* Left Column: Profile Form */}
-        <Grid item xs={12} md={6}>
-          <Box component="form" onSubmit={handleUpdateProfile} sx={{ mt: 2 }}>
-            <TextField
-              label="User ID"
-              value={user?.userID || ''}
-              fullWidth
-              disabled
-              margin="normal"
-            />
-            <TextField label="Email" value={user?.email || ''} fullWidth disabled margin="normal" />
-            <TextField
-              label="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              fullWidth
-              margin="normal"
-              required
-            />
-            <TextField
-              label="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              fullWidth
-              margin="normal"
-              required
-            />
-            <TextField
-              label="Location ID"
-              value={locationID}
-              onChange={(e) => setLocationID(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <FormControl fullWidth margin="normal" disabled>
-              <InputLabel>Account Type</InputLabel>
-              <Select value={accountType}>
-                <MenuItem value="Parent">Parent</MenuItem>
-                <MenuItem value="Staff">Staff</MenuItem>
-                <MenuItem value="Admin">Admin</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              label="Account Status"
-              value={user?.accStatus || console.log(user)}
-              fullWidth
-              disabled
-              margin="normal"
-            />
-            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-              Update Info
-            </Button>
-          </Box>
-        </Grid>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={4}>
+        {/* Left Section: Profile */}
+        <Stack spacing={2} sx={{ flex: 1 }}>
+          {/* Profile Title */}
+          <Typography variant="h4" align="center" sx={titleStyle}>
+            Profile
+          </Typography>
 
-        {/* Right Column: Contact List */}
-        <Grid item xs={12} md={6}>
-          <Box
-            sx={{
-              my: 2,
-              width: '100%', // Ensure the content doesn't stretch beyond the column
-              maxWidth: '500px', // Optional: Limit the max width of the content
-            }}
-          >
-            {contacts.length > 0 ? (
-              contacts.map((contact) => (
-                <Card
-                  key={contact.contactID}
-                  variant="outlined"
-                  sx={{
-                    my: 2,
-                    backgroundColor: '#f9f9f9',
-                    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                      {`${contact.firstName} ${contact.lastName}`}
-                    </Typography>
-                    <Typography variant="body2">Phone: {contact.phoneNumber}</Typography>
-                    <Typography variant="body2">Relationship: {contact.relationship}</Typography>
-                    <Typography variant="body2">Address: {contact.address}</Typography>
-                  </CardContent>
-                  <CardActions sx={{ justifyContent: 'flex-end' }}>
-                    <EditButton onClick={() => handleEditContact(contact)} size="small">
-                      Edit
-                    </EditButton>
-                    <DeleteButton
-                      onClick={() => handleDeleteContact(contact.contactID)}
-                      size="small"
-                    >
-                      Remove
-                    </DeleteButton>
-                  </CardActions>
-                </Card>
-              ))
-            ) : (
-              <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-                No contacts available. Use the Add Contact button to add one.
-              </Typography>
-            )}
-          </Box>
+          {/* Profile Form */}
+          <ProfileEditor
+            user={user}
+            onUpdateProfile={handleUpdateProfile}
+            onSuccess={setSuccess}
+            onError={setError}
+          />
+        </Stack>
 
-          {/* Add/Edit Contact Form */}
-          {isAdding && (
-            <Box
-              component="form"
-              my={1}
-              display="flex"
-              flexDirection="column"
-              gap={2}
-              sx={{ width: '100%', maxWidth: '500px' }}
-            >
-              <TextField
-                label="First Name"
-                name="firstName"
-                value={newContact.firstName}
-                onChange={handleInputChange}
-                required
-              />
-              <TextField
-                label="Last Name"
-                name="lastName"
-                value={newContact.lastName}
-                onChange={handleInputChange}
-                required
-              />
-              <TextField
-                label="Phone Number"
-                name="phoneNumber"
-                value={newContact.phoneNumber}
-                onChange={handleInputChange}
-                required
-              />
-              <TextField
-                label="Relationship"
-                name="relationship"
-                value={newContact.relationship}
-                onChange={handleInputChange}
-              />
-              <TextField
-                label="Address"
-                name="address"
-                value={newContact.address}
-                onChange={handleInputChange}
-              />
-              <Box display="flex" justifyContent="flex-end" gap={2}>
-                <Button variant="contained" color="primary" onClick={handleSaveContact}>
-                  {editingContact ? 'Update Contact' : 'Add Contact'}
-                </Button>
-                <Button variant="outlined" color="secondary" onClick={resetContactForm}>
-                  Cancel
-                </Button>
-              </Box>
-            </Box>
-          )}
+        {/* Right Section: Contacts */}
+        <Stack spacing={2} sx={{ flex: 1 }}>
+          {/* Contacts Title */}
+          <Typography variant="h4" align="center" sx={titleStyle}>
+            Contacts
+          </Typography>
 
-          {!isAdding && (
-            <AddContactButton
-              onClick={() => setIsAdding(true)}
-              sx={{
-                width: '100%', // Matches the container width
-                maxWidth: '500px', // Matches the container's maxWidth
-              }}
-            >
-              Add Contact
-            </AddContactButton>
-          )}
-        </Grid>
-      </Grid>
+          {/* Contacts List */}
+          <ContactList
+            userID={user?.userID}
+            fetchContactsApi={fetchContacts}
+            addContactApi={addContact}
+            updateContactApi={updateContact}
+            deleteContactApi={deleteContact}
+            onSuccess={setSuccess}
+            onError={setError}
+          />
+        </Stack>
+      </Stack>
     </Container>
   );
 };
