@@ -83,7 +83,7 @@ const UserChildren = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-      <Typography variant="h4" component="h1">User's Children Profiles</Typography>
+      <Typography variant="h4" component="h1">User&apos;s Children Profiles</Typography>
       
       {children.length === 0 ? (
         <Typography variant="h6" color="textSecondary" align="center">
