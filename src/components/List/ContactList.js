@@ -126,7 +126,7 @@ const ContactList = ({
             variant="outlined"
             sx={{
               my: 2,
-              backgroundColor: '#f9f9f9',
+              backgroundColor: '#f7f5f5',
               boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.5)',
             }}
           >
