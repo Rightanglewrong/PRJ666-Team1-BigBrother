@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, TextField, Dialog, DialogContent, Typography, DialogActions } from '@mui/material';
+import { Button, TextField, Dialog, DialogContent, Typography, DialogActions, Snackbar, Alert } from '@mui/material';
 import Image from 'next/image';
 import styles from '../HomePage.module.css';
 import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } from '../../utils/mediaAPI';
@@ -14,6 +14,7 @@ const AdminMediaGallery = () => {
   const [showResults, setShowResults] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
 
   const pageLimit = 3;
 
@@ -35,6 +36,7 @@ const AdminMediaGallery = () => {
     } catch (err) {
       console.error("Failed to fetch media by location ID:", err);
       setError("Failed to load media files.");
+      setSnackbar({ open: true, message: 'No results found.', severity: 'error' });
     }
   };
 
@@ -46,6 +48,7 @@ const AdminMediaGallery = () => {
     } catch (err) {
       console.error("Failed to fetch paginated media:", err);
       setError("Failed to load paginated media files.");
+      setSnackbar({ open: true, message: 'Failed to load paginated media files.', severity: 'error' });
     }
   };
 
@@ -90,8 +93,13 @@ const AdminMediaGallery = () => {
       } catch (error) {
         console.error("Error deleting media:", error);
         setError("Failed to delete media.");
+        setSnackbar({ open: true, message: 'Failed to delete media.', severity: 'error' });
       }
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   if (!isClient) return null;
@@ -216,6 +224,12 @@ const AdminMediaGallery = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
