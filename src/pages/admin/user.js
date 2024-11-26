@@ -21,8 +21,6 @@ import {
   InputLabel,
 } from '@mui/material';
 import { addContact, fetchContacts, updateContact, deleteContact } from '@/utils/contactApi'; // Import contact-related APIs
-import ConfirmationModal from '@/components/Modal/ConfirmationModal';
-import ErrorModal from '@/components/Modal/ErrorModal';
 import UserList from '@/components/List/UserList';
 import ContactManagementModal from '@/components/Modal/ContactManagementModal';
 import UpdateUserForm from '../../../Input/UpdateUserForm';
@@ -40,11 +38,9 @@ const AdminUserService = () => {
   });
   const [usersList, setUsersList] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [result, setResult] = useState(null);
 
-  // Error Modal
-  const [error, setError] = useState(null);
-  const [errorModalOpen, setErrorModalOpen] = useState(false);
+  // Snackbar state
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
 
   // Delete modal
   const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
@@ -70,31 +66,29 @@ const AdminUserService = () => {
         const currentUser = await getCurrentUser();
         setIsAdmin(currentUser.accountType === 'Admin');
       } catch (error) {
-        showError('Error verifying Admin Status');
+        showSnackbar('Error verifying Admin Status', 'error');
       }
     };
     checkAdmin();
   }, []);
 
-  // Error Modal Ops
-  const showError = (message) => {
-    setError(message);
-    setErrorModalOpen(true);
+  // Snackbar handler
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
   };
 
-  const closeErrorModal = () => {
-    setErrorModalOpen(false);
+  const handleCloseSnackbar = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   // Update User Op
   const handleUpdateUser = async () => {
     try {
       const response = await updateUserInDynamoDB(userID, updateData);
-      setResult(response.message);
-      setError(null);
       await handleGetUsersByAccountTypeAndLocation();
+      showSnackbar('User updated successfully', 'success');
     } catch (error) {
-      showError('Error Updating User');
+      showSnackbar('Error updating user', 'error');
     }
   };
 
@@ -106,7 +100,7 @@ const AdminUserService = () => {
 
       // Check if the user is an Admin
       if (fetchedUser.accountType === 'Admin') {
-        showError('Cannot delete an Admin user.');
+        showSnackbar('Cannot delete an Admin user.', 'error');
         setIsDeleting(false);
         return;
       }
@@ -115,7 +109,7 @@ const AdminUserService = () => {
       setUserToDelete(fetchedUser);
       setDeleteConfirmationModal(true);
     } catch (error) {
-      showError('Error validating user details for deletion.');
+      showSnackbar('Error validating user details for deletion.', 'error');
       console.error('Error in handleDeleteUser:', error);
     }
   };
@@ -124,14 +118,13 @@ const AdminUserService = () => {
     if (!userToDelete) return;
     try {
       const response = await deleteUserInDynamoDB(userToDelete.userID);
-      setResult(response.message);
-      setError(null);
       await handleGetUsersByAccountTypeAndLocation();
       setDeleteConfirmationModal(false);
       setUserID(null);
       setIsDeleting(false);
+      showSnackbar('User deleted successfully', 'success');
     } catch (error) {
-      showError('Error deleting user.');
+      showSnackbar('Error deleting user.', 'error');
     }
   };
 
@@ -149,10 +142,8 @@ const AdminUserService = () => {
 
       if (users.length > 0) {
         setUsersList(filteredUsers);
-        setError(null);
-        setErrorModalOpen(false);
       } else {
-        showError('No users found for selected location');
+        showSnackbar('No users found for selected location', 'info');
       }
 
       setUpdateData({
@@ -165,7 +156,7 @@ const AdminUserService = () => {
       });
       setUserID(null);
     } catch (error) {
-      showError('Failed to retrieve users.');
+      showSnackbar('Failed to retrieve users.', 'error');
     }
   };
 
@@ -249,7 +240,6 @@ const AdminUserService = () => {
         return [];
       }
     } catch (error) {
-      // console.error('Error fetching Parent users:', error);
       return [];
     }
   };
@@ -275,7 +265,6 @@ const AdminUserService = () => {
       setUserToViewContacts(user);
       setIsContactModalOpen(true);
     } catch (error) {
-      // console.error('Error fetching contacts:', error);
       setContacts([]); // Set contacts to an empty array if there's an error
       setUserToViewContacts(user); // Still show the dialog with an empty list
       setIsContactModalOpen(true); // Open the modal even if there are no contacts
@@ -306,7 +295,7 @@ const AdminUserService = () => {
       setContacts(updatedContacts);
     } catch (error) {
       console.error('Error deleting contact:', error);
-      showError('Failed to delete contact. Please try again.');
+      showSnackbar('Failed to delete contact. Please try again.', 'error');
     }
   };
 
@@ -323,7 +312,7 @@ const AdminUserService = () => {
       setIsAdding(false); // Close the Add/Edit Contact Form
     } catch (error) {
       console.error('Error saving contact:', error);
-      showError('Failed to save contact. Please try again.');
+      showSnackbar('Failed to save contact. Please try again.', 'error');
     }
   };
 
@@ -353,7 +342,7 @@ const AdminUserService = () => {
             label="Location ID"
             variant="outlined"
             value={locationID}
-            onChange={(e) => setLocationID(e.target.value)}
+            onChange={(e) => setLocationID(e.target.value.toUpperCase())}
             fullWidth
           />
           <Button
@@ -365,20 +354,6 @@ const AdminUserService = () => {
           </Button>
         </Box>
       </Box>
-
-      {/* Error Modal */}
-      <ErrorModal open={errorModalOpen} onClose={closeErrorModal} errorMessage={error} />
-
-      {/* Confirmation Dialog */}
-      <ConfirmationModal
-        open={deleteConfirmationModal}
-        title="Confirm Delete"
-        description={`Are you sure you want to delete ${
-          userToDelete ? `${userToDelete.firstName} ${userToDelete.lastName}` : ''
-        }?`}
-        onConfirm={handleConfirmDelete}
-        onCancel={handleDeleteModalClose}
-      />
 
       <ContactManagementModal
         open={isContactModalOpen}
@@ -430,13 +405,11 @@ const AdminUserService = () => {
         Back to Admin
       </Button>
 
-      {result && (
-        <Snackbar open={true} autoHideDuration={6000} onClose={() => setResult(null)}>
-          <Alert onClose={() => setResult(null)} severity="success" sx={{ width: '100%' }}>
-            {result}
-          </Alert>
-        </Snackbar>
-      )}
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

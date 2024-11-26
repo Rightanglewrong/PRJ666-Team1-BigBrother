@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { useRouter } from "next/router"; // Import useRouter
+import { useRouter } from "next/router";
 import { forgotPassword } from "../utils/api";
+import { Box } from "@mui/material"; // Import Box from Material-UI
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [confirmEmail, setConfirmEmail] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
 
   const validateEmail = (email) => {
-    // Regular expression to check for an email with "@" and "."
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
@@ -31,23 +31,23 @@ function ForgotPassword() {
       await forgotPassword(email); // Call the API with the email
       alert("Password reset email sent.");
     } catch (error) {
-      // Show the same message regardless of success or failure
       console.error("Error sending password reset email:", error);
       alert("Password reset email sent to account.");
     }
 
-    // Redirect to the login page
     router.push("/login");
   };
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
+        backgroundImage: "url('/background/background3.png')", // Add your background image path here
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",
-        height: "100vh",
-        backgroundColor: "#f7f7f7",
+        justifyContent: "center",
       }}
     >
       <form
@@ -55,7 +55,7 @@ function ForgotPassword() {
         style={{
           textAlign: "center",
           padding: "20px",
-          background: "#333",
+          background: "rgba(0, 0, 0, 0.8)", // Semi-transparent background for better readability
           color: "white",
           borderRadius: "8px",
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
@@ -113,7 +113,7 @@ function ForgotPassword() {
           Submit
         </button>
       </form>
-    </div>
+    </Box>
   );
 }
 

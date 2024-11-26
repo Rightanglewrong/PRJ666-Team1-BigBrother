@@ -289,6 +289,14 @@ const NavBar = () => {
                 Media
               </Link>
               <Link
+                href="/userChildren"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Child Profiles
+              </Link>
+              <Link
                 href="/mealPlan"
                 passHref
                 className={styles.dropdownItem}
