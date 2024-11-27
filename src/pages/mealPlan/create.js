@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { createMealPlan } from "../../utils/mealPlanAPI";
 import { useUser } from "@/components/authenticate";
+import { useTheme } from "@/components/ThemeContext"; // Import the theme context
 import {
   Container,
   Typography,
@@ -19,6 +20,7 @@ import {
 export default function CreateMealPlanPage() {
   const router = useRouter();
   const user = useUser();
+  const { colorblindMode } = useTheme(); // Access colorblind mode
   const today = new Date();
   const nextMonth = new Date();
   nextMonth.setMonth(today.getMonth() + 1);
@@ -33,6 +35,40 @@ export default function CreateMealPlanPage() {
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Define original colors
+  const originalColors = {
+    background: "#FFFAF0",
+    textPrimary: "#2c3e50",
+    textSecondary: "#3498db",
+    fieldBackground: "#f5f5f5",
+    buttonBackground: "#3498db",
+    buttonHover: "#2980b9",
+  };
+
+  // Define colorblind-friendly overrides
+  const colorblindOverrides = {
+    "red-green": {
+      background: "#FFF4E6",
+      textPrimary: "#1565C0",
+      textSecondary: "#1976D2",
+      buttonBackground: "#1976D2",
+      buttonHover: "#155DA8",
+    },
+    "blue-yellow": {
+      background: "#FFEBEE",
+      textPrimary: "#e77f24",
+      textSecondary: "#3db48c",
+      buttonBackground: "#e77f24",
+      buttonHover: "#c75b1e",
+    },
+  };
+
+  // Merge original colors with colorblind overrides
+  const colors = {
+    ...originalColors,
+    ...(colorblindMode !== "none" ? colorblindOverrides[colorblindMode] : {}),
+  };
 
   useEffect(() => {
     if (!user) {
@@ -71,8 +107,8 @@ export default function CreateMealPlanPage() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, p: 3, backgroundColor: "#FFFAF0", borderRadius: 2, boxShadow: 3, mb: 4 }}>
-      <Typography variant="h4" align="center" gutterBottom sx={{ color: "#2c3e50", fontWeight: "bold" }}>
+    <Container maxWidth="sm" sx={{ mt: 4, p: 3, backgroundColor: colors.background, borderRadius: 2, boxShadow: 3, mb: 4, color: colors.textPrimary, }}>
+      <Typography variant="h4" align="center" gutterBottom sx={{ color: colors.textPrimary, fontWeight: "bold" }}>
         Create Meal Plan
       </Typography>
 
@@ -86,7 +122,7 @@ export default function CreateMealPlanPage() {
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {/* Date Fields */}
-        <Typography variant="h6" sx={{ color: "#3498db", fontWeight: "bold" }}>Duration</Typography>
+        <Typography variant="h6" sx={{ color: colors.textSecondary, fontWeight: "bold" }}>Duration</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField label="Start Date" type="date" name="startDate" value={mealPlan.startDate} onChange={handleInputChange} InputLabelProps={{ shrink: true }} required />
           <TextField label="End Date" type="date" name="endDate" value={mealPlan.endDate} onChange={handleInputChange} InputLabelProps={{ shrink: true }} required />
@@ -95,15 +131,15 @@ export default function CreateMealPlanPage() {
         <Divider sx={{ my: 2 }} />
 
         {/* Meal Fields */}
-        <Typography variant="h6" sx={{ color: "#3498db", fontWeight: "bold" }}>Meals</Typography>
+        <Typography variant="h6" sx={{ color: colors.textSecondary, fontWeight: "bold" }}>Meals</Typography>
         <TextField label="Breakfast" name="breakfast" value={mealPlan.breakfast} onChange={handleInputChange} required multiline rows={2} sx={{ backgroundColor: "#f5f5f5" }} />
-        <TextField label="Lunch" name="lunch" value={mealPlan.lunch} onChange={handleInputChange} required multiline rows={2} sx={{ backgroundColor: "#f5f5f5" }} />
-        <TextField label="Snack" name="snack" value={mealPlan.snack} onChange={handleInputChange} required multiline rows={2} sx={{ backgroundColor: "#f5f5f5" }} />
+        <TextField label="Lunch" name="lunch" value={mealPlan.lunch} onChange={handleInputChange} required multiline rows={2} sx={{ backgroundColor: colors.fieldBackground }} />
+        <TextField label="Snack" name="snack" value={mealPlan.snack} onChange={handleInputChange} required multiline rows={2} sx={{ backgroundColor: colors.fieldBackground }} />
 
         <Divider sx={{ my: 2 }} />
 
         {/* Allergens and Alternatives Fields */}
-        <Typography variant="h6" sx={{ color: "#3498db", fontWeight: "bold" }}>Additional Info</Typography>
+        <Typography variant="h6" sx={{ color: colors.textSecondary, fontWeight: "bold" }}>Additional Info</Typography>
         <TextField label="Allergens" name="allergens" value={mealPlan.allergens} onChange={handleInputChange} variant="outlined" />
         <TextField label="Alternatives" name="alternatives" value={mealPlan.alternatives} onChange={handleInputChange} variant="outlined" />
 
@@ -114,9 +150,9 @@ export default function CreateMealPlanPage() {
           fullWidth
           sx={{
             mt: 3,
-            backgroundColor: "#3498db",
+            backgroundColor: colors.buttonBackground,
             color: "#fff",
-            "&:hover": { backgroundColor: "#2980b9" },
+            "&:hover": { backgroundColor: colors.buttonHover },
           }}
           disabled={loading}
         >

@@ -6,6 +6,7 @@ import {
   deleteMealPlan,
 } from "@/utils/mealPlanAPI";
 import { useUser } from "@/components/authenticate";
+import { useTheme } from "@/components/ThemeContext"; // Import the theme context
 import {
   Container,
   Typography,
@@ -28,6 +29,35 @@ export default function RecentMealPlans() {
   const [errorMessage, setErrorMessage] = useState("");
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [mealPlanToDelete, setMealPlanToDelete] = useState(null);
+  const { colorblindMode } = useTheme(); // Access colorblind mode
+
+  // Define original colors
+  const originalColors = {
+    buttonPrimary: "#d32f2f",
+    durationText: "#1565C0",
+    mealTitle: "#FF7043",
+    cardBackground: "#f5f5f5",
+  };
+
+  // Define colorblind-friendly overrides
+  const colorblindOverrides = {
+    "red-green": {
+      buttonPrimary: "#1976d2",
+      durationText: "#1565C0",
+      mealTitle: "#FF7043",
+    },
+    "blue-yellow": {
+      buttonPrimary: "#e77f24",
+      durationText: "#e77f24",
+      mealTitle: "#9147A9",
+    },
+  };
+
+  // Merge original colors with colorblind overrides
+  const colors = {
+    ...originalColors,
+    ...(colorblindMode !== "none" ? colorblindOverrides[colorblindMode] : {}),
+  };
 
   // Fetch the recent meal plans by location
   useEffect(() => {
@@ -86,7 +116,7 @@ export default function RecentMealPlans() {
       <Typography
         variant="h4"
         align="center"
-        sx={{ fontWeight: "bold", mb: 3 }}
+        sx={{ fontWeight: "bold", mb: 3, color: colors.durationText }}
       >
         Recent Meal Plans
       </Typography>
@@ -119,7 +149,7 @@ export default function RecentMealPlans() {
             <Card
               key={index}
               sx={{
-                backgroundColor: "#f5f5f5",
+                backgroundColor: colors.cardBackground,
                 boxShadow: 3,
                 borderRadius: 2,
                 p: 2,
@@ -128,7 +158,7 @@ export default function RecentMealPlans() {
               <CardContent>
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: "bold", color: "#1565C0" }}
+                  sx={{ fontWeight: "bold", color: colors.durationText }}
                 >
                   Meal Plan Duration
                 </Typography>
@@ -146,7 +176,7 @@ export default function RecentMealPlans() {
                     <Box key={idx} textAlign="center" flex={1} p={1}>
                       <Typography
                         variant="body1"
-                        sx={{ fontWeight: "bold", color: "#FF7043" }}
+                        sx={{ fontWeight: "bold", color: colors.mealTitle }}
                       >
                         {meal}
                       </Typography>
@@ -162,7 +192,13 @@ export default function RecentMealPlans() {
                   <Box mt={2} display="flex" justifyContent="center">
                     <Button
                       variant="contained"
-                      color="error"
+                      sx={{
+                        backgroundColor: colors.buttonPrimary,
+                        color: "#fff",
+                        "&:hover": {
+                          backgroundColor: colors.buttonPrimary,
+                        },
+                      }}
                       onClick={() => openConfirmationModal(plan.mealPlanID)}
                     >
                       Delete
