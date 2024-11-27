@@ -26,7 +26,7 @@ export const fetchContacts = async (userID) => {
     const data = await response.json();
     return data.entries || [];
   } catch (error) {
-    console.error('Error fetching contacts:', error);
+    //console.error('Error fetching contacts:', error);
     return [];
   }
 };
@@ -59,14 +59,14 @@ export const addContact = async (userID, newContact) => {
     if (!response.ok) {
       // Extract error details from the response
       const errorData = await response.json();
-      console.error('Error data:', errorData); // Log error details for debugging
+      //console.error('Error data:', errorData); // Log error details for debugging
       throw new Error(errorData.message || 'Failed to add contact');
     }
 
     const data = await response.json();
     return data.contact;
   } catch (error) {
-    console.error('Error adding contact:', error.message); // Improved error logging
+    //console.error('Error adding contact:', error.message); // Improved error logging
     throw new Error(error.message || 'An unknown error occurred while adding the contact.');
   }
 };
@@ -90,7 +90,7 @@ export const updateContact = async (contactID, updatedContact) => {
     const data = await response.json();
     return data.updatedContact;
   } catch (error) {
-    console.error('Error updating contact:', error);
+    //console.error('Error updating contact:', error);
     throw error;
   }
 };
@@ -115,7 +115,7 @@ export const deleteContact = async (contactID) => {
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting contact:', error);
+    //console.error('Error deleting contact:', error);
     throw error;
   }
 };

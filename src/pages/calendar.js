@@ -85,7 +85,7 @@ const CalendarView = () => {
     } catch (error) {
       setErrorMessage("Error fetching calendar entries.");
       setShowErrorModal(true);
-      console.error("Error fetching calendar entries:", error);
+      //console.error("Error fetching calendar entries:", error);
     }
   }, [user]);
 
@@ -192,10 +192,10 @@ const CalendarView = () => {
         editingEvent ? "Error updating event." : "Error creating new event."
       );
       setShowErrorModal(true);
-      console.error(
-        editingEvent ? "Error updating event:" : "Error creating new event:",
-        error
-      );
+      // console.error(
+      //   editingEvent ? "Error updating event:" : "Error creating new event:",
+      //   error
+      // );
     }
   };
 
@@ -221,7 +221,7 @@ const CalendarView = () => {
     } catch (error) {
       setErrorMessage("Error deleting event.");
       setShowErrorModal(true);
-      console.error("Error deleting event:", error);
+      //console.error("Error deleting event:", error);
     }
   };
 

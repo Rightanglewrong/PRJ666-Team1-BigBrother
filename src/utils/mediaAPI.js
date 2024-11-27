@@ -29,7 +29,7 @@ export const fetchMediaByLocationID = async (locationID) => {
     const data = await response.json();
     return data.mediaEntries; // mediaEntries now contains metadata including mediaID
   } catch (error) {
-    console.error("Error fetching media by location ID:", error);
+    //console.error("Error fetching media by location ID:", error);
     throw error;
   }
 };
@@ -71,7 +71,7 @@ export const fetchPaginatedMedia = async (mediaEntries, page) => {
       description: file.description || ''
     }));
   } catch (error) {
-    console.error("Error fetching paginated media:", error);
+    //console.error("Error fetching paginated media:", error);
     throw error;
   }
 };
@@ -87,7 +87,7 @@ export const getPaginatedMediaByLocation = async (locationID, page) => {
 
     return paginatedMedia;
   } catch (error) {
-    console.error("Error fetching paginated media by location:", error);
+    //console.error("Error fetching paginated media by location:", error);
     throw error;
   }
 };
@@ -101,7 +101,7 @@ export const deleteMediaByMediaID = async (mediaID, s3Key) => {
   }
 
   try {
-    console.log("Sending delete request for mediaID:", mediaID, "and s3Key:", s3Key); // Debugging line
+    //console.log("Sending delete request for mediaID:", mediaID, "and s3Key:", s3Key); // Debugging line
     const response = await fetch(`${BACKEND_URL}v1/media/delete/${mediaID}`, {
       method: "DELETE",
       headers: {
@@ -113,14 +113,14 @@ export const deleteMediaByMediaID = async (mediaID, s3Key) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error(`Error deleting media: ${response.statusText}`, errorData);
+      //console.error(`Error deleting media: ${response.statusText}`, errorData);
       throw new Error(`Error deleting media: ${response.statusText}`);
     }
 
     const data = await response.json();
     return data.message;
   } catch (error) {
-    console.error("Error deleting media by mediaID:", error);
+    //console.error("Error deleting media by mediaID:", error);
     throw error;
   }
 };
@@ -141,7 +141,7 @@ export const uploadMedia = async (file, childID, description = "") => {
   if (description && description.length > 150) {
     throw new Error("Description must be 150 characters or fewer.");
   }
-  console.log(description);
+  //console.log(description);
 
   try {
     const formData = new FormData();
@@ -163,14 +163,14 @@ export const uploadMedia = async (file, childID, description = "") => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Error uploading media:", errorData);
+      //console.error("Error uploading media:", errorData);
       throw new Error("Failed to upload media");
     }
 
     const data = await response.json();
     return data.media; // Return the newly created media entry
   } catch (error) {
-    console.error("Error uploading media:", error);
+    //console.error("Error uploading media:", error);
     throw error;
   }
 };
@@ -204,7 +204,7 @@ export const fetchMediaByUserID = async (userID) => {
     const data = await response.json();
     return data.mediaEntries; // mediaEntries now contains metadata including mediaID
   } catch (error) {
-    console.error("Error fetching media by user ID:", error);
+    //console.error("Error fetching media by user ID:", error);
     throw error;
   }
 };

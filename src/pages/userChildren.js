@@ -36,7 +36,7 @@ const UserChildren = () => {
         }
         isInitialMount.current = false; // Mark as not the initial mount
       } catch (error) {
-        console.error("Error decoding token:", error);
+        //console.error("Error decoding token:", error);
         setSnackbar({ open: true, message: "Invalid token. Please log in again.", severity: "error" });
         router.push("/login"); // Redirect to login page if token is invalid
       }
@@ -59,7 +59,7 @@ const UserChildren = () => {
       );
       setChildren(childProfiles.filter((profile) => profile !== null)); // Filter out null responses
     } catch (error) {
-      console.error("Error fetching child profiles:", error);
+      //console.error("Error fetching child profiles:", error);
       setSnackbar({ open: true, message: "Error fetching child profiles.", severity: "error" });
     }
   };

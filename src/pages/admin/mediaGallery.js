@@ -50,7 +50,7 @@ const AdminMediaGallery = () => {
       setMediaFiles(files);
       setError('');
     } catch (err) {
-      console.error("Failed to fetch paginated media:", err);
+      //console.error("Failed to fetch paginated media:", err);
       setError("Failed to load paginated media files.");
       setSnackbar({ open: true, message: 'Failed to load paginated media files.', severity: 'error' });
     }
@@ -95,7 +95,7 @@ const AdminMediaGallery = () => {
         setPage(newPage);
         fetchPaginatedMediaFiles(updatedEntries, newPage);
       } catch (error) {
-        console.error("Error deleting media:", error);
+        //console.error("Error deleting media:", error);
         setError("Failed to delete media.");
         setSnackbar({ open: true, message: 'Failed to delete media.', severity: 'error' });
       }

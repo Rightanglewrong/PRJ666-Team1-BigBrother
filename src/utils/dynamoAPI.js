@@ -18,7 +18,7 @@ export const createItemInDynamoDB = async (item) => {
     const data = await response.json();
     return { message: "Item created successfully", item: data };
   } catch (error) {
-    console.error("Error creating item:", error);
+    //console.error("Error creating item:", error);
     throw new Error(error.message);
   }
 };
@@ -37,7 +37,7 @@ export const retrieveItemFromDynamoDB = async (item) => {
     const data = await response.json();
     return data; // Return the retrieved item
   } catch (error) {
-    console.error("Error retrieving item:", error);
+    //console.error("Error retrieving item:", error);
     throw new Error(error.message);
   }
 };
@@ -60,7 +60,7 @@ export const updateItemInDynamoDB = async (item) => {
     const data = await response.json();
     return { message: "Item updated successfully", item: data };
   } catch (error) {
-    console.error("Error updating item:", error);
+    //console.error("Error updating item:", error);
     throw new Error(error.message);
   }
 };
@@ -83,7 +83,7 @@ export const deleteItemFromDynamoDB = async (item) => {
     const data = await response.json();
     return { message: "Item deleted successfully", data };
   } catch (error) {
-    console.error("Error deleting item:", error);
+    //console.error("Error deleting item:", error);
     throw new Error(error.message);
   }
 };

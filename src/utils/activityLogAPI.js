@@ -59,7 +59,7 @@ export const fetchLogsByLocation = async (
 
     return logs;
   } catch (error) {
-    console.error("Error fetching logs by location:", error);
+    //console.error("Error fetching logs by location:", error);
     throw new Error(error.message);
   }
 };
@@ -121,7 +121,7 @@ export const fetchLogsByUser = async (
 
     return logs;
   } catch (error) {
-    console.error("Error fetching logs by user:", error);
+    //console.error("Error fetching logs by user:", error);
     throw new Error(error.message);
   }
 };
@@ -155,7 +155,7 @@ export const deleteActivityLog = async (locationID, timestamp) => {
     const data = await response.json();
     return { message: "Activity log deleted successfully", data };
   } catch (error) {
-    console.error("Error deleting activity log:", error);
+    //console.error("Error deleting activity log:", error);
     throw new Error(error.message);
   }
 };

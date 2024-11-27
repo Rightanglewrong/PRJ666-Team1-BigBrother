@@ -110,7 +110,7 @@ const AdminUserService = () => {
       setDeleteConfirmationModal(true);
     } catch (error) {
       showSnackbar('Error validating user details for deletion.', 'error');
-      console.error('Error in handleDeleteUser:', error);
+      //console.error('Error in handleDeleteUser:', error);
     }
   };
 
@@ -171,7 +171,7 @@ const AdminUserService = () => {
 
       return users;
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      //console.error('Failed to fetch users:', error);
       return [];
     }
   };
@@ -184,7 +184,7 @@ const AdminUserService = () => {
       }
       return [];
     } catch (error) {
-      console.error('Failed to fetch users by account type and location:', error.message);
+      //console.error('Failed to fetch users by account type and location:', error.message);
       return [];
     }
   };
@@ -198,7 +198,7 @@ const AdminUserService = () => {
       const results = admins.concat(staff, parents);
       return results;
     } catch (error) {
-      console.error('Failed to fetch users by location:', error);
+      //console.error('Failed to fetch users by location:', error);
       return [];
     }
   };
@@ -212,7 +212,7 @@ const AdminUserService = () => {
         return [];
       }
     } catch (error) {
-      console.error('Error fetching Admin users:', error);
+      //console.error('Error fetching Admin users:', error);
       return [];
     }
   };
@@ -226,7 +226,7 @@ const AdminUserService = () => {
         return [];
       }
     } catch (error) {
-      console.error('Error fetching Staff users:', error);
+      //console.error('Error fetching Staff users:', error);
       return [];
     }
   };
@@ -287,14 +287,14 @@ const AdminUserService = () => {
       await deleteContact(contactID);
 
       if (!userToViewContacts?.userID) {
-        console.error('Invalid user context');
+        //console.error('Invalid user context');
         throw new Error('User context is invalid.');
       }
 
       const updatedContacts = await fetchContacts(userToViewContacts.userID);
       setContacts(updatedContacts);
     } catch (error) {
-      console.error('Error deleting contact:', error);
+      //console.error('Error deleting contact:', error);
       showSnackbar('Failed to delete contact. Please try again.', 'error');
     }
   };
@@ -311,7 +311,7 @@ const AdminUserService = () => {
       resetContactForm();
       setIsAdding(false); // Close the Add/Edit Contact Form
     } catch (error) {
-      console.error('Error saving contact:', error);
+      //console.error('Error saving contact:', error);
       showSnackbar('Failed to save contact. Please try again.', 'error');
     }
   };

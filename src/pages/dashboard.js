@@ -25,7 +25,7 @@ const DashboardPage = () => {
         const userData = await getCurrentUser();
         setUserDetails(userData);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        //console.error('Error fetching user data:', error);
         setError('Failed to load user details. Please log in again.');
 
         // Remove any stored token from localStorage

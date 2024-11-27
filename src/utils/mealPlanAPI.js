@@ -19,19 +19,19 @@ export const createMealPlan = async (token, mealPlanData) => {
       }
       if (response.status == 403) {
         let errText = "FORBIDDEN: Unauthorized for current action";
-        console.error(`Failed to create mealPlan: ${errText}`);
+        //console.error(`Failed to create mealPlan: ${errText}`);
         throw new Error(errText);
       }
       if (response.status == 500) {
         let errText = "Server Error during mealPlan creation";
-        console.error(`Failed to create mealPlan: ${errText}`);
+        //console.error(`Failed to create mealPlan: ${errText}`);
         throw new Error(errText);
       }
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating meal plan:", error);
+    //console.error("Error creating meal plan:", error);
     throw error;
   }
 };
@@ -54,19 +54,19 @@ export const updateMealPlan = async (token, id, updateData) => {
       }
       if (response.status == 403) {
         let errText = "FORBIDDEN: Unauthorized for current action";
-        console.error(`Failed to update mealPlan: ${errText}`);
+        //console.error(`Failed to update mealPlan: ${errText}`);
         throw new Error(errText);
       }
       if (response.status == 500) {
         let errText = "Server Error during mealPlan updating";
-        console.error(`Failed to update mealPlan: ${errText}`);
+        //console.error(`Failed to update mealPlan: ${errText}`);
         throw new Error(errText);
       }
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error updating meal plan:", error);
+    //console.error("Error updating meal plan:", error);
     throw error;
   }
 };
@@ -91,7 +91,7 @@ export const getMealPlan = async (token, id) => {
 
     return await response.json();
   } catch (error) {
-    console.error("Error retrieving meal plan:", error);
+    //console.error("Error retrieving meal plan:", error);
     throw error;
   }
 };
@@ -145,7 +145,7 @@ export const fetchRecentMealPlansByLocation = async (locationID) => {
     const data = await response.json();
     return data.mealPlans;
   } catch (error) {
-    console.error("Error fetching recent meal plans by location:", error);
+    //console.error("Error fetching recent meal plans by location:", error);
     throw error;
   }
 };
@@ -170,7 +170,7 @@ export const deleteMealPlan = async (token, id) => {
 
     return await response.json();
   } catch (error) {
-    console.error("Error deleting meal plan:", error);
+    //console.error("Error deleting meal plan:", error);
     throw error;
   }
 };
