@@ -34,7 +34,7 @@ const AdminMediaGallery = () => {
       setShowResults(true);
       fetchPaginatedMediaFiles(entries, 1);
     } catch (err) {
-      console.error("Failed to fetch media by location ID:", err);
+      //console.error("Failed to fetch media by location ID:", err);
       setError("Failed to load media files.");
       setSnackbar({ open: true, message: 'No results found.', severity: 'error' });
     }
@@ -46,7 +46,7 @@ const AdminMediaGallery = () => {
       setMediaFiles(files);
       setError('');
     } catch (err) {
-      console.error("Failed to fetch paginated media:", err);
+      //console.error("Failed to fetch paginated media:", err);
       setError("Failed to load paginated media files.");
       setSnackbar({ open: true, message: 'Failed to load paginated media files.', severity: 'error' });
     }
@@ -91,7 +91,7 @@ const AdminMediaGallery = () => {
         setPage(newPage);
         fetchPaginatedMediaFiles(updatedEntries, newPage);
       } catch (error) {
-        console.error("Error deleting media:", error);
+        //console.error("Error deleting media:", error);
         setError("Failed to delete media.");
         setSnackbar({ open: true, message: 'Failed to delete media.', severity: 'error' });
       }

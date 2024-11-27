@@ -55,7 +55,7 @@ const MediaGallery = () => {
       const uniqueProfiles = Array.from(new Set(profiles.map(JSON.stringify))).map(JSON.parse);
       setChildProfiles(uniqueProfiles);
     } catch (err) {
-      console.error("Failed to fetch media by user ID:", err);
+      //console.error("Failed to fetch media by user ID:", err);
       setError("Failed to load media files.");
     }
   };
@@ -74,7 +74,7 @@ const MediaGallery = () => {
       setMediaFiles(files);
       setError('');
     } catch (err) {
-      console.error("Failed to fetch paginated media:", err);
+      //console.error("Failed to fetch paginated media:", err);
       setError("Failed to load paginated media files.");
     }
   };

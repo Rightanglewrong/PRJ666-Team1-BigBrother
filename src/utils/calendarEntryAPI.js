@@ -20,14 +20,14 @@ export const createCalendarEntryInDynamoDB = async (item) => {
 
         if (!response.ok) {
             const errorText = await response.text(); 
-            console.error("Error response:", errorText); 
+            //console.error("Error response:", errorText); 
             throw new Error("Error creating Calendar Entry in DynamoDB");
         }
 
         const data = await response.json();
         return { message: "Calendar Entry created successfully", item: data };
     } catch (error) {
-        console.error("Error creating Calendar Entry:", error);
+        //console.error("Error creating Calendar Entry:", error);
         throw new Error(error.message);
     }
 };
@@ -51,7 +51,7 @@ export const retrieveCalendarEntryFromDynamoDB = async (item) => {
         const data = await response.json();
         return data; 
     } catch (error) {
-        console.error("Error retrieving Calendar Entry:", error);
+        //console.error("Error retrieving Calendar Entry:", error);
         throw new Error(error.message);
     }
 };
@@ -80,7 +80,7 @@ export const updateCalendarEntryInDynamoDB = async (item) => {
         const data = await response.json();
         return { message: "Calendar Entry updated successfully", item: data };
     } catch (error) {
-        console.error("Error updating Calendar Entry:", error);
+        //console.error("Error updating Calendar Entry:", error);
         throw new Error(error.message);
     }
 };
@@ -108,7 +108,7 @@ export const deleteCalendarEntryFromDynamoDB = async (item) => {
     const data = await response.json();
     return { message: "Calendar Entry deleted successfully", data };
   } catch (error) {
-    console.error("Error deleting Calendar Entry:", error);
+    //console.error("Error deleting Calendar Entry:", error);
     throw new Error(error.message);
   }  
 };
@@ -134,14 +134,14 @@ export const retrieveCalendarEntriesByDate = async (startDate, endDate, location
 
         if (!response.ok) {
           const errorText = await response.text(); 
-          console.error("Error response:", errorText); 
+          //console.error("Error response:", errorText); 
           throw new Error(`Error ${response.status}: No calendar entries found for this specified date range`);
         }
   
       const data = await response.json();
       return data.entries || [];
     } catch (error) {
-      console.error("Error retrieving calendar entries by date:", error);
+      //console.error("Error retrieving calendar entries by date:", error);
       throw new Error(error.message);
     }
 };

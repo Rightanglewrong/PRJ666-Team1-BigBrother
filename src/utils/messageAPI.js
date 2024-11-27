@@ -25,7 +25,7 @@ export const createMessageInDynamoDB = async (item) => {
     const data = await response.json();
     return { message: "Message created successfully", item: data };
   } catch (error) {
-    console.error("Error creating Message:", error);
+    //console.error("Error creating Message:", error);
     throw new Error(error.message);
   }
 };
@@ -54,7 +54,7 @@ export const retrieveMessageFromDynamoDB = async (messageID) => {
     const data = await response.json();
     return { message: "Message retrieved successfully", item: data };
   } catch (error) {
-    console.error("Error retrieving Message:", error);
+    //console.error("Error retrieving Message:", error);
     throw new Error(error.message);
   }
 };
@@ -87,7 +87,7 @@ export const markMessageAsDeletedBySender = async (messageID) => {
     const data = await response.json();
     return { message: "Message marked as deleted by sender successfully", data };
   } catch (error) {
-    console.error("Error marking message as deleted by sender:", error);
+    //console.error("Error marking message as deleted by sender:", error);
     throw new Error(error.message);
   }
 };
@@ -120,7 +120,7 @@ export const markMessageAsDeletedByReceiver = async (messageID) => {
     const data = await response.json();
     return { message: "Message marked as deleted by receiver successfully", data };
   } catch (error) {
-    console.error("Error marking message as deleted by receiver:", error);
+    //console.error("Error marking message as deleted by receiver:", error);
     throw new Error(error.message);
   }
 };
@@ -149,7 +149,7 @@ export const retrieveMessageByReceiverID = async (receiverID) => {
       const data = await response.json();
       return data.entries; 
     } catch (error) {
-      console.error("Error retrieving Messages for the Receiver:", error);
+      //console.error("Error retrieving Messages for the Receiver:", error);
       throw new Error(error.message);
     }
 };
@@ -177,7 +177,7 @@ export const retrieveMessageBySenderID = async (senderID) => {
     const data = await response.json();
     return data.entries; 
   } catch (error) {
-    console.error("Error retrieving Messages for the Sender:", error);
+    //console.error("Error retrieving Messages for the Sender:", error);
     throw new Error(error.message);
   }
 };

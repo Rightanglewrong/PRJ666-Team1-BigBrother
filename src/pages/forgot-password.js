@@ -31,7 +31,7 @@ function ForgotPassword() {
       await forgotPassword(email); // Call the API with the email
       alert("Password reset email sent.");
     } catch (error) {
-      console.error("Error sending password reset email:", error);
+      //console.error("Error sending password reset email:", error);
       alert("Password reset email sent to account.");
     }
 

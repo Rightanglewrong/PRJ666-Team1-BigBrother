@@ -25,7 +25,7 @@ export const ThemeProvider = ({ children }) => {
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    console.warn("useTheme called outside of ThemeProvider. Defaulting to 'none' mode.");
+    //console.warn("useTheme called outside of ThemeProvider. Defaulting to 'none' mode.");
     return { colorblindMode: "none", setMode: () => {} }; // Safe fallback
   }
   return context;

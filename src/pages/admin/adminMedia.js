@@ -67,7 +67,7 @@ const MediaUploadPage = () => {
           }
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        //console.error('Error fetching user data:', error);
         setErrorMessage('Failed to load child profiles.');
         setShowErrorSnackbar(true);
       }
@@ -123,7 +123,7 @@ const MediaUploadPage = () => {
 
       const uploadedMedia = await uploadMedia(file, childID, description);
 
-      console.log('Media uploaded successfully:', uploadedMedia);
+      //console.log('Media uploaded successfully:', uploadedMedia);
       setErrorMessage(null);
       setChildID('');
       setDescription('');
@@ -135,7 +135,7 @@ const MediaUploadPage = () => {
         window.location.reload();
       }, 2000);
     } catch (error) {
-      console.error('Error uploading media:', error);
+      //console.error('Error uploading media:', error);
       setErrorMessage('Failed to upload media.');
       setShowErrorSnackbar(true);
     }

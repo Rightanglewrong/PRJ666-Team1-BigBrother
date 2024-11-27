@@ -72,7 +72,7 @@ const ActivityLogPage = () => {
         setError("Unauthorized access. Redirecting to login...");
         setTimeout(() => router.push("/login"), 2000); // Redirect after 2 seconds
       } else {
-        console.error("Error fetching activity logs:", err);
+       //console.error("Error fetching activity logs:", err);
         setError("Failed to retrieve activity logs. Please try again.");
       }
     }

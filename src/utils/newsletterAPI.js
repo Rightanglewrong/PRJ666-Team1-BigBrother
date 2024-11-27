@@ -16,19 +16,19 @@ export const createNewsletter = async (token, newsletterData) => {
     if (!response.ok) {
       if (response.status == 403) {
         let errText = "FORBIDDEN: Unauthorized for current action";
-        console.error(`Failed to create Newsletter: ${errText}`);
+        //console.error(`Failed to create Newsletter: ${errText}`);
         throw new Error(errText);
       }
       if (response.status == 500) {
         let errText = "Server Error during  Newsletter creation";
-        console.error(`Failed to create Newsletter: ${errText}`);
+        //console.error(`Failed to create Newsletter: ${errText}`);
         throw new Error(errText);
       }
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating newsletter:", error);
+    //console.error("Error creating newsletter:", error);
     throw error;
   }
 };
@@ -47,19 +47,19 @@ export const updateNewsletter = async (token, id, updateData) => {
     if (!response.ok) {
       if (response.status == 403) {
         let errText = "FORBIDDEN: Unauthorized for current action";
-        console.error(`Failed to update Newsletter: ${errText}`);
+        //console.error(`Failed to update Newsletter: ${errText}`);
         throw new Error(errText);
       }
       if (response.status == 500) {
         let errText = "Server Error during Newsletter updating";
-        console.error(`Failed to update Newsletter: ${errText}`);
+        //console.error(`Failed to update Newsletter: ${errText}`);
         throw new Error(errText);
       }
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error updating newsletter:", error);
+    //console.error("Error updating newsletter:", error);
     throw error;
   }
 };
@@ -79,7 +79,7 @@ export const getNewsletter = async (token, id) => {
 
     return await response.json();
   } catch (error) {
-    console.error("Error retrieving newsletter:", error);
+    //console.error("Error retrieving newsletter:", error);
     throw error;
   }
 };
@@ -121,7 +121,7 @@ export const deleteNewsletter = async (token, id) => {
 
     return await response.json();
   } catch (error) {
-    console.error("Error deleting newsletter:", error);
+    //console.error("Error deleting newsletter:", error);
     throw error;
   }
 };

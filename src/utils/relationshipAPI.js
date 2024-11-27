@@ -21,14 +21,14 @@ export const createRelationshipInDynamoDB = async (item) => {
 
     if (!response.ok) {
       const errorText = await response.text(); 
-            console.error("Error response:", errorText);
+            //console.error("Error response:", errorText);
       throw new Error("Error creating Relationship in DynamoDB");
     }
 
     const data = await response.json();
     return { message: "Relationship created successfully", item: data };
   } catch (error) {
-    console.error("Error creating Relationship:", error);
+    //console.error("Error creating Relationship:", error);
     throw new Error(error.message);
   }
 };
@@ -57,7 +57,7 @@ export const getRelationshipFromDynamoDB = async (item) => {
     const data = await response.json();
     return data; 
   } catch (error) {
-    console.error("Error retrieving Relationship:", error);
+    //console.error("Error retrieving Relationship:", error);
     throw new Error(error.message);
   }
 };
@@ -88,7 +88,7 @@ export const updateRelationshipInDynamoDB = async (id, updateData) => {
     const data = await response.json();
     return { message: "Relationship updated successfully", item: data };
   } catch (error) {
-    console.error("Error updating Relationship:", error);
+    //console.error("Error updating Relationship:", error);
     throw new Error(error.message);
   }
 };
@@ -169,14 +169,14 @@ export const getRelationshipByParentID = async (parentID) => {
 
     if (!response.ok) {
       const errorText = await response.text(); 
-      console.error("Error response:", errorText); 
+      //console.error("Error response:", errorText); 
       throw new Error(errorText || "No Relationships found for the Parent ID");
     }
 
     const data = await response.json();
     return data.entries; 
   } catch (error) {
-    console.error("Error retrieving Relationships for the Location ID:", error);
+    //console.error("Error retrieving Relationships for the Location ID:", error);
     throw new Error(error.message);
   }
 };
