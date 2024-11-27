@@ -63,26 +63,7 @@ export default function Messages() {
   const [filterFirstName, setFilterFirstName] = useState(null);  
   const [filterLastName, setFilterLastName] = useState(null);  
 
-
-
-  useEffect(() => {
-    fetchUsers();
-    fetchMessages();
-  }, []);
-
-  useEffect(() => {
-    if (filterUserID) {
-      const filtered = allMessages.filter((msg) => 
-        msg.sender === filterUserID || msg.receiver === filterUserID
-      );
-      setFilteredMessages(filtered);
-    } else {
-      setFilteredMessages(allMessages);  
-    }
-  }, [filterUserID, allMessages]);
-
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const userData = await getCurrentUser();
       const users = [];
@@ -104,9 +85,9 @@ export default function Messages() {
     } catch (error) {
       setErrorMessage("Failed to load users. Please try again.");
     }
-  };
+  }, []);
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       const userData = await getCurrentUser();
       setUserDetails(userData);
@@ -156,7 +137,7 @@ export default function Messages() {
       setAllMessages([]);
       setErrorMessage("Failed to load messages. Please try again later.");
     }
-  };
+  }, []);
 
 const fetchAdminUsers = async (locationID) => {
   try {
@@ -214,6 +195,23 @@ const fetchSentMessages = async (userID) => {
     return []; 
   }
 };
+
+useEffect(() => {
+  fetchUsers();
+  fetchMessages();
+}, [fetchUsers, fetchMessages]);
+
+useEffect(() => {
+  if (filterUserID) {
+    const filtered = allMessages.filter((msg) => 
+      msg.sender === filterUserID || msg.receiver === filterUserID
+    );
+    setFilteredMessages(filtered);
+  } else {
+    setFilteredMessages(allMessages);  
+  }
+}, [filterUserID, allMessages]);
+
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
