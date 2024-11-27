@@ -33,7 +33,7 @@ import {
 } from "../../utils/childAPI"; // Adjust the path if necessary
 
 const AdminChild = () => {
-  const [searchOption, setSearchOption] = useState("id");
+  const [searchOption, setSearchOption] = useState("class");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -247,14 +247,13 @@ const AdminChild = () => {
       <FormControl sx={{ width: "50%" }}>
         <InputLabel>Search By</InputLabel>
         <Select value={searchOption} onChange={handleSearchOptionChange}>
-          <MenuItem value="id">Child ID</MenuItem>
           <MenuItem value="class">Class ID</MenuItem>
           <MenuItem value="location">Location ID</MenuItem>
         </Select>
       </FormControl>
 
       <TextField
-        label={`Enter ${searchOption === "id" ? "Child ID" : searchOption === "class" ? "Class ID" : "Location ID"}`}
+        label={`Enter ${searchOption === "class" ? "Class ID" : "Location ID"}`}
         variant="outlined"
         sx={{ width: "50%" }}
         value={searchTerm}
