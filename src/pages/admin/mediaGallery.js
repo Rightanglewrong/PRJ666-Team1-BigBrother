@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Button, TextField, Dialog, DialogContent, Typography, DialogActions, Snackbar, Alert } from '@mui/material';
+import { Button, Dialog, DialogContent, Typography, DialogActions, Snackbar, Alert } from '@mui/material';
 import Image from 'next/image';
 import styles from '../HomePage.module.css';
 import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } from '../../utils/mediaAPI';
+import { getCurrentUser } from '../../utils/api';
 
 const AdminMediaGallery = () => {
   const [locationID, setLocationID] = useState('');
+  const [defaultLocationID, setDefaultLocationID] = useState('');
   const [page, setPage] = useState(1);
   const [mediaEntries, setMediaEntries] = useState([]);
   const [mediaFiles, setMediaFiles] = useState([]);
@@ -19,26 +21,28 @@ const AdminMediaGallery = () => {
   const pageLimit = 3;
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const user = await getCurrentUser();
+        const userLocationID = user.locationID.toUpperCase();
+        setLocationID(userLocationID);
+        setDefaultLocationID(userLocationID); // Save the default location ID
+
+        // Automatically fetch media for the user's location ID
+        const entries = await fetchMediaByLocationID(userLocationID);
+        setMediaEntries(entries);
+        setShowResults(true);
+        fetchPaginatedMediaFiles(entries, 1);
+      } catch (err) {
+        console.error("Failed to fetch media by location ID:", err);
+        setError("Failed to load media files.");
+        setSnackbar({ open: true, message: 'No results found.', severity: 'error' });
+      }
+    };
+
+    fetchData();
     setIsClient(true);
   }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setPage(1);
-    try {
-      const uppercaseLocationID = locationID.toUpperCase();
-      setLocationID(uppercaseLocationID);
-  
-      const entries = await fetchMediaByLocationID(uppercaseLocationID);
-      setMediaEntries(entries);
-      setShowResults(true);
-      fetchPaginatedMediaFiles(entries, 1);
-    } catch (err) {
-      //console.error("Failed to fetch media by location ID:", err);
-      setError("Failed to load media files.");
-      setSnackbar({ open: true, message: 'No results found.', severity: 'error' });
-    }
-  };
 
   const fetchPaginatedMediaFiles = async (entries, pageNumber) => {
     try {
@@ -108,18 +112,6 @@ const AdminMediaGallery = () => {
     <div className={styles.homeContainer}>
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <h1 className={styles.title}>Media Gallery Lookup</h1>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', marginTop: '10px' }}>
-          <TextField
-            label="Location ID"
-            variant="outlined"
-            value={locationID}
-            onChange={(e) => setLocationID(e.target.value)}
-            style={{ width: '300px' }}
-          />
-          <Button type="submit" variant="contained" color="primary">
-            Submit
-          </Button>
-        </form>
 
         {showResults && (
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
