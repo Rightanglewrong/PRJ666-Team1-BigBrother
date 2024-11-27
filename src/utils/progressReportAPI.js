@@ -183,3 +183,32 @@ export const retrieveProgressReportByLocationID = async (locationID) => {
     throw new Error(error.message);
   }
 };
+
+export const sendWeeklyProgressReports = async (locationID, week) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+      throw new Error("No token found");
+  }
+  try {
+    const response = await fetch(`${BACKEND_URL}swm`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ locationID, week }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to send progress reports');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error sending weekly progress reports:', error);
+    throw new Error(error.message || 'An unknown error occurred');
+  }
+};
