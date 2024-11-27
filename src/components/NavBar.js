@@ -278,14 +278,7 @@ const NavBar = () => {
 
               {accountType === 'Admin' && (
                 <div>
-                  <Link
-                    href="/crudTester"
-                    passHref
-                    className={styles.dropdownItem}
-                    onClick={handleMenuClose}
-                  >
-                    Crud Testing
-                  </Link>
+                  
                   <Link
                     href="/admin/adminMedia"
                     passHref
