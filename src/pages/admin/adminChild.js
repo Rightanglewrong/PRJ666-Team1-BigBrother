@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   TextField,
   Typography,
@@ -31,10 +31,10 @@ import {
   deleteChildProfileFromDynamoDB,
   createChildProfileInDynamoDB,
 } from "../../utils/childAPI"; // Adjust the path if necessary
+import { useUser } from "@/components/authenticate";
 
 const AdminChild = () => {
-  const [searchOption, setSearchOption] = useState("location");
-  const [locationSearchTerm, setLocationSearchTerm] =useState("")
+  const [searchOption, setSearchOption] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,23 +48,22 @@ const AdminChild = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [showCreateForm, setShowCreateForm] = useState(false);
   const resultsPerPage = 3;
+  const user = useUser();
+
+  useEffect(() => {
+    handleSearch(); // Run the search when the component mounts (initial loading)
+  }, []);
 
   const handleSearchOptionChange = (event) => {
     setSearchOption(event.target.value);
     setSearchTerm("");
-    setLocationSearchTerm("");
-    setSearchResult(null);
     setCurrentPage(1);
     setExpandedCard(null);
   };
 
   const handleSearchTermChange = (event) => {
     const { value } = event.target;
-    if (searchOption === "location") {
-      setSearchTerm(value.toUpperCase());
-    } else {
-      setSearchTerm(value);
-    }
+    setSearchTerm(value);
   };
 
   const calculateAge = (birthDate) => {
@@ -122,12 +121,16 @@ const AdminChild = () => {
   const handleSearch = async () => {
     try {
       let result;
-      if (searchOption === "class") {
-        result = await retrieveChildrenByLocationID(locationSearchTerm);
-        result = result.filter((child) => child.classID === searchTerm);
-      } else if (searchOption === "location") {
-        result = await retrieveChildrenByLocationID(searchTerm);
-      }
+        result = await retrieveChildrenByLocationID(user.locationID); // Fetch all children for user's location
+      
+      if (searchOption === "Class ID") {
+        result = result.filter((child) => child.classID === searchTerm); // Filter by classID if searchTerm is provided
+      } else if (searchOption === "Child's First Name") {
+        result = result.filter((child) => child.firstName === searchTerm);
+      } else if (searchOption === "Child's Last Name") {
+        result = result.filter((child) => child.lastName === searchTerm);
+      } 
+      
 
       if (result && result.child && result.child.success) {
         setSearchResult([result.child.child]);
@@ -246,30 +249,30 @@ const AdminChild = () => {
       <FormControl sx={{ width: "50%" }}>
         <InputLabel>Search By</InputLabel>
         <Select value={searchOption} onChange={handleSearchOptionChange}>
-          <MenuItem value="location">Location ID</MenuItem>
-          <MenuItem value="class">Class ID</MenuItem>
+          <MenuItem value="All">All Children At This Location</MenuItem>
+          <MenuItem value="Class ID">Class ID</MenuItem>
+          <MenuItem value="Child's First Name">Child First Name</MenuItem>
+          <MenuItem value="Child's Last Name">Child Last Name</MenuItem>
         </Select>
       </FormControl>
 
-      <TextField
-        label={`Enter ${searchOption === "class" ? "Class ID" : "Location ID"}`}
-        variant="outlined"
-        sx={{ width: "50%" }}
-        value={searchTerm}
-        onChange={handleSearchTermChange}
-        placeholder={`Search by ${searchOption}`}
-      />
-      {searchOption === "class" ? (
-      <TextField
-        label={`Enter Location ID`}
-        variant="outlined"
-        sx={{ width: "50%" }}
-        value={locationSearchTerm}
-        onChange={(e) => setLocationSearchTerm(e.target.value.toUpperCase())}
-        placeholder={`Search by ${searchOption}`}
-      /> ): <></> }
 
-      <Button variant="contained" color="primary" onClick={handleSearch} disabled={!searchTerm}>
+      {searchOption !== "All" && (
+        <TextField
+          label={`Enter ${searchOption}`}
+          variant="outlined"
+          sx={{ width: "50%" }}
+          value={searchTerm}
+          onChange={handleSearchTermChange}
+          placeholder={`Search by ${searchOption}`}
+        />
+      )}
+
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={handleSearch} 
+        disabled={(searchOption !== "All" && !searchTerm)}>
         Search
       </Button>
 
