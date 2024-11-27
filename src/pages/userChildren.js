@@ -9,13 +9,12 @@ import {
   Collapse,
   IconButton,
   Pagination,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { retrieveChildProfileByID } from "../utils/childAPI";
 import { getRelationshipByParentID } from "../utils/relationshipAPI";
 import { useRouter } from "next/router";
+import SnackbarNotification from "../components/Modal/SnackBar"; // Import the Snackbar component
 
 const UserChildren = () => {
   const [children, setChildren] = useState([]);
@@ -64,7 +63,6 @@ const UserChildren = () => {
       setSnackbar({ open: true, message: "Error fetching child profiles.", severity: "error" });
     }
   };
-  
 
   const handleExpandClick = (index) => {
     setExpandedCard(expandedCard === index ? null : index);
@@ -130,11 +128,12 @@ const UserChildren = () => {
         </Box>
       )}
 
-      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      <SnackbarNotification
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={handleCloseSnackbar}
+      />
     </Box>
   );
 };
