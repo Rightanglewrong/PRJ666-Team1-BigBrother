@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getAllNewsletters } from "@/utils/newsletterAPI";
+import { useTheme } from "@/components/ThemeContext"; // Import ThemeContext
 import {
   Container,
   Typography,
@@ -21,11 +22,35 @@ import { useUser } from "@/components/authenticate";
 
 export default function NewsletterIndex() {
   const user = useUser();
+  const { colorblindMode } = useTheme(); // Access the colorblind mode from ThemeContext
   const [newsletters, setNewsletters] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const newslettersPerPage = 5; // Adjust this value for the number of newsletters per page
+
+  // Define original and colorblind-friendly button colors
+  const buttonColors = {
+    original: {
+      primary: "#3498db",
+      secondary: "#2ecc71",
+      danger: "#e74c3c",
+    },
+    "red-green": {
+      primary: "#1976d2", // Replace red with blue shades
+      secondary: "#ff9800", // Replace green with orange shades
+      danger: "#d32f2f", // Replace danger red with a neutral dark
+    },
+    "blue-yellow": {
+      primary: "#e77f24", // Replace blue with orange
+      secondary: "#3db48c", // Replace green with teal
+      danger: "#c62828", // Replace danger red with neutral dark
+    },
+  };
+
+  const colors =
+    buttonColors[colorblindMode] || buttonColors["original"]; // Use appropriate colors based on mode
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -125,9 +150,9 @@ export default function NewsletterIndex() {
               variant="contained"
               startIcon={<AddIcon />}
               sx={{
-                backgroundColor: "#2ecc71",
+                backgroundColor: colors.secondary,
                 color: "#fff",
-                "&:hover": { backgroundColor: "#27ae60" },
+                "&:hover": { backgroundColor: colors.primary },
                 textTransform: "none",
                 fontWeight: "bold",
                 width: "100%",
@@ -199,7 +224,7 @@ export default function NewsletterIndex() {
                     <Button
                       variant="contained"
                       sx={{
-                        backgroundColor: "#3498db",
+                        backgroundColor: colors.primary,
                         color: "#fff",
                         "&:hover": { backgroundColor: "#2980b9" },
                         textTransform: "none",
@@ -229,7 +254,9 @@ export default function NewsletterIndex() {
           count={Math.ceil(newsletters.length / newslettersPerPage)}
           page={currentPage}
           onChange={handlePageChange}
-          color="primary"
+          color={
+            colorblindMode === "blue-yellow" ? "secondary" : "primary" // Use "secondary" for blue-yellow mode
+          }
         />
       </Box>
     </Container>

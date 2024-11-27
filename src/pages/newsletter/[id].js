@@ -24,9 +24,11 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useUser } from "@/components/authenticate";
+import { useTheme } from "@/components/ThemeContext"; // Import ThemeContext
 
 export default function NewsletterDetailPage() {
   const user = useUser();
+  const { colorblindMode } = useTheme(); // Access the colorblind mode
   const router = useRouter();
   const { id } = router.query;
   const [newsletter, setNewsletter] = useState(null);
@@ -38,6 +40,28 @@ export default function NewsletterDetailPage() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State for delete confirmation dialog
 
   const accountTypeOptions = ["Admin", "Staff", "Parent"];
+
+  // Define original and colorblind-friendly button colors
+  const buttonColors = {
+    original: {
+      primary: "#3498db",
+      secondary: "#2ecc71",
+      danger: "#e74c3c",
+    },
+    "red-green": {
+      primary: "#1976d2",
+      secondary: "#ff9800",
+      danger: "#e77f24",
+    },
+    "blue-yellow": {
+      primary: "#e77f24",
+      secondary: "#3db48c",
+      danger: "#c62828",
+    },
+  };
+
+  const colors =
+    buttonColors[colorblindMode] || buttonColors["original"];
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -215,9 +239,9 @@ export default function NewsletterDetailPage() {
                 type="submit"
                 variant="contained"
                 sx={{
-                  backgroundColor: "#3498db",
+                  backgroundColor: colors.primary,
                   color: "#fff",
-                  "&:hover": { backgroundColor: "#2980b9" },
+                  "&:hover": { backgroundColor: colors.secondary },
                 }}
               >
                 Save Changes
@@ -265,7 +289,12 @@ export default function NewsletterDetailPage() {
                 <Button
                   variant="contained"
                   onClick={() => setEditMode(true)}
-                  sx={{ mt: 2 }}
+                  sx={{
+                    mt: 2,
+                    backgroundColor: colors.primary,
+                    color: "#fff",
+                    "&:hover": { backgroundColor: colors.secondary },
+                  }}
                 >
                   Edit Newsletter
                 </Button>
@@ -274,9 +303,17 @@ export default function NewsletterDetailPage() {
                 <>
                   <Button
                     variant="outlined"
-                    color="error"
                     onClick={() => setOpenDeleteDialog(true)}
-                    sx={{ mt: 2, ml: 2 }}
+                    sx={{
+                      mt: 2,
+                      ml: 2,
+                      borderColor: colors.danger,
+                      color: colors.danger,
+                      "&:hover": {
+                        backgroundColor: colors.danger,
+                        color: "#fff",
+                      },
+                    }}
                   >
                     Delete
                   </Button>
@@ -335,7 +372,12 @@ export default function NewsletterDetailPage() {
                   variant="contained"
                   onClick={sendNewsletterViaEmail}
                   disabled={sendingEmail || selectedAccountTypes.length === 0}
-                  sx={{ mt: 3 }}
+                  sx={{
+                    mt: 3,
+                    backgroundColor: colors.secondary,
+                    color: "#fff",
+                    "&:hover": { backgroundColor: colors.primary },
+                  }}
                   startIcon={sendingEmail && <CircularProgress size={20} />}
                 >
                   {sendingEmail ? "Sending..." : "Email Newsletter"}
@@ -344,7 +386,11 @@ export default function NewsletterDetailPage() {
               <Button
                 variant="text"
                 onClick={backToList}
-                sx={{ mt: 3, color: "#3498db" }}
+                sx={{
+                  mt: 3,
+                  color: colors.primary,
+                  "&:hover": { color: colors.secondary },
+                }}
               >
                 Back to Newsletter List
               </Button>

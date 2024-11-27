@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { createNewsletter } from "@/utils/newsletterAPI";
 import { useUser } from "@/components/authenticate";
+import { useTheme } from "@/components/ThemeContext"; // Import ThemeContext
 import {
   Container,
   Typography,
@@ -16,12 +17,32 @@ import {
 
 export default function CreateNewsletterPage() {
   const userDetails = useUser();
+  const { colorblindMode } = useTheme(); // Access the colorblind mode
   const router = useRouter();
   const [newsletter, setNewsletter] = useState({
     title: "",
     content: "",
   });
   const [message, setMessage] = useState("");
+
+    // Define original and colorblind-friendly button colors
+    const buttonColors = {
+      original: {
+        primary: "#3498db",
+        secondary: "#2ecc71",
+      },
+      "red-green": {
+        primary: "#1976d2",
+        secondary: "#ff9800",
+      },
+      "blue-yellow": {
+        primary: "#e77f24",
+        secondary: "#3db48c",
+      },
+    };
+  
+    const colors =
+      buttonColors[colorblindMode] || buttonColors["original"];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -103,10 +124,10 @@ export default function CreateNewsletterPage() {
           type="submit"
           variant="contained"
           sx={{
-            backgroundColor: "#3498db",
+            backgroundColor: colors.primary,
             color: "#fff",
             fontWeight: "bold",
-            "&:hover": { backgroundColor: "#2980b9" },
+            "&:hover": { backgroundColor: colors.secondary },
           }}
           fullWidth
         >
@@ -118,7 +139,10 @@ export default function CreateNewsletterPage() {
         <Button
           onClick={() => router.push("/newsletter")}
           variant="text"
-          sx={{ color: "#3498db" }}
+          sx={{
+            color: colors.primary,
+            "&:hover": { color: colors.secondary },
+          }}
         >
           Back to Newsletter List
         </Button>
