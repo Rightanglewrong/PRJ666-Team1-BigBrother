@@ -19,6 +19,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material"; 
+import { useCallback } from 'react';
 
 
 export default function ViewProgressReportsPage() {
@@ -41,7 +42,7 @@ export default function ViewProgressReportsPage() {
 
     
         
-    const fetchReportsByChildID = async () => { 
+    const fetchReportsByChildID = useCallback(async () => { 
       if (childID) {
         try{
             const childReportData = await retrieveProgressReportByChildID(childID);
@@ -50,11 +51,11 @@ export default function ViewProgressReportsPage() {
             setMessage(`Error fetching child reports: ${error.message}`);
         }
       };        
-    };
+    }, [childID]);
 
     useEffect(() => {
       fetchReportsByChildID();
-    }, [childID]);
+    }, [fetchReportsByChildID, childID]);
        
 
     const parseReportContent = (content) => {
@@ -64,12 +65,12 @@ export default function ViewProgressReportsPage() {
           const [subject, progressTrend, comments, action] = contentArray;
   
           return (
-              <div>
+              <Box component ="div">
                   {subject && <div><strong>Subject:</strong> {subject}</div>}
                   {progressTrend && <div><strong>Progress Trend:</strong> {progressTrend}</div>}
                   {comments && <div><strong>Comments:</strong> {comments}</div>}
                   {action && <div><strong>Action:</strong> {action}</div>}
-              </div>
+              </Box>
           );
       }
       return null;
@@ -170,9 +171,9 @@ export default function ViewProgressReportsPage() {
             childReports.map(report => (
               <Box key={report.progressReportID} mb={2}>
                 <Typography variant="h6">Title: {report.reportTitle}</Typography>
-                <Typography variant="body1">
+                <Box>
                 {parseReportContent(report.content)}
-                </Typography>
+                </Box>
                 <Typography variant="body1"> Creation Date:  
                 {report.datePosted}
                 </Typography>

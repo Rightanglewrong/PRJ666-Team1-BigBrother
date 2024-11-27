@@ -13,6 +13,7 @@ import { getCurrentUser } from "../utils/api";
 import { useUser } from "@/components/authenticate";
 import { withAuth } from "@/hoc/withAuth";
 import styles from "./calendar.module.css";
+import { useCallback } from 'react';
 
 const CalendarView = () => {
   const user = useUser();
@@ -32,23 +33,7 @@ const CalendarView = () => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
 
-  useEffect(() => {
-    const fetchUserDataAndLoadEvents = async () => {
-      if (user) {
-        setIsAuthorized(
-          user.accountType === "Admin" || user.accountType === "Staff"
-        );
-        setNewEvent((prev) => ({
-          ...prev,
-          createdBy: user.userID,
-          locationID: user.locationID,
-        }));
-        await loadCalendarEntries();
-      }
-    };
 
-    fetchUserDataAndLoadEvents();
-  }, [user]);
 
   // Format date to YYYY-MM-DD
   const formatDateToYYYYMMDD = (date) => {
@@ -69,7 +54,7 @@ const CalendarView = () => {
   };
 
   // Function to load calendar entries by date range
-  const loadCalendarEntries = async () => {
+  const loadCalendarEntries = useCallback(async () => {
     const startDate = new Date();
     startDate.setFullYear(startDate.getFullYear() - 1); // Start date: 1 year ago
     const endDate = new Date();
@@ -102,7 +87,25 @@ const CalendarView = () => {
       setShowErrorModal(true);
       console.error("Error fetching calendar entries:", error);
     }
+  }, [user]);
+
+  useEffect(() => {
+    const fetchUserDataAndLoadEvents = async () => {
+      if (user) {
+        setIsAuthorized(
+          user.accountType === "Admin" || user.accountType === "Staff"
+        );
+        setNewEvent((prev) => ({
+          ...prev,
+          createdBy: user.userID,
+          locationID: user.locationID,
+        }));
+        await loadCalendarEntries();
+      }
   };
+
+    fetchUserDataAndLoadEvents();
+  }, [loadCalendarEntries, user]);
 
   // Handle event creation (with date and time selection)
   const handleSelect = (selectionInfo) => {

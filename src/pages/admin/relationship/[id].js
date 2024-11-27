@@ -26,6 +26,8 @@ import {
     MenuItem,
     DialogContentText
   } from "@mui/material"; 
+import { useCallback } from 'react';
+
 
 export default function Relationships() {
     const router = useRouter();
@@ -40,12 +42,7 @@ export default function Relationships() {
     const [parentProfiles, setParentProfiles] = useState([]);
     const [childProfiles, setChildProfiles] = useState([]);
     
-    useEffect(() => {
-        if (id && type) {
-            fetchEntityName();
-            fetchRelationships();
-        }
-    }, [id, type]);
+ 
 
     useEffect(() => {
         const fetchProfilesData = async () => {
@@ -58,7 +55,7 @@ export default function Relationships() {
                 setParentProfiles(parents.users || []);
                 setChildProfiles(children || []);
             } catch (error) {
-                console.error("Error fetching profiles:", error);
+                setErrorMessage("Error fetching profiles:", error);
                 setParentProfiles([]);
                 setChildProfiles([]);
             }
@@ -67,7 +64,7 @@ export default function Relationships() {
         fetchProfilesData();
     }, [user]);
 
-    const fetchEntityName = async () => {
+    const fetchEntityName = useCallback(async () => {
         try {
             if (type === "parent") {
                 const parent = await retrieveUserByIDInDynamoDB(id);
@@ -77,11 +74,11 @@ export default function Relationships() {
                 setEntityName(`${child.child.child.firstName} ${child.child.child.lastName}`);
             }
         } catch (error) {
-            console.error("Error loading entity name:", error); 
+            setErrorMessage("Error loading entity name:", error); 
         }
-    };
+    }, [id, type]);
 
-    const fetchRelationships = async () => {
+    const fetchRelationships = useCallback(async () => {
         try {
             let data = [];
             if (type === "parent") {
@@ -114,9 +111,16 @@ export default function Relationships() {
 
             setRelationships(enrichedRelationships || []);
         } catch (error) {
-            console.error("Error loading relationships. Please try again.");
+            setErrorMessage("Error loading relationships. Please try again.");
         }
-    };
+    }, [id, type]);
+
+    useEffect(() => {
+        if (id && type) {
+            fetchEntityName();
+            fetchRelationships();
+        }
+    }, [fetchEntityName, fetchRelationships, id, type]);
 
     const handleDeleteClick = (relationshipID) => {
         setDeleteRelation(relationshipID);
@@ -183,12 +187,6 @@ export default function Relationships() {
             >
                   {`${entityName}'s Relationships`}
             </Typography>
-
-            {errorMessage && (
-                <Alert severity="error" onClose={() => setErrorMessage("")}>
-                    {errorMessage}
-                </Alert>
-            )}
 
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "center" }}>
                 {relationships.length > 0 ? (

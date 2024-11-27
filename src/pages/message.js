@@ -36,11 +36,11 @@ import {
   retrieveUserByIDInDynamoDB,
   getUsersByAccountTypeAndLocation
 } from "../utils/userAPI";
+import { useCallback } from 'react';
+
 
 export default function Messages() {
   const [userDetails, setUserDetails] = useState(null);
-  const [incomingMessages, setIncomingMessages] = useState([]);
-  const [outgoingMessages, setOutgoingMessages] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -63,26 +63,7 @@ export default function Messages() {
   const [filterFirstName, setFilterFirstName] = useState(null);  
   const [filterLastName, setFilterLastName] = useState(null);  
 
-
-
-  useEffect(() => {
-    fetchUsers();
-    fetchMessages();
-  }, []);
-
-  useEffect(() => {
-    if (filterUserID) {
-      const filtered = allMessages.filter((msg) => 
-        msg.sender === filterUserID || msg.receiver === filterUserID
-      );
-      setFilteredMessages(filtered);
-    } else {
-      setFilteredMessages(allMessages);  
-    }
-  }, [filterUserID, allMessages]);
-
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const userData = await getCurrentUser();
       const users = [];
@@ -104,9 +85,9 @@ export default function Messages() {
     } catch (error) {
       setErrorMessage("Failed to load users. Please try again.");
     }
-  };
+  }, []);
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       const userData = await getCurrentUser();
       setUserDetails(userData);
@@ -148,19 +129,15 @@ export default function Messages() {
 
     }));
       const allMessagesList = [...receivedMessagesWithNames, ...sentMessagesWithNames]
-      setIncomingMessages(receivedMessagesWithNames || []);
-      setOutgoingMessages(sentMessagesWithNames || []);
       
       setAllMessages(allMessagesList);
       setFilteredMessages(allMessagesList);
       
     } catch (error) {
-      setIncomingMessages([]); 
-      setOutgoingMessages([]); 
       setAllMessages([]);
       setErrorMessage("Failed to load messages. Please try again later.");
     }
-  };
+  }, []);
 
 const fetchAdminUsers = async (locationID) => {
   try {
@@ -218,6 +195,23 @@ const fetchSentMessages = async (userID) => {
     return []; 
   }
 };
+
+useEffect(() => {
+  fetchUsers();
+  fetchMessages();
+}, [fetchUsers, fetchMessages]);
+
+useEffect(() => {
+  if (filterUserID) {
+    const filtered = allMessages.filter((msg) => 
+      msg.sender === filterUserID || msg.receiver === filterUserID
+    );
+    setFilteredMessages(filtered);
+  } else {
+    setFilteredMessages(allMessages);  
+  }
+}, [filterUserID, allMessages]);
+
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
