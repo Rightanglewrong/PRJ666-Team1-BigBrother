@@ -45,7 +45,7 @@ const AdminChild = () => {
   const [deleteChildID, setDeleteChildID] = useState(null);
   const [deleteInput, setDeleteInput] = useState("");
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const [showCreateForm, setShowCreateForm]= useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const resultsPerPage = 3;
 
   const handleSearchOptionChange = (event) => {
@@ -57,7 +57,66 @@ const AdminChild = () => {
   };
 
   const handleSearchTermChange = (event) => {
-    setSearchTerm(event.target.value);
+    const { value } = event.target;
+    if (searchOption === "id") {
+      setSearchTerm(value.toLowerCase());
+    } else if (searchOption === "location") {
+      setSearchTerm(value.toUpperCase());
+    } else {
+      setSearchTerm(value);
+    }
+  };
+
+  const calculateAge = (birthDate) => {
+    if (!birthDate) return "";
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const handleInputChange = (field, value) => {
+    setEditData((prev) => {
+      const updatedData = { ...prev, [field]: value };
+      if (field === "birthDate") {
+        const today = new Date();
+        const selectedDate = new Date(value);
+        if (selectedDate > today) {
+          setSnackbar({
+            open: true,
+            message: "Birth date cannot be greater than today's date.",
+            severity: "error",
+          });
+          return prev;
+        }
+        updatedData.age = calculateAge(value);
+      }
+      return updatedData;
+    });
+  };
+
+  const handleCreateInputChange = (field, value) => {
+    setCreateData((prev) => {
+      const updatedData = { ...prev, [field]: value };
+      if (field === "birthDate") {
+        const today = new Date();
+        const selectedDate = new Date(value);
+        if (selectedDate > today) {
+          setSnackbar({
+            open: true,
+            message: "Birth date cannot be greater than today's date.",
+            severity: "error",
+          });
+          return prev;
+        }
+        updatedData.age = calculateAge(value);
+      }
+      return updatedData;
+    });
   };
 
   const handleSearch = async () => {
@@ -93,11 +152,11 @@ const AdminChild = () => {
   };
 
   const handleCreateButtonClick = () => {
-    setShowCreateForm(true); // Toggle the visibility of the create form
+    setShowCreateForm(true);
   };
 
   const handleCancelCreateButtonClick = () => {
-    setShowCreateForm(false); // Toggle the visibility of the create form
+    setShowCreateForm(false);
   };
 
   const handleEditClick = (item) => {
@@ -113,42 +172,32 @@ const AdminChild = () => {
     setIsEditing(true);
   };
 
-  const handleInputChange = (field, value) => {
-    setEditData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleCreateInputChange = (field, value) => {
-    setCreateData((prev) => ({ ...prev, [field]: value }));
-  };
-
   const handleCreate = async () => {
-    try{ 
+    try {
       await createChildProfileInDynamoDB(createData);
       setSnackbar({ open: true, message: "Child created successfully!", severity: "success" });
-      setCreateData({}); 
+      setCreateData({});
       handleSearch();
       setShowCreateForm(false);
-
-    }catch (error) {
+    } catch (error) {
       setSnackbar({
         open: true,
         message: "Error creating profile. Please check all fields.",
         severity: "error",
       });
     }
-  }
+  };
 
   const handleSave = async (childID) => {
     try {
       const updatedData = { ...editData };
-      delete updatedData.childID; // Ensure childID is not sent to the API if unnecessary
-  
+      delete updatedData.childID;
+
       await updateChildProfileInDynamoDB(childID, updatedData);
-      setSnackbar({ open: true, message: "Profile updated successfully!", severity: "success" }); // Success notification
-      setIsEditing(false); // Exit edit mode
-      handleSearch(); // Refresh the search results
+      setSnackbar({ open: true, message: "Profile updated successfully!", severity: "success" });
+      setIsEditing(false);
+      handleSearch();
     } catch (error) {
-      // Custom error message
       setSnackbar({
         open: true,
         message: "Error saving edits. Please check fields are all filled in.",
@@ -156,7 +205,7 @@ const AdminChild = () => {
       });
     }
   };
-  
+
   const handleHideSearchResults = () => {
     setSearchResult(null);
   };
@@ -195,9 +244,6 @@ const AdminChild = () => {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
       <Typography variant="h4" component="h1">Search for Child Profile</Typography>
-
-      
-
       <FormControl sx={{ width: "50%" }}>
         <InputLabel>Search By</InputLabel>
         <Select value={searchOption} onChange={handleSearchOptionChange}>
@@ -221,12 +267,10 @@ const AdminChild = () => {
       </Button>
 
       {!showCreateForm && (
-      <Button variant="contained" color="primary" onClick={handleCreateButtonClick}>
-        Create Child Profile
-      </Button>
+        <Button variant="contained" color="primary" onClick={handleCreateButtonClick}>
+          Create Child Profile
+        </Button>
       )}
-
-      
 
       {searchResult && (
         <Box sx={{ mt: 4, width: "50%" }}>
@@ -307,15 +351,21 @@ const AdminChild = () => {
                           />
                           <TextField
                             label="Birth Date"
-                            value={editData.birthDate}
+                            type="date"
+                            value={editData.birthDate || ""}
                             onChange={(e) => handleInputChange("birthDate", e.target.value)}
-                            fullWidth sx={{ mb: 2 }}
+                            fullWidth
+                            sx={{ mb: 2 }}
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
                           />
                           <TextField
                             label="Age"
-                            value={editData.age}
-                            onChange={(e) => handleInputChange("age", e.target.value)}
-                            fullWidth sx={{ mb: 2 }}
+                            value={editData.age || ""}
+                            disabled
+                            fullWidth
+                            sx={{ mb: 2 }}
                           />
                           <Box sx={{ display: "flex", gap: 2 }}>
                             <Button variant="contained" color="primary" onClick={() => handleSave(editData.childID)}>
@@ -360,7 +410,7 @@ const AdminChild = () => {
         </Box>
       )}
 
-{showCreateForm && (
+      {showCreateForm && (
         <Box sx={{ width: "50%", mt: 3 }}>
           <Typography variant="h5">Create New Child Profile</Typography>
           <TextField
@@ -393,39 +443,32 @@ const AdminChild = () => {
           />
           <TextField
             label="Birth Date"
+            type="date"
             value={createData.birthDate || ""}
             onChange={(e) => handleCreateInputChange("birthDate", e.target.value)}
             fullWidth
             sx={{ mb: 2 }}
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
           <TextField
             label="Age"
             value={createData.age || ""}
-            onChange={(e) => handleCreateInputChange("age", e.target.value)}
+            disabled
             fullWidth
             sx={{ mb: 2 }}
           />
-      {showCreateForm && (
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2, marginBottom : 4 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCancelCreateButtonClick}
-          >
-            Cancel Creation
-          </Button>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleCreate}
-          >
-            Confirm Create
-          </Button>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2, marginBottom: 4 }}>
+            <Button variant="contained" color="primary" onClick={handleCancelCreateButtonClick}>
+              Cancel Creation
+            </Button>
+            <Button variant="contained" color="success" onClick={handleCreate}>
+              Confirm Create
+            </Button>
+          </Box>
         </Box>
       )}
-
-      </Box>
-     )}
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
@@ -459,6 +502,5 @@ const AdminChild = () => {
     </Box>
   );
 };
-
 
 export default AdminChild;

@@ -1,4 +1,4 @@
-// components/CustomCard.js
+// components/Card/CustomCard.js
 import React from 'react';
 import { Card, CardContent, CardActions, Typography } from '@mui/material';
 

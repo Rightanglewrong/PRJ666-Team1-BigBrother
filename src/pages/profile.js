@@ -3,170 +3,39 @@ import { useUser } from '@/components/authenticate';
 import { updateUserProfile, getCurrentUser } from '../utils/api';
 import { addContact, fetchContacts, updateContact, deleteContact } from '@/utils/contactApi';
 import { withAuth } from '@/hoc/withAuth';
-import {
-  Box,
-  Container,
-  Typography,
-  TextField,
-  Select,
-  MenuItem,
-  Button,
-  Snackbar,
-  Alert,
-  FormControl,
-  InputLabel,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-} from '@mui/material';
+import { Box, Container, Typography, Button, Snackbar, Alert, Stack } from '@mui/material';
 import { styled } from '@mui/system';
-
-const AddContactButton = styled(Button)({
-  backgroundColor: '#4CAF50',
-  color: 'white',
-  '&:hover': { backgroundColor: '#45a049' },
-});
-
-const EditButton = styled(Button)({
-  backgroundColor: '#3498db',
-  color: 'white',
-  '&:hover': { backgroundColor: '#2980b9' },
-});
-
-const DeleteButton = styled(Button)({
-  backgroundColor: '#e74c3c',
-  color: 'white',
-  '&:hover': { backgroundColor: '#c0392b' },
-});
+import ProfileEditor from '@/components/Form/ProfileEditor';
+import ContactList from '@/components/List/ContactList';
 
 const ProfilePage = () => {
   const user = useUser();
 
-  // Profile state
-  const [firstName, setFirstName] = useState(user?.firstName || '');
-  const [lastName, setLastName] = useState(user?.lastName || '');
-  const [locationID, setLocationID] = useState(user?.locationID || '');
-  const [accountType] = useState(user?.accountType || ''); // Account type is uneditable
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
-  // Contact state
-  const [contacts, setContacts] = useState([]);
-  const [newContact, setNewContact] = useState({
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    relationship: '',
-    address: '',
-  });
-  const [editingContact, setEditingContact] = useState(null);
-  const [isAdding, setIsAdding] = useState(false);
-
-  // Load contacts on mount
-  useEffect(() => {
-    const loadContacts = async () => {
-      try {
-        const fetchedContacts = await fetchContacts(user.userID);
-        setContacts(fetchedContacts);
-      } catch (error) {
-        setError(error.message || 'Error fetching contacts.');
-      }
-    };
-    if (user) loadContacts();
-  }, [user]);
-
   // Update profile handler
-  const handleUpdateProfile = async (e) => {
-    e.preventDefault();
-    // Only include fields that have been changed
-    const updatedData = {};
-    if (firstName !== user.firstName) updatedData.firstName = firstName;
-    if (lastName !== user.lastName) updatedData.lastName = lastName;
-    if (locationID !== user.locationID) updatedData.locationID = locationID;
-    if (accountType !== user.accountType) updatedData.accountType = accountType;
-
-    // Check if there are any updates
-    if (Object.keys(updatedData).length === 0) {
-      setError('No changes to update');
-      return;
-    }
-    
+  const handleUpdateProfile = async (updatedData) => {
     try {
       const response = await updateUserProfile(updatedData);
-      const token = response.token;
 
-      if (token) {
-        // Update the token in localStorage
-        localStorage.setItem('token', token);
+      if (response.token) {
+        localStorage.setItem('token', response.token);
       }
 
-      // Check the updated user profile for accStatus
-      const updatedUser = await getCurrentUser(); 
+      const updatedUser = await getCurrentUser();
+
       if (updatedUser.accStatus === 'PENDING') {
         setError('Your account is now pending reapproval. You will be logged out.');
         localStorage.removeItem('token');
-        setTimeout(() => {
-          window.location.href = '/login'; 
-        }, 3000); // Provide time for the user to read the message
+        setTimeout(() => (window.location.href = '/login'), 3000);
         return;
       }
 
       setSuccess('Profile updated successfully');
     } catch (err) {
-      setError(`Failed to update profile: ${err}`);
+      setError(`Failed to update profile: ${err.message}`);
     }
-  };
-
-  // Save or update contact
-  const handleSaveContact = async () => {
-    try {
-      const contactData = { userID: user.userID, ...newContact };
-      if (editingContact) {
-        await updateContact(editingContact.contactID, contactData);
-        setSuccess('Contact updated successfully!');
-      } else {
-        await addContact(user.userID, contactData);
-        setSuccess('Contact added successfully!');
-      }
-      const updatedContacts = await fetchContacts(user.userID);
-      setContacts(updatedContacts);
-      resetContactForm();
-    } catch (error) {
-      setError(`Error adding/updating contact: ${error.message}`);
-    }
-  };
-
-  const handleEditContact = (contact) => {
-    setNewContact(contact);
-    setEditingContact(contact);
-    setIsAdding(true);
-  };
-
-  const handleDeleteContact = async (contactID) => {
-    try {
-      await deleteContact(contactID);
-      setContacts((prevContacts) => prevContacts.filter((c) => c.contactID !== contactID));
-      setSuccess('Contact deleted successfully!');
-    } catch (error) {
-      setError(`Error deleting contact: ${error.message}`);
-    }
-  };
-
-  const resetContactForm = () => {
-    setNewContact({
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      relationship: '',
-      address: '',
-    });
-    setEditingContact(null);
-    setIsAdding(false);
-  };
-
-  const handleInputChange = (e) => {
-    setNewContact({ ...newContact, [e.target.name]: e.target.value });
   };
 
   const titleStyle = {
@@ -181,209 +50,64 @@ const ProfilePage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      {/* Profile and Contacts Titles */}
-      <Grid container spacing={4} alignItems="center">
-        {/* Left Column: Profile Title */}
-        <Grid item xs={12} md={6}>
-          <Typography variant="h4" gutterBottom align="center" sx={titleStyle}>
-            Profile
-          </Typography>
-        </Grid>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh', // Ensure the container fills the viewport
+      }}
+    >
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        {/* Notifications */}
+        <Snackbar open={Boolean(success)} autoHideDuration={6000} onClose={() => setSuccess('')}>
+          <Alert onClose={() => setSuccess('')} severity="success" variant="filled">
+            {success}
+          </Alert>
+        </Snackbar>
+        <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={() => setError('')}>
+          <Alert onClose={() => setError('')} severity="error" variant="filled">
+            {error}
+          </Alert>
+        </Snackbar>
 
-        {/* Right Column: Contacts Title */}
-        <Grid item xs={12} md={6}>
-          <Typography variant="h4" gutterBottom align="center" sx={titleStyle}>
-            Contacts
-          </Typography>
-        </Grid>
-      </Grid>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={4}>
+          {/* Left Section: Profile */}
+          <Stack spacing={2} sx={{ flex: 1 }}>
+            {/* Profile Title */}
+            <Typography variant="h4" align="center" sx={titleStyle}>
+              Profile
+            </Typography>
 
-      {/* Notifications */}
-      <Snackbar open={Boolean(success)} autoHideDuration={6000} onClose={() => setSuccess('')}>
-        <Alert onClose={() => setSuccess('')} severity="success" variant="filled">
-          {success}
-        </Alert>
-      </Snackbar>
-      <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={() => setError('')}>
-        <Alert onClose={() => setError('')} severity="error" variant="filled">
-          {error}
-        </Alert>
-      </Snackbar>
-
-      <Grid container spacing={4}>
-        {/* Left Column: Profile Form */}
-        <Grid item xs={12} md={6}>
-          <Box component="form" onSubmit={handleUpdateProfile} sx={{ mt: 2 }}>
-            <TextField
-              label="User ID"
-              value={user?.userID || ''}
-              fullWidth
-              disabled
-              margin="normal"
+            {/* Profile Form */}
+            <ProfileEditor
+              user={user}
+              onUpdateProfile={handleUpdateProfile}
+              onSuccess={setSuccess}
+              onError={setError}
             />
-            <TextField label="Email" value={user?.email || ''} fullWidth disabled margin="normal" />
-            <TextField
-              label="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              fullWidth
-              margin="normal"
-              required
-            />
-            <TextField
-              label="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              fullWidth
-              margin="normal"
-              required
-            />
-            <TextField
-              label="Location ID"
-              value={locationID}
-              onChange={(e) => setLocationID(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <FormControl fullWidth margin="normal" disabled>
-              <InputLabel>Account Type</InputLabel>
-              <Select value={accountType}>
-                <MenuItem value="Parent">Parent</MenuItem>
-                <MenuItem value="Staff">Staff</MenuItem>
-                <MenuItem value="Admin">Admin</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              label="Account Status"
-              value={user?.accStatus || console.log(user)}
-              fullWidth
-              disabled
-              margin="normal"
-            />
-            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-              Update Info
-            </Button>
-          </Box>
-        </Grid>
+          </Stack>
 
-        {/* Right Column: Contact List */}
-        <Grid item xs={12} md={6}>
-          <Box
-            sx={{
-              my: 2,
-              width: '100%', // Ensure the content doesn't stretch beyond the column
-              maxWidth: '500px', // Optional: Limit the max width of the content
-            }}
-          >
-            {contacts.length > 0 ? (
-              contacts.map((contact) => (
-                <Card
-                  key={contact.contactID}
-                  variant="outlined"
-                  sx={{
-                    my: 2,
-                    backgroundColor: '#f9f9f9',
-                    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                      {`${contact.firstName} ${contact.lastName}`}
-                    </Typography>
-                    <Typography variant="body2">Phone: {contact.phoneNumber}</Typography>
-                    <Typography variant="body2">Relationship: {contact.relationship}</Typography>
-                    <Typography variant="body2">Address: {contact.address}</Typography>
-                  </CardContent>
-                  <CardActions sx={{ justifyContent: 'flex-end' }}>
-                    <EditButton onClick={() => handleEditContact(contact)} size="small">
-                      Edit
-                    </EditButton>
-                    <DeleteButton
-                      onClick={() => handleDeleteContact(contact.contactID)}
-                      size="small"
-                    >
-                      Remove
-                    </DeleteButton>
-                  </CardActions>
-                </Card>
-              ))
-            ) : (
-              <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-                No contacts available. Use the Add Contact button to add one.
-              </Typography>
-            )}
-          </Box>
+          {/* Right Section: Contacts */}
+          <Stack spacing={2} sx={{ flex: 1 }}>
+            {/* Contacts Title */}
+            <Typography variant="h4" align="center" sx={titleStyle}>
+              Contacts
+            </Typography>
 
-          {/* Add/Edit Contact Form */}
-          {isAdding && (
-            <Box
-              component="form"
-              my={1}
-              display="flex"
-              flexDirection="column"
-              gap={2}
-              sx={{ width: '100%', maxWidth: '500px' }}
-            >
-              <TextField
-                label="First Name"
-                name="firstName"
-                value={newContact.firstName}
-                onChange={handleInputChange}
-                required
-              />
-              <TextField
-                label="Last Name"
-                name="lastName"
-                value={newContact.lastName}
-                onChange={handleInputChange}
-                required
-              />
-              <TextField
-                label="Phone Number"
-                name="phoneNumber"
-                value={newContact.phoneNumber}
-                onChange={handleInputChange}
-                required
-              />
-              <TextField
-                label="Relationship"
-                name="relationship"
-                value={newContact.relationship}
-                onChange={handleInputChange}
-              />
-              <TextField
-                label="Address"
-                name="address"
-                value={newContact.address}
-                onChange={handleInputChange}
-              />
-              <Box display="flex" justifyContent="flex-end" gap={2}>
-                <Button variant="contained" color="primary" onClick={handleSaveContact}>
-                  {editingContact ? 'Update Contact' : 'Add Contact'}
-                </Button>
-                <Button variant="outlined" color="secondary" onClick={resetContactForm}>
-                  Cancel
-                </Button>
-              </Box>
-            </Box>
-          )}
-
-          {!isAdding && (
-            <AddContactButton
-              onClick={() => setIsAdding(true)}
-              sx={{
-                width: '100%', // Matches the container width
-                maxWidth: '500px', // Matches the container's maxWidth
-              }}
-            >
-              Add Contact
-            </AddContactButton>
-          )}
-        </Grid>
-      </Grid>
-    </Container>
+            {/* Contacts List */}
+            <ContactList
+              userID={user?.userID}
+              fetchContactsApi={fetchContacts}
+              addContactApi={addContact}
+              updateContactApi={updateContact}
+              deleteContactApi={deleteContact}
+              onSuccess={setSuccess}
+              onError={setError}
+            />
+          </Stack>
+        </Stack>
+      </Container>
+    </Box>
   );
 };
-
 export default withAuth(ProfilePage);
