@@ -4,7 +4,6 @@ import { updateUserProfile, getCurrentUser } from '../utils/api';
 import { addContact, fetchContacts, updateContact, deleteContact } from '@/utils/contactApi';
 import { withAuth } from '@/hoc/withAuth';
 import { Box, Container, Typography, Button, Snackbar, Alert, Stack } from '@mui/material';
-import { styled } from '@mui/system';
 import ProfileEditor from '@/components/Form/ProfileEditor';
 import ContactList from '@/components/List/ContactList';
 
