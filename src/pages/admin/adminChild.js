@@ -33,7 +33,8 @@ import {
 } from "../../utils/childAPI"; // Adjust the path if necessary
 
 const AdminChild = () => {
-  const [searchOption, setSearchOption] = useState("id");
+  const [searchOption, setSearchOption] = useState("location");
+  const [locationSearchTerm, setLocationSearchTerm] =useState("")
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,6 +52,7 @@ const AdminChild = () => {
   const handleSearchOptionChange = (event) => {
     setSearchOption(event.target.value);
     setSearchTerm("");
+    setLocationSearchTerm("");
     setSearchResult(null);
     setCurrentPage(1);
     setExpandedCard(null);
@@ -58,9 +60,7 @@ const AdminChild = () => {
 
   const handleSearchTermChange = (event) => {
     const { value } = event.target;
-    if (searchOption === "id") {
-      setSearchTerm(value.toLowerCase());
-    } else if (searchOption === "location") {
+    if (searchOption === "location") {
       setSearchTerm(value.toUpperCase());
     } else {
       setSearchTerm(value);
@@ -122,10 +122,9 @@ const AdminChild = () => {
   const handleSearch = async () => {
     try {
       let result;
-      if (searchOption === "id") {
-        result = await retrieveChildProfileByID(searchTerm);
-      } else if (searchOption === "class") {
-        result = await retrieveChildrenByClassID(searchTerm);
+      if (searchOption === "class") {
+        result = await retrieveChildrenByLocationID(locationSearchTerm);
+        result = result.filter((child) => child.classID === searchTerm);
       } else if (searchOption === "location") {
         result = await retrieveChildrenByLocationID(searchTerm);
       }
@@ -247,20 +246,28 @@ const AdminChild = () => {
       <FormControl sx={{ width: "50%" }}>
         <InputLabel>Search By</InputLabel>
         <Select value={searchOption} onChange={handleSearchOptionChange}>
-          <MenuItem value="id">Child ID</MenuItem>
-          <MenuItem value="class">Class ID</MenuItem>
           <MenuItem value="location">Location ID</MenuItem>
+          <MenuItem value="class">Class ID</MenuItem>
         </Select>
       </FormControl>
 
       <TextField
-        label={`Enter ${searchOption === "id" ? "Child ID" : searchOption === "class" ? "Class ID" : "Location ID"}`}
+        label={`Enter ${searchOption === "class" ? "Class ID" : "Location ID"}`}
         variant="outlined"
         sx={{ width: "50%" }}
         value={searchTerm}
         onChange={handleSearchTermChange}
         placeholder={`Search by ${searchOption}`}
       />
+      {searchOption === "class" ? (
+      <TextField
+        label={`Enter Location ID`}
+        variant="outlined"
+        sx={{ width: "50%" }}
+        value={locationSearchTerm}
+        onChange={(e) => setLocationSearchTerm(e.target.value.toUpperCase())}
+        placeholder={`Search by ${searchOption}`}
+      /> ): <></> }
 
       <Button variant="contained" color="primary" onClick={handleSearch} disabled={!searchTerm}>
         Search
