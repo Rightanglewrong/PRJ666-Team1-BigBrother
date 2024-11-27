@@ -109,7 +109,7 @@ export default function HomePage() {
           py: { xs: 4, md: 8 },
         }}
       >
-        <Grid container spacing={6} justifyContent="center">
+        <Grid container spacing={4} justifyContent="center">
           {/* Dashboard */}
           {/* <Grid item xs={12} sm={6} md={3}>
             <Link href="/dashboard" passHref>
