@@ -117,7 +117,6 @@ export const deleteRelationshipFromDynamoDB = async (id) => {
     const data = await response.json();
     return { message: "Relationship deleted successfully", data };
   } catch (error) {
-    console.error("Error deleting Relationship:", error);
     throw new Error(error.message);
   }
 
@@ -142,14 +141,12 @@ export const getRelationshipByChildID = async (childID) => {
   
       if (!response.ok) {
         const errorText = await response.text(); 
-        console.error("Error response:", errorText); 
         throw new Error("No Relationships found for the Child ID");
       }
   
       const data = await response.json();
       return data.entries; 
     } catch (error) {
-      console.error("Error retrieving Relationships for the Child ID:", error);
       throw new Error(error.message);
     }
 };

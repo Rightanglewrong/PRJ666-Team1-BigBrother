@@ -36,11 +36,11 @@ import {
   retrieveUserByIDInDynamoDB,
   getUsersByAccountTypeAndLocation
 } from "../utils/userAPI";
+import { useCallback } from 'react';
+
 
 export default function Messages() {
   const [userDetails, setUserDetails] = useState(null);
-  const [incomingMessages, setIncomingMessages] = useState([]);
-  const [outgoingMessages, setOutgoingMessages] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -148,15 +148,11 @@ export default function Messages() {
 
     }));
       const allMessagesList = [...receivedMessagesWithNames, ...sentMessagesWithNames]
-      setIncomingMessages(receivedMessagesWithNames || []);
-      setOutgoingMessages(sentMessagesWithNames || []);
       
       setAllMessages(allMessagesList);
       setFilteredMessages(allMessagesList);
       
     } catch (error) {
-      setIncomingMessages([]); 
-      setOutgoingMessages([]); 
       setAllMessages([]);
       setErrorMessage("Failed to load messages. Please try again later.");
     }
