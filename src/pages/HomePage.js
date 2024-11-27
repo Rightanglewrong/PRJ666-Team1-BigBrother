@@ -142,7 +142,7 @@ export default function HomePage() {
               >
                 <CardMedia
                   component="img"
-                  image="https://cdn-icons-png.flaticon.com/512/2224/2224109.png"
+                  image="/icons/Mealplan.png"
                   alt="Meal Plan Icon"
                   sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
                 />
@@ -175,7 +175,7 @@ export default function HomePage() {
               >
                 <CardMedia
                   component="img"
-                  image="https://static-00.iconduck.com/assets.00/calendar-icon-1995x2048-tot17508.png"
+                  image="/icons/Calendar.png"
                   alt="Event Calendar Icon"
                   sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
                 />
@@ -208,7 +208,7 @@ export default function HomePage() {
               >
                 <CardMedia
                   component="img"
-                  image="https://cdn-icons-png.flaticon.com/512/7305/7305498.png"
+                  image="/icons/Newsletter.png"
                   alt="Newsletter Icon"
                   sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
                 />

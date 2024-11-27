@@ -16,10 +16,12 @@ import {
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useUser } from "../components/authenticate";
 import styles from "./NavBar.module.css";
+import { useTheme } from "@/pages/ThemeContext"; // Import the theme context
 
 const NavBar = () => {
   const { firstName, accountType } = useUser() || {};
   const [anchorEl, setAnchorEl] = useState(null); // Controls dropdown menu
+  const { isColourblindMode, toggleColourblindMode } = useTheme(); // Access theme state
   const router = useRouter();
 
   const isLoggedIn = !!firstName; // Checks if user data is present to determine login status
@@ -59,7 +61,9 @@ const NavBar = () => {
     <AppBar
       position="sticky"
       sx={{
-        background: backgroundColor,
+        background: isColourblindMode
+          ? "linear-gradient(90deg, #4A90E2, #50E3C2)" // Colourblind-friendly palette
+          : backgroundColor,
         padding: "5px 20px",
         zIndex: 1000,
       }}
@@ -88,6 +92,21 @@ const NavBar = () => {
             </Button>
           </Link>
         </Typography>
+
+        {/* Colourblind Mode Toggle */}
+        <Button
+          onClick={toggleColourblindMode}
+          sx={{
+            backgroundColor: isColourblindMode ? "#E94E77" : "#7B8794",
+            color: "#fff",
+            marginLeft: 2,
+            "&:hover": {
+              backgroundColor: isColourblindMode ? "#D14562" : "#69707F",
+            },
+          }}
+        >
+          {isColourblindMode ? "Disable Colourblind Mode" : "Enable Colourblind Mode"}
+        </Button>
 
         {/* Right Section */}
         {isLoggedIn ? (
