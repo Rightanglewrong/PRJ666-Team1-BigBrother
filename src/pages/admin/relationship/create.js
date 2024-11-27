@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { createRelationshipInDynamoDB } from "../../../utils/relationshipAPI";
+import { createRelationshipInDynamoDB, getRelationshipByParentID
+ } from "../../../utils/relationshipAPI";
 import { getUsersByAccountTypeAndLocation } from "../../../utils/userAPI";
 import { retrieveChildrenByLocationID } from "../../../utils/childAPI";
 import { useUser } from "@/components/authenticate";
@@ -72,6 +73,18 @@ export default function CreateRelationshipPage() {
     }
 
     try {
+
+      const existingRelationships = await getRelationshipByParentID(parentID);
+
+      if (
+        existingRelationships.some(
+          (relationship) => relationship.childID === childID
+        )
+      ) {
+        setMessage("A Relationship between this Parent and Child already exists.");
+        return;
+      }
+
       const parentEmail = parentsList.find((parent) => parent.userID === parentID)?.email;
 
       const newRelationship = {
@@ -109,6 +122,19 @@ export default function CreateRelationshipPage() {
         Create Relationship
       </Typography>
 
+      <Snackbar
+        open={!!message}
+        autoHideDuration={4000}
+        onClose={() => setMessage("")}
+      >
+        <Alert
+          onClose={() => setMessage("")}
+          severity={message.includes("successfully") ? "success" : "error"}
+          sx={{ width: "100%" }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
       
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
