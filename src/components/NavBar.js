@@ -276,16 +276,16 @@ const NavBar = () => {
                 Messages
               </Link>
 
-              {accountType === 'Admin' && (
+              {(accountType === "Admin" || accountType === "Staff") && (
                 <div>
                   
                   <Link
-                    href="/admin/adminMedia"
+                    href="/admin/staffMedia"
                     passHref
                     className={styles.dropdownItem}
                     onClick={handleMenuClose}
                   >
-                    Admin Media Upload
+                    Staff Media Upload
                   </Link>
                   <Link
                     href="/admin"
