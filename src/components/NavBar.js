@@ -1,8 +1,8 @@
-"use client"; // Ensure this is a Client Component
+'use client'; // Ensure this is a Client Component
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   AppBar,
   Toolbar,
@@ -12,17 +12,19 @@ import {
   MenuItem,
   Button,
   Divider,
-} from "@mui/material";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { useUser } from "../components/authenticate";
-import styles from "./NavBar.module.css";
-import { useTheme } from "@/pages/ThemeContext"; // Import the theme context
+  Select,
+  Box,
+} from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useUser } from '../components/authenticate';
+import styles from './NavBar.module.css';
+import { useTheme } from '@/components/ThemeContext'; // Import the theme context
 
 const NavBar = () => {
   const { firstName, accountType } = useUser() || {};
   const [anchorEl, setAnchorEl] = useState(null); // Controls dropdown menu
-  const { isColourblindMode, toggleColourblindMode } = useTheme(); // Access theme state
   const router = useRouter();
+  const { colorblindMode, setMode } = useTheme(); // Access colorblind mode and setter
 
   const isLoggedIn = !!firstName; // Checks if user data is present to determine login status
 
@@ -40,18 +42,18 @@ const NavBar = () => {
   };
 
   const accountColors = {
-    Admin: "linear-gradient(90deg, #6a11cb, #2575fc)", // Existing color
-    Parent: "linear-gradient(90deg, #388E3C, #66BB6A)", // Gradient green for Parent
-    Staff: "linear-gradient(90deg, #FFA000, #FFC107)",  // Darker yellow for Staff
+    Admin: 'linear-gradient(90deg, #6a11cb, #2575fc)', // Existing color
+    Parent: 'linear-gradient(90deg, #388E3C, #66BB6A)', // Gradient green for Parent
+    Staff: 'linear-gradient(90deg, #FFA000, #FFC107)', // Darker yellow for Staff
   };
 
   const backgroundColor = accountColors[accountType] || accountColors.Admin;
 
   // Define menu background colors for each account type
   const accountMenuColors = {
-    Admin: "linear-gradient(90deg, #f52ad3f4, #25dcfce4)", // Existing color for Admin
-    Parent: "linear-gradient(90deg, #388E3C, #A5D6A7)",     // Similar green gradient for Parent
-    Staff: "linear-gradient(90deg, #FFA000, #FFCA28)",      // Matching yellow gradient for Staff
+    Admin: 'linear-gradient(90deg, #f52ad3f4, #25dcfce4)', // Existing color for Admin
+    Parent: 'linear-gradient(90deg, #388E3C, #A5D6A7)', // Similar green gradient for Parent
+    Staff: 'linear-gradient(90deg, #FFA000, #FFCA28)', // Matching yellow gradient for Staff
   };
 
   // Set the background based on the account type
@@ -61,31 +63,35 @@ const NavBar = () => {
     <AppBar
       position="sticky"
       sx={{
-        background: isColourblindMode
-          ? "linear-gradient(90deg, #4A90E2, #50E3C2)" // Colourblind-friendly palette
-          : backgroundColor,
+        background:
+          colorblindMode === "red-green"
+            ? "linear-gradient(90deg, #70a1d7, #b8e986)" // Accessible palette
+            : colorblindMode === "blue-yellow"
+            ? "linear-gradient(90deg, #e77f24, #3db48c)" // Accessible palette
+            : backgroundColor, // Default gradient
+        transition: "background 0.3s ease-in-out",
         padding: "5px 20px",
         zIndex: 1000,
       }}
     >
       <Toolbar
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         {/* Logo Section */}
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Link href={isLoggedIn ? "/HomePage" : "/"} passHref>
+          <Link href={isLoggedIn ? '/HomePage' : '/'} passHref>
             <Button
               color="inherit"
               sx={{
-                fontSize: "1.8rem",
-                fontWeight: "bold",
-                textTransform: "none",
-                color: "#fff",
-                textDecoration: "none",
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                textTransform: 'none',
+                color: '#fff',
+                textDecoration: 'none',
               }}
             >
               Big Brother
@@ -93,20 +99,52 @@ const NavBar = () => {
           </Link>
         </Typography>
 
-        {/* Colourblind Mode Toggle */}
-        <Button
-          onClick={toggleColourblindMode}
+        <Box
           sx={{
-            backgroundColor: isColourblindMode ? "#E94E77" : "#7B8794",
-            color: "#fff",
-            marginLeft: 2,
-            "&:hover": {
-              backgroundColor: isColourblindMode ? "#D14562" : "#69707F",
-            },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            padding: '0 10px',
           }}
         >
-          {isColourblindMode ? "Disable Colourblind Mode" : "Enable Colourblind Mode"}
-        </Button>
+          <Select
+            value={colorblindMode}
+            onChange={(e) => setMode(e.target.value)}
+            sx={{
+              "& .MuiPaper-root": {
+                background: menuBackgroundColor,
+                color: "#fff",
+                borderRadius: "8px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                "& .MuiMenuItem-root": {
+                  padding: "8px 16px",
+                  borderRadius: "4px",
+                  "&:hover": {
+                    backgroundColor: "#444",
+                  },
+                },
+              },
+            }}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  backgroundColor: '#333',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  '& .MuiMenuItem-root': {
+                    '&:hover': {
+                      backgroundColor: '#555',
+                    },
+                  },
+                },
+              },
+            }}
+          >
+            <MenuItem value="none">No Colorblind</MenuItem>
+            <MenuItem value="red-green">Red-Green Mode</MenuItem>
+            <MenuItem value="blue-yellow">Blue-Yellow Mode</MenuItem>
+          </Select>
+        </Box>
 
         {/* Right Section */}
         {isLoggedIn ? (
@@ -115,11 +153,11 @@ const NavBar = () => {
               color="inherit"
               onClick={handleMenuOpen}
               sx={{
-                color: "#fff",
+                color: '#fff',
                 fontWeight: 600,
-                "&:hover": {
-                  transform: "translateY(-2px)",
-                  color: "#fbc531",
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  color: '#fbc531',
                 },
               }}
             >
@@ -128,127 +166,29 @@ const NavBar = () => {
                 variant="body1"
                 sx={{
                   marginLeft: 1,
-                  color: "#fff",
+                  color: '#fff',
                   fontWeight: 600,
                 }}
               >
                 Welcome, {firstName}
               </Typography>
             </IconButton>
-            {/* <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-              sx={{
-                "& .MuiPaper-root": {
-                  background: "linear-gradient(90deg, #f52ad3f4, #25dcfce4)",
-                  color: "#fff",
-                  borderRadius: "4px",
-                  minWidth: "160px",
-                },
-              }}
-            >
-              <MenuItem
-                onClick={handleMenuClose}
-                sx={{
-                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
-                }}
-              >
-                <Link href="/profile">Profile</Link>
-              </MenuItem>
 
-              <MenuItem
-                onClick={handleMenuClose}
-                sx={{
-                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
-                }}
-              >
-                <Link href="/calendar">Calendar</Link>
-              </MenuItem>
-              <MenuItem
-                onClick={handleMenuClose}
-                sx={{
-                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
-                }}
-              >
-                <Link href="/contact">Contact List</Link>
-              </MenuItem>
-              <MenuItem
-                onClick={handleMenuClose}
-                sx={{
-                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
-                }}
-              >
-                <Link href="/mealPlan">Meal Plan</Link>
-              </MenuItem>
-              <MenuItem
-                onClick={handleMenuClose}
-                sx={{
-                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
-                }}
-              >
-                <Link href="/newsletter">Newsletter</Link>
-              </MenuItem>
-              <MenuItem
-                onClick={handleMenuClose}
-                sx={{
-                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
-                }}
-              >
-                <Link href="/message">Messages</Link>
-              </MenuItem>
-              {(accountType === "Admin" || accountType === "Staff") && (
-                <div>
-                  <MenuItem
-                    onClick={handleMenuClose}
-                    sx={{
-                      "&:hover": {
-                        backgroundColor: "#ffcf4d",
-                        color: "#9318a5",
-                      },
-                    }}
-                  >
-                    <Link href="/admin">Admin Services</Link>
-                  </MenuItem>
-                </div>
-              )}
-              {/* Divider line before Logout */}
-            {/* <Divider sx={{ my: 1, backgroundColor: "white" }} /> 
-              <MenuItem
-                onClick={handleMenuClose}
-                sx={{
-                  "&:hover": { backgroundColor: "#ffcf4d", color: "#9318a5" },
-                }}
-              >
-                <Link href="/examplePage">Example Page</Link>
-              </MenuItem>
-              <MenuItem
-                onClick={handleLogout}
-                sx={{
-                  color: "white",
-                  cursor: "pointer",
-                  textAlign: "center",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    background: "linear-gradient(90deg, #ff512f, #f09819)",
-                    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)",
-                    transform: "scale(1.05)",
-                  },
-                }}
-              >
-                Logout
-              </MenuItem>
-            </Menu> */}
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
               sx={{
-                "& .MuiPaper-root": {
-                  background: menuBackgroundColor,  // Apply background based on account type
-                  color: "#fff",
-                  borderRadius: "4px",
-                  minWidth: "160px",
+                '& .MuiPaper-root': {
+                  background:
+                  colorblindMode === "red-green"
+                    ? "linear-gradient(90deg, #70a1d7, #b8e986)" // Red-Green mode colors
+                    : colorblindMode === "blue-yellow"
+                    ? "linear-gradient(90deg, #e77f24, #3db48c)" // Blue-Yellow mode colors
+                    : menuBackgroundColor, // Default menu background color
+                  color: '#fff',
+                  borderRadius: '4px',
+                  minWidth: '160px',
                 },
               }}
             >
@@ -269,7 +209,7 @@ const NavBar = () => {
                 Calendar
               </Link>
 
-              {(accountType === "Parent" || accountType === "Staff") && (
+              {(accountType === 'Parent' || accountType === 'Staff') && (
                 <div>
                   <Link
                     href="/progressReport"
@@ -280,11 +220,9 @@ const NavBar = () => {
                     Progress Report
                   </Link>
                 </div>
-
-                
               )}
 
-              {(accountType === "Staff") && (
+              {accountType === 'Staff' && (
                 <div>
                   <Link
                     href="/relationship"
@@ -295,8 +233,6 @@ const NavBar = () => {
                     Relationships
                   </Link>
                 </div>
-
-                
               )}
 
               <Link
@@ -340,7 +276,7 @@ const NavBar = () => {
                 Messages
               </Link>
 
-              {(accountType === "Admin") && (
+              {accountType === 'Admin' && (
                 <div>
                   <Link
                     href="/crudTester"
@@ -368,9 +304,7 @@ const NavBar = () => {
                   </Link>
                 </div>
               )}
-
-              <Divider sx={{ my: 1, backgroundColor: "white" }} />
-
+              <Divider sx={{ my: 1, backgroundColor: 'white' }} />
               <Link
                 href="#"
                 passHref
@@ -386,7 +320,7 @@ const NavBar = () => {
             </Menu>
           </>
         ) : (
-          <Typography variant="body1" sx={{ color: "#fff", fontWeight: 600 }}>
+          <Typography variant="body1" sx={{ color: '#fff', fontWeight: 600 }}>
             You are not logged in
           </Typography>
         )}

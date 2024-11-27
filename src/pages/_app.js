@@ -2,7 +2,7 @@
 import '../app/globals.css';
 import NavBar from '../components/NavBar';
 import Authenticate from '../components/authenticate';
-import { ThemeProvider } from './ThemeContext';
+import { ThemeProvider } from '@/components/ThemeContext';
 
 export default function MyApp({ Component, pageProps }) {
   return (
