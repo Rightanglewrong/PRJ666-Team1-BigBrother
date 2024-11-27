@@ -49,7 +49,7 @@ export default function Authenticate({ children }) {
             }
           }
         } catch (error) {
-          console.error("Error decoding token:", error);
+          //console.error("Error decoding token:", error);
           setLoading(false);
           if (!publicPaths.includes(pathname)) {
             router.push("/login"); // Decoding failed, redirect to login

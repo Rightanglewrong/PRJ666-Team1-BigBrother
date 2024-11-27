@@ -52,7 +52,7 @@ export async function getCurrentUser() {
     const userData = await response.json();
     return userData; // Return user details from backend
   } catch (error) {
-    console.error("Error fetching user details:", error);
+    //console.error("Error fetching user details:", error);
     throw new Error(error.message);
   }
 }
@@ -78,7 +78,7 @@ export async function login(email, password) {
     const data = await response.json();
     return data; // Should return token or error message
   } catch (error) {
-    console.error("Error logging in:", error);
+    //console.error("Error logging in:", error);
     return { error: error.message };
   }
 }

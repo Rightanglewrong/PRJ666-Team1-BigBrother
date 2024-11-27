@@ -21,14 +21,14 @@ export const createProgressReportInDynamoDB = async (item) => {
 
     if (!response.ok) {
       const errorText = await response.text(); 
-            console.error("Error response:", errorText);
+            //console.error("Error response:", errorText);
       throw new Error("Error creating Progress Report in DynamoDB");
     }
 
     const data = await response.json();
     return { message: "Progress Report created successfully", item: data };
   } catch (error) {
-    console.error("Error creating Progress Report:", error);
+    //console.error("Error creating Progress Report:", error);
     throw new Error(error.message);
   }
 };
@@ -57,7 +57,7 @@ export const retrieveProgressReportFromDynamoDB = async (item) => {
     const data = await response.json();
     return data; 
   } catch (error) {
-    console.error("Error retrieving Progress Report:", error);
+    //console.error("Error retrieving Progress Report:", error);
     throw new Error(error.message);
   }
 };
@@ -88,7 +88,7 @@ export const updateProgressReportInDynamoDB = async (id, updateData) => {
     const data = await response.json();
     return { message: "Progress Report updated successfully", item: data };
   } catch (error) {
-    console.error("Error updating Progress Report:", error);
+    //console.error("Error updating Progress Report:", error);
     throw new Error(error.message);
   }
 };
@@ -117,7 +117,7 @@ export const deleteProgressReportFromDynamoDB = async (id) => {
     const data = await response.json();
     return { message: "Progress Report deleted successfully", data };
   } catch (error) {
-    console.error("Error deleting Progress Report:", error);
+    //console.error("Error deleting Progress Report:", error);
     throw new Error(error.message);
   }
 
@@ -142,14 +142,14 @@ export const retrieveProgressReportByChildID = async (childID) => {
   
       if (!response.ok) {
         const errorText = await response.text(); 
-        console.error("Error response:", errorText); 
+        //console.error("Error response:", errorText); 
         throw new Error("No Progress Report found for the Child ID");
       }
   
       const data = await response.json();
       return data.entries; 
     } catch (error) {
-      console.error("Error retrieving Progress Report for the Child ID:", error);
+      //console.error("Error retrieving Progress Report for the Child ID:", error);
       throw new Error(error.message);
     }
 };
@@ -172,14 +172,14 @@ export const retrieveProgressReportByLocationID = async (locationID) => {
 
     if (!response.ok) {
       const errorText = await response.text(); 
-      console.error("Error response:", errorText); 
+      //console.error("Error response:", errorText); 
       throw new Error(errorText || "No Progress Report found for the Location ID");
     }
 
     const data = await response.json();
     return data.entries; 
   } catch (error) {
-    console.error("Error retrieving Progress Report for the Location ID:", error);
+    //console.error("Error retrieving Progress Report for the Location ID:", error);
     throw new Error(error.message);
   }
 };
@@ -208,7 +208,7 @@ export const sendWeeklyProgressReports = async (locationID, week) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error sending weekly progress reports:', error);
+    //console.error('Error sending weekly progress reports:', error);
     throw new Error(error.message || 'An unknown error occurred');
   }
 };

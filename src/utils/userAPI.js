@@ -19,7 +19,7 @@ export const retrieveUserByIDInDynamoDB = async (id) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error retreiving User', error);
+    //console.error('Error retreiving User', error);
     throw new Error(error.message);
   }
 };
@@ -45,7 +45,7 @@ export const updateUserInDynamoDB = async (id, updateData) => {
     const data = await response.json();
     return { message: 'User updated successfully', item: data };
   } catch (error) {
-    console.error('Error updating User', error);
+    //console.error('Error updating User', error);
     throw new Error(error.message);
   }
 };
@@ -71,7 +71,7 @@ export const deleteUserInDynamoDB = async (id) => {
     const data = await response.json();
     return { message: 'User deleted successfully', data };
   } catch (error) {
-    console.error('Error Deleting User');
+    //console.error('Error Deleting User');
     throw new Error(error.message);
   }
 };
@@ -103,7 +103,7 @@ export const getUsersByAccountTypeAndLocation = async (accountType, locationID) 
     }
     return data; // Success response with users
   } catch (error) {
-    console.error('Error fetching users by accountType and locationID');
+    //console.error('Error fetching users by accountType and locationID');
     throw error;
   }
 };

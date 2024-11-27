@@ -141,7 +141,7 @@ const AdminChild = () => {
       setCurrentPage(1);
       setExpandedCard(null);
     } catch (error) {
-      console.error("Error performing search:", error.message);
+      //console.error("Error performing search:", error.message);
       setSearchResult([]);
     }
   };

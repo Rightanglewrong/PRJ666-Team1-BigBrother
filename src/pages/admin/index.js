@@ -55,7 +55,7 @@ const AdminPage = () => {
           setIsModalOpen(true);
         }
       } catch (error) {
-        console.error('Error fetching pending users:', error);
+        //console.error('Error fetching pending users:', error);
 
         // Handle invalid or expired token
         if (error.message === `Error fetching users: {"message":"Invalid or expired token"}`) {
@@ -84,7 +84,7 @@ const AdminPage = () => {
       await approveUser(userID);
       setPendingUsers((prev) => prev.filter((u) => u.userID !== userID));
     } catch (error) {
-      console.error('Error approving user:', error);
+      //console.error('Error approving user:', error);
     }
   };
 
@@ -93,7 +93,7 @@ const AdminPage = () => {
       await deleteUserInDynamoDB(userID);
       setPendingUsers((prev) => prev.filter((u) => u.userID !== userID));
     } catch (error) {
-      console.error('Error denying user:', error);
+      //console.error('Error denying user:', error);
     }
   };
 

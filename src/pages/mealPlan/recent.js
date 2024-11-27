@@ -94,7 +94,7 @@ export default function RecentMealPlans() {
       setErrorMessage("Meal plan deleted successfully");
     } catch (error) {
       setErrorMessage("Failed to delete meal plan");
-      console.error("Error deleting meal plan:", error);
+      //console.error("Error deleting meal plan:", error);
     } finally {
       setConfirmationModalOpen(false);
       setMealPlanToDelete(null);

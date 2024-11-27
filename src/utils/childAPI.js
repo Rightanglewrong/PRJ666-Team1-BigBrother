@@ -20,14 +20,14 @@ export const createChildProfileInDynamoDB = async (childData) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Error response:", errorText);
+      //console.error("Error response:", errorText);
       throw new Error("Error creating Child Profile in DynamoDB");
     }
 
     const data = await response.json();
     return { message: "Child Profile created successfully", child: data };
   } catch (error) {
-    console.error("Error creating Child Profile:", error);
+    //console.error("Error creating Child Profile:", error);
     throw new Error(error.message);
   }
 };
@@ -56,7 +56,7 @@ export const retrieveChildProfileByID = async (childID) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error retrieving Child Profile:", error);
+    //console.error("Error retrieving Child Profile:", error);
     throw new Error(error.message);
   }
 };
@@ -87,7 +87,7 @@ export const updateChildProfileInDynamoDB = async (childID, updateData) => {
     const data = await response.json();
     return { message: "Child Profile updated successfully", child: data };
   } catch (error) {
-    console.error("Error updating Child Profile:", error);
+    //console.error("Error updating Child Profile:", error);
     throw new Error(error.message);
   }
 };
@@ -117,7 +117,7 @@ export const deleteChildProfileFromDynamoDB = async (childID) => {
     const data = await response.json();
     return { message: "Child Profile deleted successfully", data };
   } catch (error) {
-    console.error("Error deleting Child Profile:", error);
+    //console.error("Error deleting Child Profile:", error);
     throw new Error(error.message);
   }
 };
@@ -141,14 +141,14 @@ export const retrieveChildrenByClassID = async (classID) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Error response:", errorText);
+      //console.error("Error response:", errorText);
       throw new Error("No Children found for the specified Class ID");
     }
 
     const data = await response.json();
     return data.entries;
   } catch (error) {
-    console.error("Error retrieving Children by Class ID:", error);
+    //console.error("Error retrieving Children by Class ID:", error);
     throw new Error(error.message);
   }
 };
@@ -172,14 +172,14 @@ export const retrieveChildrenByLocationID = async (locationID) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Error response:", errorText);
+      //console.error("Error response:", errorText);
       throw new Error("No Children found for the specified Location ID");
     }
 
     const data = await response.json();
     return data.entries;
   } catch (error) {
-    console.error("Error retrieving Children by Location ID");
+    //console.error("Error retrieving Children by Location ID");
     throw new Error(error.message);
   }
 };

@@ -54,7 +54,7 @@ export default function ProgressReport() {
           }
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        //console.error("Error fetching user data:", error);
         setErrorMessage("Failed to load user details. Please log in again.");
       }
     };
@@ -68,7 +68,7 @@ export default function ProgressReport() {
           try {
             const childData = await retrieveChildProfileByID(id);
             if (!childData) {
-              console.warn(`No data found for child with ID ${id}`);
+              //console.warn(`No data found for child with ID ${id}`);
               return null;
             }
             const { childID, firstName, lastName, age, birthDate, ...rest } = childData.child.child;
@@ -80,7 +80,7 @@ export default function ProgressReport() {
               birthDate,
             };
           } catch (error) {
-            console.error(`Error retrieving data for child ${id}:`, error);
+            //console.error(`Error retrieving data for child ${id}:`, error);
             throw error;
           }
         })
@@ -88,7 +88,7 @@ export default function ProgressReport() {
       const validChildProfiles = childProfileData.filter(profile => profile !== null).flat();
       return validChildProfiles;
     } catch (error) {
-      console.error("Error fetching child profiles:", error);
+      //console.error("Error fetching child profiles:", error);
       setErrorMessage("Failed to fetch child profiles.");
     }
   };
