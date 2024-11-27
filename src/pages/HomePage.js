@@ -1,9 +1,9 @@
-"use client"; // Ensure this is a Client Component
+'use client'; // Ensure this is a Client Component
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter from next/navigation
-import { useUser } from "@/components/authenticate";
-import Link from "next/link";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
+import { useUser } from '@/components/authenticate';
+import Link from 'next/link';
 import {
   Box,
   Typography,
@@ -21,33 +21,35 @@ import {
 
 export default function HomePage() {
   const user = useUser();
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const router = useRouter(); // Initialize the router
 
   useEffect(() => {
     if (!user) {
-      setError("Session expired, please log in again.");
+      setError('Session expired, please log in again.');
 
       // Remove the invalid token if any exists
-      localStorage.removeItem("token");
+      localStorage.removeItem('token');
 
       // Redirect to login page
-      router.push("/login");
+      router.push('/login');
     }
   }, [user, router]);
-  
-  {error && (
-    <Snackbar
-      open
-      autoHideDuration={6000}
-      onClose={() => setError("")}
-      anchorOrigin={{ vertical: "top", horizontal: "center" }}
-    >
-      <Alert severity="error" variant="filled">
-        {error}
-      </Alert>
-    </Snackbar>
-  )}
+
+  {
+    error && (
+      <Snackbar
+        open
+        autoHideDuration={6000}
+        onClose={() => setError('')}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert severity="error" variant="filled">
+          {error}
+        </Alert>
+      </Snackbar>
+    );
+  }
 
   return (
     <Box
@@ -72,6 +74,7 @@ export default function HomePage() {
         </Snackbar>
       )}
 
+      {/* Header Section */}
       <Box
         sx={{
           backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -81,16 +84,31 @@ export default function HomePage() {
         }}
       >
         <Container maxWidth="md">
-          <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontSize: { xs: '1.8rem', md: '3rem' } }}>
-            Welcome to Big Brother App
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            gutterBottom
+            sx={{ fontSize: { xs: '1.8rem', md: '3rem' } }}
+          >
+            Welcome to Big Brother!
           </Typography>
           <Typography variant="h6" sx={{ mb: 2, fontSize: { xs: '1rem', md: '1.5rem' } }}>
-            Simplifying Childcare Management for a Brighter Tomorrow
+            Your Partner in Simplifying Childcare Management
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 2, fontSize: { xs: '0.9rem', md: '1.2rem' } }}>
+            Stay informed, manage schedules, and connect effortlessly with your child&#39;s daycare.
           </Typography>
         </Container>
       </Box>
 
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
+      {/* Main Content Section */}
+      <Container
+        maxWidth="lg"
+        sx={{
+          flex: 1, // Ensures the main content takes up the available space
+          py: { xs: 4, md: 8 },
+        }}
+      >
         <Grid container spacing={6} justifyContent="center">
           {/* Dashboard */}
           {/* <Grid item xs={12} sm={6} md={3}>
@@ -147,10 +165,18 @@ export default function HomePage() {
                   sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
                 />
                 <CardContent>
-                  <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
+                  >
                     Meal Plan
                   </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+                  >
                     View and manage meal plans.
                   </Typography>
                 </CardContent>
@@ -180,10 +206,18 @@ export default function HomePage() {
                   sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
                 />
                 <CardContent>
-                  <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
+                  >
                     Event Calendar
                   </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+                  >
                     Check upcoming events and activities.
                   </Typography>
                 </CardContent>
@@ -213,11 +247,60 @@ export default function HomePage() {
                   sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
                 />
                 <CardContent>
-                  <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
+                  >
                     Newsletter
                   </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+                  >
                     Stay updated with the latest news.
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Link>
+          </Grid>
+
+          {/* Child Progress Report */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Link href="/progressReport" passHref>
+              <Card
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: { xs: 'row', sm: 'column' },
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  p: { xs: 2, sm: 3 },
+                  '&:hover': { boxShadow: 6, transform: 'scale(1.05)' },
+                  transition: 'all 0.3s',
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  image="/icons/ProgressReport.png"
+                  alt="Progress Report Icon"
+                  sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
+                />
+                <CardContent>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
+                  >
+                    Child Progress
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+                  >
+                    Track and celebrate your child’s development milestones.
                   </Typography>
                 </CardContent>
               </Card>
@@ -232,6 +315,7 @@ export default function HomePage() {
           backgroundColor: '#333',
           color: 'white',
           textAlign: 'center',
+          mt: 'auto',
         }}
       >
         <Container maxWidth="sm">
@@ -248,7 +332,7 @@ export default function HomePage() {
             </Link>
           </Stack>
           <Typography variant="body2" sx={{ mt: 2 }}>
-            © {new Date().getFullYear()} Big Brother App. All rights reserved.
+            © {new Date().getFullYear()} Big Brother App. Supporting Parents Every Step of the Way.
           </Typography>
         </Container>
       </Box>
