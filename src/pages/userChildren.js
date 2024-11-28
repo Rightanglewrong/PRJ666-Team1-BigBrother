@@ -60,7 +60,7 @@ const UserChildren = () => {
       setChildren(childProfiles.filter((profile) => profile !== null)); // Filter out null responses
     } catch (error) {
       //console.error("Error fetching child profiles:", error);
-      setSnackbar({ open: true, message: "Error fetching child profiles.", severity: "error" });
+      //setSnackbar({ open: true, message: "Error fetching child profiles.", severity: "error" });
     }
   };
 
