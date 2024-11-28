@@ -24,7 +24,8 @@ import {
     TextField,
     Select,
     MenuItem,
-    DialogContentText
+    DialogContentText,
+    Snackbar
   } from "@mui/material"; 
 import { useCallback } from 'react';
 
@@ -35,6 +36,7 @@ export default function Relationships() {
     const { id, type } = router.query; // `id` is the parentID or childID; `type` specifies "parent" or "child".
     const [relationships, setRelationships] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
+    const [showSnackbar, setShowSnackbar] = useState(false); 
     const [entityName, setEntityName] = useState("");
     const [deleteRelation, setDeleteRelation] = useState(null);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -56,8 +58,7 @@ export default function Relationships() {
                 setChildProfiles(children || []);
             } catch (error) {
                 setErrorMessage("Error fetching profiles:", error);
-                setParentProfiles([]);
-                setChildProfiles([]);
+                setShowSnackbar(true);
             }
         };
 
@@ -75,6 +76,7 @@ export default function Relationships() {
             }
         } catch (error) {
             setErrorMessage("Error loading entity name:", error); 
+            setShowSnackbar(true);
         }
     }, [id, type]);
 
@@ -112,6 +114,7 @@ export default function Relationships() {
             setRelationships(enrichedRelationships || []);
         } catch (error) {
             setErrorMessage("Error loading relationships. Please try again.");
+            setShowSnackbar(true);
         }
     }, [id, type]);
 
@@ -136,8 +139,13 @@ export default function Relationships() {
                 fetchRelationships(); 
             } catch (error) {
                 setErrorMessage(`Error deleting relationship: ${error.message}`);
+                setShowSnackbar(true);
             }
         }
+    };
+
+    const handleSnackbarClose = () => {
+        setShowSnackbar(false); 
     };
 
     const handleDeleteCancel = () => {
@@ -152,11 +160,27 @@ export default function Relationships() {
 
     const handleSaveUpdate = async () => {
         try {
+
+            const existingRelationships = await getRelationshipByParentID(editingRelation.parentID);
+
+            // Check if a relationship with the same childID already exists
+            if (
+                existingRelationships.some(
+                    (relationship) => relationship.childID === editingRelation.childID
+                )
+            ) {
+                setErrorMessage(
+                    "A relationship between this Parent and Child already exists."
+                );
+                setShowSnackbar(true);
+                return;
+            }
             await updateRelationshipInDynamoDB(editingRelation.relationshipID, editingRelation);
             setEditingRelation(null);
             window.location.reload();
         } catch (error) {
             setErrorMessage("Failed to update relationship. Please try again.");
+            setShowSnackbar(true);
         }
     };
 
@@ -371,6 +395,16 @@ export default function Relationships() {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <Snackbar
+                open={showSnackbar}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+            >
+                <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
+                    {errorMessage}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 }

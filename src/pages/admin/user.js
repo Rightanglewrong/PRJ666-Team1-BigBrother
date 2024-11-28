@@ -19,6 +19,10 @@ import {
   Paper,
   FormControl,
   InputLabel,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  DialogContent,
 } from '@mui/material';
 import { addContact, fetchContacts, updateContact, deleteContact } from '@/utils/contactApi'; // Import contact-related APIs
 import UserList from '@/components/List/UserList';
@@ -410,6 +414,27 @@ const AdminUserService = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {deleteConfirmationModal && (
+      <Dialog
+        open={deleteConfirmationModal}
+        onClose={handleDeleteModalClose}
+        aria-labelledby="delete-confirmation"
+      >
+        <DialogTitle id="delete-confirmation">Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete user {userToDelete?.firstName}?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteModalClose}>Cancel</Button>
+          <Button onClick={handleConfirmDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )}
     </Container>
   );
 };

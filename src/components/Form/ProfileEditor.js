@@ -101,7 +101,7 @@ const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
           <TextField
             label="Location ID"
             name="locationID"
-            value={formData.locationID}
+            value={formData.locationID.toUpperCase()}
             onChange={handleInputChange}
             fullWidth
             margin="normal"
