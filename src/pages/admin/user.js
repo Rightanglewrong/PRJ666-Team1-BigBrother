@@ -128,11 +128,13 @@ const AdminUserService = () => {
       setIsDeleting(false);
       showSnackbar('User deleted successfully', 'success');
     } catch (error) {
+      setIsDeleting(false);
       showSnackbar('Error deleting user.', 'error');
     }
   };
 
   const handleDeleteModalClose = () => {
+    setIsDeleting(false);
     setDeleteConfirmationModal(false);
     setUserToDelete(null); // Reset the user to delete
   };
