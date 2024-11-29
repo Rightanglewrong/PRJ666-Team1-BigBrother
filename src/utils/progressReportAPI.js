@@ -120,8 +120,6 @@ export const deleteProgressReportFromDynamoDB = async (id) => {
     //console.error("Error deleting Progress Report:", error);
     throw new Error(error.message);
   }
-
-  
 };
 
 export const retrieveProgressReportByChildID = async (childID) => {
