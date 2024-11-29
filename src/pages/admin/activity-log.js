@@ -36,8 +36,8 @@ const getDateNDaysFromToday = (daysOffset) =>
 const ActivityLogPage = () => {
   const user = useUser();
   const [logs, setLogs] = useState([]);
-  const [searchType, setSearchType] = useState("location");
-  const [locationID, setLocationID] = useState("");
+  const [searchType, setSearchType] = useState("email");
+  const [locationID, setLocationID] = useState(user.locationID);
   const [email, setEmail] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(null);
   const [startDate, setStartDate] = useState(getDateNDaysFromToday(-7));
@@ -160,6 +160,7 @@ const ActivityLogPage = () => {
               <CustomInput
                 label="Location ID"
                 value={locationID}
+                disabled
                 onChange={(e) => setLocationID(e.target.value)}
                 placeholder="Enter Location ID"
               />
