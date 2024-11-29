@@ -1,145 +1,173 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import {createProgressReportInDynamoDB} from "../../../utils/progressReportAPI"
-import { retrieveChildProfileByID }from "../../../utils/childAPI"
-import { useUser } from "@/components/authenticate";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { createProgressReportInDynamoDB } from '../../../utils/progressReportAPI';
+import { retrieveChildProfileByID } from '../../../utils/childAPI';
+import { useUser } from '@/components/authenticate';
 import {
-    Container,
-    Typography,
-    TextField,
-    Button,
-    Snackbar,
-    Alert,
-    Box,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-} from "@mui/material"; 
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
+import SnackbarNotification from '@/components/Modal/SnackBar';
 
 export default function CreateProgressReportPage() {
-    const router = useRouter();
-    const user = useUser();
-    
-    const [childID, setChildID] = useState("");
-    const [reportTitle, setReportTitle] = useState("");
-    const [reportContent, setReportContent] = useState("");
-    const [message, setMessage] = useState("");
-    const [childName, setChildName] = useState("");    
-    const [reportType, setReportType] = useState("simplified");
-    const [subject, setSubject] = useState("");
-    const [progressTrending, setProgressTrending] = useState("");
-    const [details, setDetails] = useState("");
-    const [recommendedActivity, setRecommendedActivity] = useState("");
+  const router = useRouter();
+  const user = useUser();
 
-    const [openErrorDialog, setOpenErrorDialog] = useState(false);
+  const [childID, setChildID] = useState('');
+  const [reportTitle, setReportTitle] = useState('');
+  const [reportContent, setReportContent] = useState('');
+  const [message, setMessage] = useState('');
+  const [childName, setChildName] = useState('');
+  const [reportType, setReportType] = useState('simplified');
+  const [subject, setSubject] = useState('');
+  const [progressTrending, setProgressTrending] = useState('');
+  const [details, setDetails] = useState('');
+  const [recommendedActivity, setRecommendedActivity] = useState('');
 
-    useEffect(() => {
-      if (user && !(user.accountType === "Admin" || user.accountType === "Staff")) {
-        setOpenErrorDialog(true); // Show the error dialog
-        setTimeout(() => {
-          router.push("/"); // Redirect to home after a timeout
-        }, 3000);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  useEffect(() => {
+    if (user && !(user.accountType === 'Admin' || user.accountType === 'Staff')) {
+      setErrorMessage(
+        'You are not authorized to create progress reports. Redirecting to the homepage...'
+      );
+      localStorage.removeItem('token');
+      setSnackbarOpen(true);
+      setTimeout(() => {
+        router.push('/');
+      }, 3000);
+    }
+  }, [user, router]);
+
+  useEffect(() => {
+    if (router.query.childID) {
+      setChildID(router.query.childID);
+    }
+  }, [router.query.childID]);
+
+  useEffect(() => {
+    if (router.query.suggestions) {
+      try {
+        const suggestions = JSON.parse(router.query.suggestions);
+
+        const formattedDetails =
+          suggestions.length > 0
+            ? "Based on the last two weeks of the child's progress reports, this is the activities that are recommended for further growth!"
+            : '';
+
+        const formattedRecommendedActivities = suggestions
+          .map((s) => `${s.activity} - ${s.reason}`)
+          .join('\n');
+
+        // Update fields based on AI suggestions
+        setDetails(formattedDetails);
+        setRecommendedActivity(formattedRecommendedActivities);
+        setSubject('AI Suggestions');
+        setProgressTrending('AI Suggestions');
+        setReportTitle('AI Suggested Activities');
+
+        // Auto set report type to detailed
+        setReportType('detailed');
+      } catch (error) {
+        console.error('Error parsing suggestions:', error);
       }
-    }, [user, router]);
+    }
+  }, [router.query.suggestions]);
 
-    const isFormDisabled = openErrorDialog;
-  
-    useEffect(() => {
-      if (router.query.childID) {
-        setChildID(router.query.childID);  
-      }
-    }, [router.query.childID]);
-
-
-    useEffect(() => {
-      if (childID) {
-        const fetchChildProfile = async () => {
-          try {
-            const profile = await retrieveChildProfileByID(childID);
-            setChildName(profile.child.child.firstName + " " + profile.child.child.lastName); // Set the child name
-          } catch (error) {
-            setMessage(`Error fetching child profile: ${error.message}`);
-          }
-        };
-  
-        fetchChildProfile();
-      }
-    }, [childID]);
-    
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        const createdBy = user.userID;
-    
-        if (!createdBy) {
-          setMessage("User is not authenticated.");
-          return router.push("/login");
-        }
-    
+  useEffect(() => {
+    if (childID) {
+      const fetchChildProfile = async () => {
         try {
-          let content;
-
-          if (reportType === "detailed") {
-              content = `${subject} | ${progressTrending} | ${details} | ${recommendedActivity}`;
-          } else {
-            content = reportContent;
-          }
-
-          const newReport = {
-            childID,
-            reportTitle,
-            content: content,
-            createdBy,
-            locationID: user.locationID
-          };
-          await createProgressReportInDynamoDB(newReport);
-          setMessage("Progress Report created successfully");
-          router.push(`/admin/progressReport/child?childID=${childID}`); 
-
+          const profile = await retrieveChildProfileByID(childID);
+          setChildName(`${profile.child.child.firstName} ${profile.child.child.lastName}`);
         } catch (error) {
-          setMessage(`Error creating Progress Report: ${error.message}`);
+          setErrorMessage(`Error fetching child profile: ${error.message}`);
         }
       };
 
-return (
+      fetchChildProfile();
+    }
+  }, [childID]);
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const createdBy = user.userID;
+
+    if (!createdBy) {
+      setErrorMessage('User is not authenticated.');
+      localStorage.removeItem('token');
+      return router.push('/login');
+    }
+
+    try {
+      const content =
+        reportType === 'detailed'
+          ? `${subject} | ${progressTrending} | ${details} | ${recommendedActivity}`
+          : reportContent;
+
+      const newReport = {
+        childID,
+        reportTitle,
+        content,
+        createdBy,
+        locationID: user.locationID,
+      };
+      await createProgressReportInDynamoDB(newReport);
+      setMessage('Progress Report created successfully');
+      router.push(`/admin/progressReport/child?childID=${childID}`);
+    } catch (error) {
+      setErrorMessage(`Error creating Progress Report: ${error.message}`);
+    }
+  };
+
+  return (
     <Container
       maxWidth="sm"
       sx={{
         mt: 4,
         p: 3,
-        backgroundColor: "#FFEBEE",
+        backgroundColor: '#FFEBEE',
         borderRadius: 2,
         boxShadow: 3,
         mb: 4,
       }}
     >
-      <Typography variant="h4" align="center" gutterBottom sx={{ color: "#2c3e50", fontWeight: "bold" }}>
+      <Typography
+        variant="h4"
+        align="center"
+        gutterBottom
+        sx={{ color: '#2c3e50', fontWeight: 'bold' }}
+      >
         Create Progress Report
       </Typography>
 
       {message && (
-        <Snackbar open={Boolean(message)} autoHideDuration={6000} onClose={() => setMessage("")}>
-          <Alert severity="info" onClose={() => setMessage("")}>
-            {message}
-          </Alert>
-        </Snackbar>
+        <SnackbarNotification
+          open={Boolean(message)}
+          message={message}
+          severity="info"
+          onClose={() => setMessage('')}
+        />
       )}
 
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
       >
-        <TextField
-          label="Child Name"
-          value={childName}
-          required
-          disabled
-        >
-        </TextField>
+        <TextField label="Child Name" value={childName} required disabled />
 
         <FormControl fullWidth required>
           <InputLabel>Report Type</InputLabel>
@@ -160,58 +188,74 @@ return (
           required
         />
 
-        
+        {reportType === 'detailed' ? (
+          <>
+            <TextField
+              label="Subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              required
+            />
+            <TextField
+              label="Progress Trending"
+              value={progressTrending}
+              onChange={(e) => setProgressTrending(e.target.value)}
+              required
+            />
+            <TextField
+              label="Details"
+              multiline
+              rows={4}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              required
+            />
+            <TextField
+              label="Recommended Activity for Improvement"
+              multiline
+              value={recommendedActivity}
+              onChange={(e) => setRecommendedActivity(e.target.value)}
+              required
+              slotProps={{
+                input: {
+                  style: {
+                    resize: 'vertical', 
+                    overflow: 'scroll', 
+                    minHeight: '100px', 
+                  },
+                },
+              }}
+            />
+          </>
+        ) : (
+          <TextField
+            label="Content"
+            multiline
+            rows={4}
+            value={reportContent}
+            onChange={(e) => setReportContent(e.target.value)}
+            required
+            slotProps={{
+              input: {
+                style: {
+                  resize: 'vertical', // Enable vertical resizing
+                  overflow: 'auto', // Handle overflow for large content
+                  minHeight: '100px', // Minimum height
+                  maxHeight: '500px', // Optional: Maximum height
+                },
+              },
+            }}
+          />
+        )}
 
-        {reportType === "detailed" ? (
-  <>
-    <TextField
-      label="Subject"
-      value={subject}
-      onChange={(e) => setSubject(e.target.value)}
-      required
-    />
-    <TextField
-      label="Progress Trending"
-      value={progressTrending}
-      onChange={(e) => setProgressTrending(e.target.value)}
-      required
-    />
-    <TextField
-      label="Details"
-      multiline
-      rows={4}
-      value={details}
-      onChange={(e) => setDetails(e.target.value)}
-      required
-    />
-    <TextField
-      label="Recommended Activity for Improvement"
-      multiline
-      rows={4}
-      value={recommendedActivity}
-      onChange={(e) => setRecommendedActivity(e.target.value)}
-      required
-    />
-  </>
-) : (
-  <TextField
-    label="Content"
-    multiline
-    rows={4}
-    value={reportContent}
-    onChange={(e) => setReportContent(e.target.value)}
-    required
-  />
-)}
-        
         <Button
           type="submit"
           variant="contained"
           fullWidth
           sx={{
-            backgroundColor: "#3498db",
-            color: "#fff",
-            "&:hover": { backgroundColor: "#2980b9" },
+            backgroundColor: '#3498db',
+            color: '#fff',
+            '&:hover': { backgroundColor: '#2980b9' },
           }}
         >
           Create Progress Report
@@ -221,9 +265,9 @@ return (
           variant="outlined"
           fullWidth
           sx={{
-            color: "#3498db",
-            borderColor: "#3498db",
-            "&:hover": { borderColor: "#2980b9", color: "#2980b9" },
+            color: '#3498db',
+            borderColor: '#3498db',
+            '&:hover': { borderColor: '#2980b9', color: '#2980b9' },
           }}
           onClick={() => router.back()}
         >
@@ -231,20 +275,12 @@ return (
         </Button>
       </Box>
 
-       {/* Unauthorized Access Dialog */}
-       <Dialog
-        open={openErrorDialog}
-        onClose={() => setOpenErrorDialog(false)}
-        aria-labelledby="error-dialog-title"
-        aria-describedby="error-dialog-description"
-      >
-        <DialogTitle id="error-dialog-title">Unauthorized Access</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" id="error-dialog-description">
-            You are not authorized to create progress reports. Redirecting to the homepage...
-          </Typography>
-        </DialogContent>
-      </Dialog>
+      <SnackbarNotification
+        open={snackbarOpen}
+        message={errorMessage}
+        severity="error"
+        onClose={handleSnackbarClose}
+      />
     </Container>
   );
 }

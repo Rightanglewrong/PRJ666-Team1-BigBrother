@@ -3,7 +3,17 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { retrieveChildrenByLocationID } from '../../../utils/childAPI';
 import { useUser } from '@/components/authenticate';
-import { Container, Typography, Select, Button, Alert, Box, MenuItem } from '@mui/material';
+import { generateSuggestions } from '@/utils/suggestionsAPI';
+import {
+  Container,
+  Typography,
+  Select,
+  Button,
+  Alert,
+  Box,
+  MenuItem,
+  CircularProgress,
+} from '@mui/material';
 import SendWeeklyReports from '@/components/weeklyReportSender';
 import SnackbarNotification from '@/components/Modal/SnackBar';
 
@@ -15,15 +25,18 @@ export default function ProgressReportLanding() {
   const [childProfiles, setChildProfiles] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Find the currently selected child's name
-  const selectedChild = childProfiles.find((child) => child.childID === childID);
+  let selectedChild = null;
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
+          localStorage.removeItem('token');
+          router.push('/login');
           throw new Error('Unauthorized - please log in again.');
         }
 
@@ -31,6 +44,7 @@ export default function ProgressReportLanding() {
 
         setChildProfiles(children || []);
         setMessage('');
+        selectedChild = childProfiles.find((child) => child.childID === childID);
       } catch (error) {
         if (error.message.includes('Unauthorized')) {
           setMessage('Session expired. Redirecting to login...');
@@ -67,6 +81,41 @@ export default function ProgressReportLanding() {
     }
     setErrorMessage('');
     router.push(`/admin/progressReport/child?childID=${childID}`);
+  };
+
+  const handleGenerateSuggestionReport = async () => {
+    if (!childID) {
+      setErrorMessage('Please select a child before proceeding.');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    setIsLoading(true); // Start loading
+    try {
+      const selectedChild = childProfiles.find((child) => child.childID === childID);
+      if (!selectedChild) {
+        setErrorMessage('Invalid child selected.');
+        setSnackbarOpen(true);
+        setIsLoading(false); // Stop loading
+        return;
+      }
+
+      const suggestions = await generateSuggestions(childID, selectedChild.age);
+
+      // Redirect to the create page with suggestions as pre-filled data
+      router.push({
+        pathname: '/admin/progressReport/create',
+        query: {
+          childID,
+          suggestions: JSON.stringify(suggestions.suggestions), // Pass suggestions as a query param
+        },
+      });
+    } catch (error) {
+      setErrorMessage(error.message || 'Failed to generate AI suggestion report.');
+      setSnackbarOpen(true);
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
   };
 
   const handleSnackbarClose = () => {
@@ -132,6 +181,16 @@ export default function ProgressReportLanding() {
           sx={{ textTransform: 'none' }}
         >
           Create Progress Report
+        </Button>
+
+        <Button
+          variant="contained"
+          color="info"
+          onClick={handleGenerateSuggestionReport}
+          sx={{ textTransform: 'none' }}
+          disabled={isLoading} // Disable the button while loading
+        >
+          {isLoading ? <CircularProgress size={24} /> : 'Generate AI Suggestion Report'}
         </Button>
 
         <Button
