@@ -213,7 +213,7 @@ export default function NewsletterIndex() {
                     variant="body2"
                     sx={{ fontSize: "0.9rem", color: "#95a5a6" }}
                   >
-                    {new Date(newsletter.createdAt).toLocaleDateString()}
+                    {new Date(`${newsletter.createdAt}T00:00:00`).toLocaleDateString()}
                   </Typography>
                 </CardContent>
                 <CardActions sx={{ pl: 2, pb: 2 }}>
