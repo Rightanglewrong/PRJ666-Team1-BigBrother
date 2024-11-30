@@ -6,6 +6,7 @@ import {
   getUsersByAccountTypeAndLocation,
 } from '../../utils/userAPI';
 import { getCurrentUser } from '@/utils/api';
+import { useUser } from '@/components/authenticate';
 import {
   Container,
   Typography,
@@ -30,6 +31,7 @@ import ContactManagementModal from '@/components/Modal/ContactManagementModal';
 import UpdateUserForm from '../../../Input/UpdateUserForm';
 
 const AdminUserService = () => {
+  const user = useUser();
   const router = useRouter();
   const [userID, setUserID] = useState('');
   const [accountType, setAccountType] = useState('');
@@ -347,9 +349,10 @@ const AdminUserService = () => {
           <TextField
             label="Location ID"
             variant="outlined"
-            value={locationID}
+            value={user.locationID}
             onChange={(e) => setLocationID(e.target.value.toUpperCase())}
             fullWidth
+            disabled
           />
           <Button
             variant="contained"
