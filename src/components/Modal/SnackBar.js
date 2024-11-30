@@ -1,4 +1,4 @@
-// components/Modal/SnackbarNotification.js
+// components/Modal/Snackbar.js
 import React from "react";
 import { Snackbar, Alert, Box } from "@mui/material";
 
