@@ -10,7 +10,6 @@ import {
   InputLabel,
   Card,
   CardContent,
-  CardActionArea,
   Collapse,
   IconButton,
   Pagination,
@@ -293,7 +292,7 @@ const AdminChild = () => {
               <Typography variant="h6">Search Results:</Typography>
               {paginatedResults.map((item, index) => (
                 <Card key={index} sx={{ mb: 2, backgroundColor: "#f5f5f5" }}>
-                  <CardActionArea onClick={() => handleExpandClick(index)}>
+                  <Box onClick={() => handleExpandClick(index)}>
                     <CardContent sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                         {item.lastName}, {item.firstName}
@@ -311,7 +310,7 @@ const AdminChild = () => {
                         <ExpandMoreIcon />
                       </IconButton>
                     </CardContent>
-                  </CardActionArea>
+                  </Box>
                   <Collapse in={expandedCard === index} timeout="auto" unmountOnExit>
                     <CardContent>
                       {!isEditing ? (
