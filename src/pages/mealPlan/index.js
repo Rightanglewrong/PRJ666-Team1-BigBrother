@@ -231,7 +231,14 @@ export default function MealPlanIndex() {
           </Box>
 
           {/* Action Buttons */}
-          <Box display="flex" justifyContent="center" mt={3} gap={2} flexWrap="wrap">
+          <Box
+            display="flex"
+            flexDirection={{ xs: 'column', md: 'row' }} // Column for mobile, row for larger screens
+            justifyContent="center"
+            mt={3}
+            gap={2}
+            flexWrap="wrap"
+          >
             {user && (user.accountType === 'Admin' || user.accountType === 'Staff') && (
               <>
                 <Button

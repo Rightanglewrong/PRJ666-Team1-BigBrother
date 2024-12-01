@@ -8,8 +8,8 @@ export default function MyApp({ Component, pageProps }) {
   return (
     <ThemeProvider>
       <Authenticate>
-        <NavBar />
-        <Component {...pageProps} />
+          <NavBar />
+          <Component {...pageProps} />
       </Authenticate>
     </ThemeProvider>
   );
