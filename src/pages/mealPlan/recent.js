@@ -1,12 +1,9 @@
 // src/pages/mealPlan/recent.js
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import {
-  fetchRecentMealPlansByLocation,
-  deleteMealPlan,
-} from "@/utils/mealPlanAPI";
-import { useUser } from "@/components/authenticate";
-import { useTheme } from "@/components/ThemeContext"; // Import the theme context
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { fetchRecentMealPlansByLocation, deleteMealPlan } from '@/utils/mealPlanAPI';
+import { useUser } from '@/components/authenticate';
+import { useTheme } from '@/components/ThemeContext'; // Import the theme context
 import {
   Container,
   Typography,
@@ -18,62 +15,67 @@ import {
   Snackbar,
   Alert,
   Divider,
-} from "@mui/material";
-import ConfirmationModal from "@/components/Modal/ConfirmationModal";
+} from '@mui/material';
+import ConfirmationModal from '@/components/Modal/ConfirmationModal';
 
 export default function RecentMealPlans() {
   const user = useUser();
   const router = useRouter();
   const [mealPlans, setMealPlans] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [mealPlanToDelete, setMealPlanToDelete] = useState(null);
   const { colorblindMode } = useTheme(); // Access colorblind mode
+  const [handMode, setHandMode] = useState('none'); // Hand mode state
+
+   // Load hand mode from localStorage on component mount
+   useEffect(() => {
+    const storedHandMode = localStorage.getItem("handMode") || "none";
+    setHandMode(storedHandMode);
+  }, []);
 
   // Define original colors
   const originalColors = {
-    buttonPrimary: "#d32f2f",
-    durationText: "#1565C0",
-    mealTitle: "#FF7043",
-    cardBackground: "#f5f5f5",
+    buttonPrimary: '#d32f2f',
+    durationText: '#1565C0',
+    mealTitle: '#FF7043',
+    cardBackground: '#f5f5f5',
   };
 
   // Define colorblind-friendly overrides
   const colorblindOverrides = {
-    "red-green": {
-      buttonPrimary: "#1976d2",
-      durationText: "#1565C0",
-      mealTitle: "#FF7043",
+    'red-green': {
+      buttonPrimary: '#1976d2',
+      durationText: '#1565C0',
+      mealTitle: '#FF7043',
     },
-    "blue-yellow": {
-      buttonPrimary: "#e77f24",
-      durationText: "#e77f24",
-      mealTitle: "#9147A9",
+    'blue-yellow': {
+      buttonPrimary: '#e77f24',
+      durationText: '#e77f24',
+      mealTitle: '#9147A9',
     },
   };
 
   // Merge original colors with colorblind overrides
   const colors = {
     ...originalColors,
-    ...(colorblindMode !== "none" ? colorblindOverrides[colorblindMode] : {}),
+    ...(colorblindMode !== 'none' ? colorblindOverrides[colorblindMode] : {}),
   };
 
   // Fetch the recent meal plans by location
   useEffect(() => {
     const fetchMealPlans = async () => {
       try {
-        const recentMealPlans = await fetchRecentMealPlansByLocation(
-          user.locationID
-        );
+        const recentMealPlans = await fetchRecentMealPlansByLocation(user.locationID);
         setMealPlans(recentMealPlans);
       } catch (error) {
-        if (error.message.includes("Unauthorized")) {
-          setErrorMessage("Session expired. Redirecting to login...");
-          localStorage.removeItem("token");
-          setTimeout(() => router.push("/login"), 2000);
+        if (error.message.includes('Unauthorized')) {
+          setErrorMessage('Session expired. Redirecting to login...');
+          localStorage.removeItem('token');
+          setTimeout(() => router.push('/login'), 2000);
         } else {
-          setErrorMessage(error.message || "Error fetching recent meal plans.");
+          setErrorMessage(error.message || 'Error fetching recent meal plans.');
         }
       } finally {
         setLoading(false);
@@ -84,16 +86,14 @@ export default function RecentMealPlans() {
   }, [user, router]);
 
   const handleDeleteMealPlan = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
 
     try {
       await deleteMealPlan(token, mealPlanToDelete);
-      setMealPlans(
-        mealPlans.filter((plan) => plan.mealPlanID !== mealPlanToDelete)
-      );
-      setErrorMessage("Meal plan deleted successfully");
+      setMealPlans(mealPlans.filter((plan) => plan.mealPlanID !== mealPlanToDelete));
+      setErrorMessage('Meal plan deleted successfully');
     } catch (error) {
-      setErrorMessage("Failed to delete meal plan");
+      setErrorMessage('Failed to delete meal plan');
       //console.error("Error deleting meal plan:", error);
     } finally {
       setConfirmationModalOpen(false);
@@ -116,7 +116,7 @@ export default function RecentMealPlans() {
       <Typography
         variant="h4"
         align="center"
-        sx={{ fontWeight: "bold", mb: 3, color: colors.durationText }}
+        sx={{ fontWeight: 'bold', mb: 3, color: colors.durationText }}
       >
         Recent Meal Plans
       </Typography>
@@ -125,22 +125,17 @@ export default function RecentMealPlans() {
         <Snackbar
           open={Boolean(errorMessage)}
           autoHideDuration={6000}
-          onClose={() => setErrorMessage("")}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => setErrorMessage('')}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         >
-          <Alert severity="info" onClose={() => setErrorMessage("")}>
+          <Alert severity="info" onClose={() => setErrorMessage('')}>
             {errorMessage}
           </Alert>
         </Snackbar>
       )}
 
       {loading ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="40vh"
-        >
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="40vh">
           <CircularProgress />
         </Box>
       ) : mealPlans.length ? (
@@ -156,10 +151,7 @@ export default function RecentMealPlans() {
               }}
             >
               <CardContent>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: "bold", color: colors.durationText }}
-                >
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: colors.durationText }}>
                   Meal Plan Duration
                 </Typography>
                 <Divider sx={{ my: 1 }} />
@@ -172,30 +164,40 @@ export default function RecentMealPlans() {
                 <Divider sx={{ my: 2 }} />
 
                 <Box display="flex" justifyContent="space-between" mt={2}>
-                  {["Breakfast", "Lunch", "Snack"].map((meal, idx) => (
+                  {['Breakfast', 'Lunch', 'Snack'].map((meal, idx) => (
                     <Box key={idx} textAlign="center" flex={1} p={1}>
                       <Typography
                         variant="body1"
-                        sx={{ fontWeight: "bold", color: colors.mealTitle }}
+                        sx={{ fontWeight: 'bold', color: colors.mealTitle }}
                       >
                         {meal}
                       </Typography>
                       <Typography variant="body2">
-                        {plan[meal.toLowerCase()] || "Not specified"}
+                        {plan[meal.toLowerCase()] || 'Not specified'}
                       </Typography>
                     </Box>
                   ))}
                 </Box>
 
                 {/* Delete Button for Admins */}
-                {user.accountType === "Admin" && (
-                  <Box mt={2} display="flex" justifyContent="center">
+                {user.accountType === 'Admin' && (
+                  <Box
+                    mt={2}
+                    display="flex"
+                    justifyContent={
+                      handMode === 'left'
+                        ? 'flex-start'
+                        : handMode === 'right'
+                        ? 'flex-end'
+                        : 'center'
+                    } // Adjust button position based on hand mode
+                  >
                     <Button
                       variant="contained"
                       sx={{
                         backgroundColor: colors.buttonPrimary,
-                        color: "#fff",
-                        "&:hover": {
+                        color: '#fff',
+                        '&:hover': {
                           backgroundColor: colors.buttonPrimary,
                         },
                       }}

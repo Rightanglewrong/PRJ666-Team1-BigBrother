@@ -4,19 +4,34 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [colorblindMode, setColorblindMode] = useState("none"); // Modes: "none", "red-green", "blue-yellow"
+  const [handMode, setHandMode] = useState('none'); // Default to "none" until selected
 
   const setMode = (mode) => {
     setColorblindMode(mode);
     localStorage.setItem("colorblindMode", mode);
   };
 
+  const setHandModePreference = (mode) => {
+    setHandMode(mode);
+    localStorage.setItem("handMode", mode);
+  };
+
   useEffect(() => {
     const storedMode = localStorage.getItem("colorblindMode") || "none";
+    const storedHandMode = localStorage.getItem("handMode") || "none";
     setColorblindMode(storedMode);
+    setHandMode(storedHandMode);
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ colorblindMode, setMode }}>
+    <ThemeContext.Provider
+      value={{
+        colorblindMode,
+        setMode,
+        handMode,
+        setHandMode: setHandModePreference, // Explicit setter for handMode
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );
@@ -25,8 +40,13 @@ export const ThemeProvider = ({ children }) => {
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    //console.warn("useTheme called outside of ThemeProvider. Defaulting to 'none' mode.");
-    return { colorblindMode: "none", setMode: () => {} }; // Safe fallback
+    // Safe fallback
+    return {
+      colorblindMode: "none",
+      setMode: () => {},
+      handMode: "none",
+      setHandMode: () => {},
+    };
   }
   return context;
 };
