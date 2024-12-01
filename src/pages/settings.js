@@ -1,11 +1,9 @@
 import React from 'react';
 import { Container, Typography, Box, RadioGroup, Radio, FormControlLabel, Divider } from '@mui/material';
 import { useTheme } from '@/components/ThemeContext';
-import { useHandMode } from '@/components/HandModeContext';
 
 const SettingsPage = () => {
-  const { colorblindMode, setMode } = useTheme(); // Access colorblind mode
-  const { handMode, setHandMode } = useHandMode(); // Access hand mode
+  const { colorblindMode, setMode, handMode, setHandMode } = useTheme(); // Access modes and setters from ThemeContext
 
   const handleHandModeChange = (event) => {
     setHandMode(event.target.value); // Update global hand mode

@@ -28,6 +28,13 @@ export default function NewsletterIndex() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const newslettersPerPage = 5; // Adjust this value for the number of newsletters per page
+  const [handMode, setHandMode] = useState("none"); // State for hand mode
+
+    // Load hand mode from localStorage
+    useEffect(() => {
+      const storedHandMode = localStorage.getItem("handMode") || "none";
+      setHandMode(storedHandMode);
+    }, []);
 
   // Define original and colorblind-friendly button colors
   const buttonColors = {
@@ -143,7 +150,16 @@ export default function NewsletterIndex() {
 
       {user &&
         (user.accountType === "Admin" || user.accountType === "Staff") && (
-          <Box textAlign="center" sx={{ mt: 4 }}>
+          <Box
+            textAlign={
+              handMode === "left"
+                ? "left"
+                : handMode === "right"
+                ? "right"
+                : "center"
+            }
+            sx={{ mt: 4 }}
+          >
             <Button
               component={Link}
               href="/newsletter/create"
@@ -216,7 +232,18 @@ export default function NewsletterIndex() {
                     {new Date(`${newsletter.createdAt}T00:00:00`).toLocaleDateString()}
                   </Typography>
                 </CardContent>
-                <CardActions sx={{ pl: 2, pb: 2 }}>
+                <CardActions
+                  sx={{
+                    pl: 2,
+                    pb: 2,
+                    justifyContent:
+                      handMode === "left"
+                        ? "flex-start"
+                        : handMode === "right"
+                        ? "flex-end"
+                        : "left",
+                  }}
+                >
                   <Link
                     href={`/newsletter/${newsletter.newsletterID}`}
                     passHref

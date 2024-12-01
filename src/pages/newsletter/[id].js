@@ -1,11 +1,7 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import {
-  getNewsletter,
-  updateNewsletter,
-  deleteNewsletter,
-} from "@/utils/newsletterAPI";
-import { sendEmailsToUsers } from "@/utils/emailAPI";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { getNewsletter, updateNewsletter, deleteNewsletter } from '@/utils/newsletterAPI';
+import { sendEmailsToUsers } from '@/utils/emailAPI';
 import {
   Container,
   Typography,
@@ -22,9 +18,9 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from "@mui/material";
-import { useUser } from "@/components/authenticate";
-import { useTheme } from "@/components/ThemeContext"; // Import ThemeContext
+} from '@mui/material';
+import { useUser } from '@/components/authenticate';
+import { useTheme } from '@/components/ThemeContext'; // Import ThemeContext
 
 export default function NewsletterDetailPage() {
   const user = useUser();
@@ -33,41 +29,52 @@ export default function NewsletterDetailPage() {
   const { id } = router.query;
   const [newsletter, setNewsletter] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [selectedAccountTypes, setSelectedAccountTypes] = useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State for delete confirmation dialog
+  const [handMode, setHandMode] = useState('none'); // Default to none
 
-  const accountTypeOptions = ["Admin", "Staff", "Parent"];
+  const accountTypeOptions = ['Admin', 'Staff', 'Parent'];
+
+  // Load hand mode from localStorage
+  useEffect(() => {
+    const storedHandMode = localStorage.getItem('handMode') || 'none';
+    setHandMode(storedHandMode);
+  }, []);
 
   // Define original and colorblind-friendly button colors
   const buttonColors = {
     original: {
-      primary: "#3498db",
-      secondary: "#2ecc71",
-      danger: "#e74c3c",
+      primary: '#3498db',
+      secondary: '#2ecc71',
+      danger: '#e74c3c',
     },
-    "red-green": {
-      primary: "#1976d2",
-      secondary: "#ff9800",
-      danger: "#e77f24",
+    'red-green': {
+      primary: '#1976d2',
+      secondary: '#ff9800',
+      danger: '#e77f24',
     },
-    "blue-yellow": {
-      primary: "#e77f24",
-      secondary: "#3db48c",
-      danger: "#c62828",
+    'blue-yellow': {
+      primary: '#e77f24',
+      secondary: '#3db48c',
+      danger: '#c62828',
     },
   };
 
-  const colors =
-    buttonColors[colorblindMode] || buttonColors["original"];
+  const colors = buttonColors[colorblindMode] || buttonColors['original'];
+
+  // Utility function for hand mode alignment
+  const getAlignment = () => {
+    return handMode === 'left' ? 'flex-start' : handMode === 'right' ? 'flex-end' : 'left';
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (!user) {
-      setMessage("User is not authenticated");
-      router.push("/login");
+      setMessage('User is not authenticated');
+      router.push('/login');
       return;
     }
 
@@ -79,7 +86,7 @@ export default function NewsletterDetailPage() {
           setLoading(false);
         }
       } catch (error) {
-        setMessage("Error fetching newsletter details");
+        setMessage('Error fetching newsletter details');
         setLoading(false);
       }
     }
@@ -103,9 +110,9 @@ export default function NewsletterDetailPage() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (!token) {
-      setMessage("User is not authenticated");
+      setMessage('User is not authenticated');
       return;
     }
 
@@ -114,32 +121,26 @@ export default function NewsletterDetailPage() {
         title: newsletter.title,
         content: newsletter.content,
       });
-      setMessage("Newsletter updated successfully");
+      setMessage('Newsletter updated successfully');
       setEditMode(false);
     } catch (error) {
-      setMessage("Error updating newsletter");
+      setMessage('Error updating newsletter');
     }
   };
 
   const sendNewsletterViaEmail = async () => {
     setSendingEmail(true);
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     const subject = newsletter.title;
     const content = newsletter.content;
 
     try {
       for (const accountType of selectedAccountTypes) {
-        await sendEmailsToUsers(
-          token,
-          accountType,
-          user.locationID,
-          subject,
-          content
-        );
+        await sendEmailsToUsers(token, accountType, user.locationID, subject, content);
       }
-      setMessage("Newsletter emailed successfully to selected users.");
+      setMessage('Newsletter emailed successfully to selected users.');
     } catch (error) {
-      setMessage("Error sending newsletter via email.");
+      setMessage('Error sending newsletter via email.');
     } finally {
       setSendingEmail(false);
     }
@@ -147,18 +148,18 @@ export default function NewsletterDetailPage() {
 
   const handleDelete = async () => {
     setOpenDeleteDialog(false);
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     try {
       await deleteNewsletter(token, id);
-      setMessage("Newsletter deleted successfully");
-      setTimeout(() => router.push("/newsletter"), 500);
+      setMessage('Newsletter deleted successfully');
+      setTimeout(() => router.push('/newsletter'), 500);
     } catch (error) {
-      setMessage("Error deleting newsletter");
+      setMessage('Error deleting newsletter');
     }
   };
 
   const backToList = () => {
-    router.push("/newsletter");
+    router.push('/newsletter');
   };
 
   if (loading) {
@@ -166,10 +167,10 @@ export default function NewsletterDetailPage() {
       <Container
         maxWidth="sm"
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
         }}
       >
         <CircularProgress />
@@ -183,39 +184,35 @@ export default function NewsletterDetailPage() {
       sx={{
         mt: 4,
         p: 3,
-        backgroundColor: "#f7f9fc",
+        backgroundColor: '#f7f9fc',
         borderRadius: 2,
         boxShadow: 3,
         mb: 4,
-        overflow: "hidden",
       }}
     >
       <Typography
         variant="h4"
         align="center"
         gutterBottom
-        sx={{ color: "#2c3e50", fontWeight: "bold" }}
+        sx={{ color: '#2c3e50', fontWeight: 'bold' }}
       >
         Newsletter Details
       </Typography>
 
       {message && (
-        <Snackbar
-          open={Boolean(message)}
-          autoHideDuration={6000}
-          onClose={() => setMessage("")}
-        >
+        <Snackbar open={Boolean(message)} autoHideDuration={6000} onClose={() => setMessage('')}>
           <Alert severity="info">{message}</Alert>
         </Snackbar>
       )}
 
       {newsletter && (
         <Box>
+          {/* Form Section */}
           {editMode ? (
             <Box
               component="form"
               onSubmit={handleUpdate}
-              sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+              sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
             >
               <TextField
                 label="Title"
@@ -235,42 +232,49 @@ export default function NewsletterDetailPage() {
                 multiline
                 rows={6}
               />
-              <Button
-                type="submit"
-                variant="contained"
+              {/* Action Buttons */}
+              <Box
                 sx={{
-                  backgroundColor: colors.primary,
-                  color: "#fff",
-                  "&:hover": { backgroundColor: colors.secondary },
+                  display: 'flex',
+                  justifyContent: getAlignment(),
+                  gap: 2,
+                  flexWrap: 'wrap',
                 }}
               >
-                Save Changes
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setEditMode(false)}
-                sx={{ mt: 1 }}
-              >
-                Cancel
-              </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: colors.primary,
+                    color: '#fff',
+                    '&:hover': { backgroundColor: colors.secondary },
+                  }}
+                >
+                  Save Changes
+                </Button>
+                <Button variant="outlined" onClick={() => setEditMode(false)} sx={{ mt: 1 }}>
+                  Cancel
+                </Button>
+              </Box>
             </Box>
           ) : (
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              {/* Details Section */}
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                 Title:
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {newsletter.title}
               </Typography>
 
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                 Content:
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {newsletter.content}
               </Typography>
 
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                 Published By:
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
@@ -284,55 +288,67 @@ export default function NewsletterDetailPage() {
                 Updated At: {newsletter.updatedAt}
               </Typography>
 
-              {(user.accountType === "Admin" ||
-                user.accountType === "Staff") && (
-                <Button
-                  variant="contained"
-                  onClick={() => setEditMode(true)}
+              {/* Edit Button */}
+              {(user.accountType === 'Admin' || user.accountType === 'Staff') && (
+                <Box
                   sx={{
-                    mt: 2,
-                    backgroundColor: colors.primary,
-                    color: "#fff",
-                    "&:hover": { backgroundColor: colors.secondary },
+                    display: 'flex',
+                    justifyContent: getAlignment(),
+                    mt: 3,
+                    gap: 2,
+                    flexWrap: 'wrap',
                   }}
                 >
-                  Edit Newsletter
-                </Button>
-              )}
-              {user.accountType === "Admin" && (
-                <>
                   <Button
-                    variant="outlined"
-                    onClick={() => setOpenDeleteDialog(true)}
+                    variant="contained"
+                    onClick={() => setEditMode(true)}
                     sx={{
                       mt: 2,
-                      ml: 2,
-                      borderColor: colors.danger,
-                      color: colors.danger,
-                      "&:hover": {
-                        backgroundColor: colors.danger,
-                        color: "#fff",
-                      },
+                      backgroundColor: colors.primary,
+                      color: '#fff',
+                      '&:hover': { backgroundColor: colors.secondary },
                     }}
                   >
-                    Delete
+                    Edit Newsletter
                   </Button>
-                  <Dialog
-                    open={openDeleteDialog}
-                    onClose={() => setOpenDeleteDialog(false)}
+                </Box>
+              )}
+              {user.accountType === 'Admin' && (
+                <>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: getAlignment(),
+                      gap: 2,
+                      flexWrap: 'wrap',
+                    }}
                   >
+                    <Button
+                      variant="outlined"
+                      onClick={() => setOpenDeleteDialog(true)}
+                      sx={{
+                        mt: 2,
+                        borderColor: colors.danger,
+                        color: colors.danger,
+                        '&:hover': {
+                          backgroundColor: colors.danger,
+                          color: '#fff',
+                        },
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </Box>
+                  <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
                     <DialogTitle>Confirm Delete</DialogTitle>
                     <DialogContent>
                       <DialogContentText>
-                        Are you sure you want to delete this newsletter? This
-                        action cannot be undone.
+                        Are you sure you want to delete this newsletter? This action cannot be
+                        undone.
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                      <Button
-                        onClick={() => setOpenDeleteDialog(false)}
-                        color="primary"
-                      >
+                      <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
                         Cancel
                       </Button>
                       <Button onClick={handleDelete} color="error">
@@ -343,57 +359,102 @@ export default function NewsletterDetailPage() {
                 </>
               )}
 
-              {(user.accountType === "Admin" ||
-                user.accountType === "Staff") && (
+              {(user.accountType === 'Admin' || user.accountType === 'Staff') && (
                 <>
-              <Typography variant="h6" sx={{ mt: 3 }}>
-                Select Account Types to Email:
-              </Typography>
-              <Box>
-                {accountTypeOptions.map((accountType) => (
-                  <FormControlLabel
-                    key={accountType}
-                    control={
-                      <Checkbox
-                        value={accountType}
-                        onChange={handleAccountTypeChange}
-                      />
-                    }
-                    label={accountType}
-                  />
-                ))}
-              </Box>
-              </>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', md: 'row' }, // Stack vertically on small screens, horizontally on larger screens
+                      justifyContent: getAlignment(), // Align based on hand mode
+                      alignItems: { xs: 'flex-start', md: 'flex-start' }, // Ensure consistent alignment across devices
+                      gap: 2,
+                      flexWrap: 'wrap', // Allow wrapping for better alignment
+                      mt: 3, // Add margin-top for spacing
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        mt: { xs: 2, md: 0 },
+                        minWidth: '200px',
+                        flexShrink: 0, // Prevent text from shrinking
+                        textAlign: { xs: 'left', md: 'right' }, // Align text based on screen size
+                        mr: { md: 2 }, // Add margin-right on larger screens for spacing
+                      }}
+                    >
+                      Select Account Types to Email:
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        flexWrap: 'wrap', // Ensure checkboxes wrap neatly
+                        gap: 2,
+                        justifyContent: 'flex-start', // Align checkboxes to the start
+                      }}
+                    >
+                      {accountTypeOptions.map((accountType) => (
+                        <FormControlLabel
+                          key={accountType}
+                          control={
+                            <Checkbox value={accountType} onChange={handleAccountTypeChange} />
+                          }
+                          label={accountType}
+                          sx={{
+                            textAlign: 'left', // Align labels to the left
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                </>
               )}
 
-              {(user.accountType === "Admin" ||
-                user.accountType === "Staff") && (
-                <Button
-                  variant="contained"
-                  onClick={sendNewsletterViaEmail}
-                  disabled={sendingEmail || selectedAccountTypes.length === 0}
+              {(user.accountType === 'Admin' || user.accountType === 'Staff') && (
+                <Box
                   sx={{
-                    mt: 3,
-                    backgroundColor: colors.secondary,
-                    color: "#fff",
-                    "&:hover": { backgroundColor: colors.primary },
+                    display: 'flex',
+                    justifyContent: getAlignment(),
+                    gap: 2,
+                    flexWrap: 'wrap',
                   }}
-                  startIcon={sendingEmail && <CircularProgress size={20} />}
                 >
-                  {sendingEmail ? "Sending..." : "Email Newsletter"}
-                </Button>
+                  <Button
+                    variant="contained"
+                    onClick={sendNewsletterViaEmail}
+                    disabled={sendingEmail || selectedAccountTypes.length === 0}
+                    sx={{
+                      mt: 3,
+                      backgroundColor: colors.secondary,
+                      color: '#fff',
+                      '&:hover': { backgroundColor: colors.primary },
+                    }}
+                    startIcon={sendingEmail && <CircularProgress size={20} />}
+                  >
+                    {sendingEmail ? 'Sending...' : 'Email Newsletter'}
+                  </Button>
+                </Box>
               )}
-              <Button
-                variant="text"
-                onClick={backToList}
+              <Box
                 sx={{
-                  mt: 3,
-                  color: colors.primary,
-                  "&:hover": { color: colors.secondary },
+                  display: 'flex',
+                  justifyContent: getAlignment(),
+                  gap: 2,
+                  flexWrap: 'wrap',
                 }}
               >
-                Back to Newsletter List
-              </Button>
+                <Button
+                  variant="text"
+                  onClick={backToList}
+                  sx={{
+                    mt: 3,
+                    color: colors.primary,
+                    '&:hover': { color: colors.secondary },
+                  }}
+                >
+                  Back to Newsletter List
+                </Button>
+              </Box>
             </Box>
           )}
         </Box>
