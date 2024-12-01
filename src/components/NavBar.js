@@ -29,8 +29,8 @@ const NavBar = () => {
   const isLoggedIn = !!firstName; // Checks if user data is present to determine login status
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/");
+    localStorage.removeItem('token');
+    router.push('/');
   };
 
   const handleMenuOpen = (event) => {
@@ -64,13 +64,13 @@ const NavBar = () => {
       position="sticky"
       sx={{
         background:
-          colorblindMode === "red-green"
-            ? "linear-gradient(90deg, #70a1d7, #b8e986)" // Accessible palette
-            : colorblindMode === "blue-yellow"
-            ? "linear-gradient(90deg, #e77f24, #3db48c)" // Accessible palette
+          colorblindMode === 'red-green'
+            ? 'linear-gradient(90deg, #70a1d7, #b8e986)' // Accessible palette
+            : colorblindMode === 'blue-yellow'
+            ? 'linear-gradient(90deg, #e77f24, #3db48c)' // Accessible palette
             : backgroundColor, // Default gradient
-        transition: "background 0.3s ease-in-out",
-        padding: "5px 20px",
+        transition: 'background 0.3s ease-in-out',
+        padding: '5px 20px',
         zIndex: 1000,
       }}
     >
@@ -99,7 +99,7 @@ const NavBar = () => {
           </Link>
         </Typography>
 
-        <Box
+       {/* <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -111,16 +111,16 @@ const NavBar = () => {
             value={colorblindMode}
             onChange={(e) => setMode(e.target.value)}
             sx={{
-              "& .MuiPaper-root": {
+              '& .MuiPaper-root': {
                 background: menuBackgroundColor,
-                color: "#fff",
-                borderRadius: "8px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                "& .MuiMenuItem-root": {
-                  padding: "8px 16px",
-                  borderRadius: "4px",
-                  "&:hover": {
-                    backgroundColor: "#444",
+                color: '#fff',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                '& .MuiMenuItem-root': {
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  '&:hover': {
+                    backgroundColor: '#444',
                   },
                 },
               },
@@ -144,10 +144,10 @@ const NavBar = () => {
             <MenuItem value="red-green">Red-Green Mode</MenuItem>
             <MenuItem value="blue-yellow">Blue-Yellow Mode</MenuItem>
           </Select>
-        </Box>
+        </Box> */}
 
         {/* Right Section */}
-        {isLoggedIn ? (
+        {isLoggedIn && (
           <>
             <IconButton
               color="inherit"
@@ -181,11 +181,11 @@ const NavBar = () => {
               sx={{
                 '& .MuiPaper-root': {
                   background:
-                  colorblindMode === "red-green"
-                    ? "linear-gradient(90deg, #70a1d7, #b8e986)" // Red-Green mode colors
-                    : colorblindMode === "blue-yellow"
-                    ? "linear-gradient(90deg, #e77f24, #3db48c)" // Blue-Yellow mode colors
-                    : menuBackgroundColor, // Default menu background color
+                    colorblindMode === 'red-green'
+                      ? 'linear-gradient(90deg, #70a1d7, #b8e986)' // Red-Green mode colors
+                      : colorblindMode === 'blue-yellow'
+                      ? 'linear-gradient(90deg, #e77f24, #3db48c)' // Blue-Yellow mode colors
+                      : menuBackgroundColor, // Default menu background color
                   color: '#fff',
                   borderRadius: '4px',
                   minWidth: '160px',
@@ -276,9 +276,8 @@ const NavBar = () => {
                 Messages
               </Link>
 
-              {(accountType === "Admin" || accountType === "Staff") && (
+              {(accountType === 'Admin' || accountType === 'Staff') && (
                 <div>
-                  
                   <Link
                     href="/admin/staffMedia"
                     passHref
@@ -299,6 +298,14 @@ const NavBar = () => {
               )}
               <Divider sx={{ my: 1, backgroundColor: 'white' }} />
               <Link
+                href="/settings"
+                passHref
+                className={styles.dropdownItem}
+                onClick={handleMenuClose}
+              >
+                Settings
+              </Link>
+              <Link
                 href="#"
                 passHref
                 className={styles.dropdownItem}
@@ -312,10 +319,6 @@ const NavBar = () => {
               </Link>
             </Menu>
           </>
-        ) : (
-          <Typography variant="body1" sx={{ color: '#fff', fontWeight: 600 }}>
-            You are not logged in
-          </Typography>
         )}
       </Toolbar>
     </AppBar>
