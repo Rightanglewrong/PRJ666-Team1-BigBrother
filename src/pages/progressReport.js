@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router"
-import {
-  retrieveProgressReportByChildID,
-} from "../utils/progressReportAPI";
-import { retrieveChildProfileByID, retrieveChildrenByLocationID } from "../utils/childAPI";
-import { getRelationshipByParentID } from "../utils/relationshipAPI";
-import { getCurrentUser } from "../utils/api";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { retrieveProgressReportByChildID } from '../utils/progressReportAPI';
+import { retrieveChildProfileByID, retrieveChildrenByLocationID } from '../utils/childAPI';
+import { getRelationshipByParentID } from '../utils/relationshipAPI';
+import { getCurrentUser } from '../utils/api';
 import {
   Container,
   Typography,
@@ -18,20 +16,21 @@ import {
   InputLabel,
   Select,
   MenuItem,
-} from "@mui/material"; 
+  Divider,
+} from '@mui/material';
 
 export default function ProgressReport() {
   const router = useRouter();
-  const [childID, setChildID] = useState("");
-  const [message, setMessage] = useState("");
+  const [childID, setChildID] = useState('');
+  const [message, setMessage] = useState('');
   const [userDetails, setUserDetails] = useState(null);
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [childProfiles, setChildProfiles] = useState([]);
   const [selectedChildID, setSelectedChildID] = useState(null);
   const [filteredReports, setFilteredReports] = useState([]);
-  const [currentChildProfile, setCurrentChildProfile] = useState("");
+  const [currentChildProfile, setCurrentChildProfile] = useState('');
   const [selectedReport, setSelectedReport] = useState(null);
 
   useEffect(() => {
@@ -43,7 +42,9 @@ export default function ProgressReport() {
           setUserId(userData.userID);
           if (userData.accountType === 'Parent') {
             const relationshipData = await getRelationshipByParentID(userData.userID);
-            const uniqueChildIDs = [...new Set(relationshipData.map((relationship) => relationship.childID))];
+            const uniqueChildIDs = [
+              ...new Set(relationshipData.map((relationship) => relationship.childID)),
+            ];
             const childProfilesData = await fetchChildProfiles(uniqueChildIDs);
             setChildProfiles(childProfilesData);
           } else if (userData.accountType === 'Staff') {
@@ -55,7 +56,7 @@ export default function ProgressReport() {
         }
       } catch (error) {
         //console.error("Error fetching user data:", error);
-        setErrorMessage("Failed to load user details. Please log in again.");
+        setErrorMessage('Failed to load user details. Please log in again.');
       }
     };
     fetchUserDetails();
@@ -85,11 +86,11 @@ export default function ProgressReport() {
           }
         })
       );
-      const validChildProfiles = childProfileData.filter(profile => profile !== null).flat();
+      const validChildProfiles = childProfileData.filter((profile) => profile !== null).flat();
       return validChildProfiles;
     } catch (error) {
       //console.error("Error fetching child profiles:", error);
-      setErrorMessage("Failed to fetch child profiles.");
+      setErrorMessage('Failed to fetch child profiles.');
     }
   };
 
@@ -100,8 +101,8 @@ export default function ProgressReport() {
   const handleReset = () => {
     setSelectedChildID(null);
     setFilteredReports([]);
-    setChildID("");
-    setMessage("");
+    setChildID('');
+    setMessage('');
     setSelectedReport(null);
   };
 
@@ -135,30 +136,50 @@ export default function ProgressReport() {
   const parseReportContent = (content) => {
     if (content && typeof content === 'string') {
       if (content.includes('|')) {
-      const contentArray = content.split('|').map(item => item.trim());
-      const [subject, progressTrend, comments, action] = contentArray;
+        const contentArray = content.split('|').map((item) => item.trim());
+        const [subject, progressTrend, comments, action] = contentArray;
 
-      return (
-        <div>
-          {subject && <div><strong>Subject:</strong> {subject}</div>}
-          {progressTrend && <div><strong>Progress Trend:</strong> {progressTrend}</div>}
-          {comments && <div><strong>Comments:</strong> {comments}</div>}
-          {action && <div><strong>Action:</strong> {action}</div>}
-        </div>
-      );
-    } else {
-        return <Typography><strong>Content:</strong> {content}</Typography>;
+        return (
+          <div>
+            {subject && (
+              <div>
+                <strong>Subject:</strong> {subject}
+              </div>
+            )}
+            {progressTrend && (
+              <div>
+                <strong>Progress Trend:</strong> {progressTrend}
+              </div>
+            )}
+            {comments && (
+              <div>
+                <strong>Comments:</strong> {comments}
+              </div>
+            )}
+            {action && (
+              <div>
+                <strong>Action:</strong> {action}
+              </div>
+            )}
+          </div>
+        );
+      } else {
+        return (
+          <Typography>
+            <strong>Content:</strong> {content}
+          </Typography>
+        );
+      }
     }
-  }
     return null;
-  }; 
+  };
 
   return (
-    
     <Container>
-      <Typography variant="h3" gutterBottom>
+      <Typography variant="h3" mt={2} align="center" gutterBottom>
         Progress Reports
       </Typography>
+      <Divider></Divider>
       <Typography variant="body1" gutterBottom>
         {message}
       </Typography>
@@ -166,16 +187,16 @@ export default function ProgressReport() {
       <Box>
         {selectedChildID ? (
           <Box>
-            <Box display="flex" justifyContent="space-between" alignItems="center"  mb={2}>
-            <Typography variant="h5" gutterBottom>
-              Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}
-            </Typography>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Typography variant="h5" gutterBottom>
+                Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}
+              </Typography>
 
-            {userDetails?.accountType === "Staff" && (
-              <Button variant="contained" color="primary" onClick={handleCreateReportClick}>
-                Create Progress Report
-              </Button> 
-            )}
+              {userDetails?.accountType === 'Staff' && (
+                <Button variant="contained" color="primary" onClick={handleCreateReportClick}>
+                  Create Progress Report
+                </Button>
+              )}
             </Box>
             <Box>
               {filteredReports.map((report) => (
@@ -217,7 +238,6 @@ export default function ProgressReport() {
               <Button variant="contained" onClick={handleReset} sx={{ marginRight: 2 }}>
                 Return to Child Profiles
               </Button>
-              
             </Box>
           </Box>
         ) : (
@@ -229,13 +249,16 @@ export default function ProgressReport() {
             <Box>
               {childProfiles.map((child) => (
                 <Box key={child.childID} sx={{ marginBottom: 2 }}>
-                  <Typography variant="h6">{child.firstName} {child.lastName}</Typography>
-                  <Typography variant="body2"><strong>Age:</strong> {child.age}</Typography>
-                  <Typography variant="body2"><strong>Birth Date:</strong> {child.birthDate}</Typography>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleChildClick(child.childID)}
-                  >
+                  <Typography variant="h6">
+                    {child.firstName} {child.lastName}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Age:</strong> {child.age}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Birth Date:</strong> {child.birthDate}
+                  </Typography>
+                  <Button variant="outlined" onClick={() => handleChildClick(child.childID)}>
                     View Progress Reports
                   </Button>
                 </Box>
@@ -246,15 +269,37 @@ export default function ProgressReport() {
       </Box>
 
       {showErrorModal && (
-        <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-          <Box sx={{ backgroundColor: 'white', padding: '16px', borderRadius: '8px', width: '400px' }}>
-            <Typography variant="h6" gutterBottom>Error</Typography>
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <Box
+            sx={{ backgroundColor: 'white', padding: '16px', borderRadius: '8px', width: '400px' }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Error
+            </Typography>
             <Typography variant="body1">{errorMessage}</Typography>
-            <Button variant="contained" color="primary" onClick={handleCloseErrorModal} sx={{ marginTop: '16px' }}>Close</Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCloseErrorModal}
+              sx={{ marginTop: '16px' }}
+            >
+              Close
+            </Button>
           </Box>
         </Box>
       )}
     </Container>
   );
 }
-
