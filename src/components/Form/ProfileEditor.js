@@ -12,8 +12,10 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
+import { useTheme } from '@/components/ThemeContext'; // Import ThemeContext
 
 const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
+  const { darkMode, handMode, colorblindMode } = useTheme(); // Access Dark Mode, Hand Mode, and Colorblind Mode
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -73,11 +75,57 @@ const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
     setIsEditing(false); // Exit edit mode
   };
 
+  // Dynamic styles for modes
+  const colors = {
+    text: darkMode ? '#f1f1f1' : '#333',
+    background: darkMode ? '#121212' : '#ffffff',
+    containerBackground: darkMode ? '#2c2c2c' : '#f7f9fc',
+    button: {
+      primary:
+        colorblindMode === 'red-green'
+          ? '#1976d2'
+          : colorblindMode === 'blue-yellow'
+          ? '#6a0dad'
+          : '#4caf50',
+      primaryHover:
+        colorblindMode === 'red-green'
+          ? '#1565c0'
+          : colorblindMode === 'blue-yellow'
+          ? '#580c91'
+          : '#43a047',
+      secondary:
+        colorblindMode === 'red-green'
+          ? '#e77f24'
+          : colorblindMode === 'blue-yellow'
+          ? '#f44336'
+          : '#f44336',
+      secondaryHover:
+        colorblindMode === 'red-green'
+          ? '#cc6f1f'
+          : colorblindMode === 'blue-yellow'
+          ? '#e65100'
+          : '#d32f2f',
+    },
+  };
+
+  const alignment =
+    handMode === 'left' ? 'flex-start' : handMode === 'right' ? 'flex-end' : 'center';
+
   return (
-    <Card sx={{ maxWidth: 600, mx: 'auto', mt: 4, boxShadow: 10, backgroundColor: '#f7f5f5' }}>
+    <Card
+      sx={{
+        maxWidth: 600,
+        mx: 'auto',
+        mt: 4,
+        boxShadow: darkMode ? 'none' : 10,
+        backgroundColor: colors.containerBackground,
+        color: colors.text,
+        transition: 'background-color 0.3s, color 0.3s',
+      }}
+    >
       {isEditing ? (
         <Box component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
+          <Typography variant="h6" sx={{ mb: 2, color: colors.text }}>
             Edit Profile
           </Typography>
           <TextField
@@ -88,6 +136,7 @@ const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
             fullWidth
             margin="normal"
             required
+            sx={{ input: { color: colors.text }, label: { color: colors.text } }}
           />
           <TextField
             label="Last Name"
@@ -97,6 +146,7 @@ const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
             fullWidth
             margin="normal"
             required
+            sx={{ input: { color: colors.text }, label: { color: colors.text } }}
           />
           <TextField
             label="Location ID"
@@ -105,20 +155,37 @@ const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
             onChange={handleInputChange}
             fullWidth
             margin="normal"
+            sx={{ input: { color: colors.text }, label: { color: colors.text } }}
           />
           <FormControl fullWidth margin="normal" disabled>
-            <InputLabel>Account Type</InputLabel>
+            <InputLabel sx={{ color: colors.text }}>Account Type</InputLabel>
             <Select value={accountType}>
               <MenuItem value="Parent">Parent</MenuItem>
               <MenuItem value="Staff">Staff</MenuItem>
               <MenuItem value="Admin">Admin</MenuItem>
             </Select>
           </FormControl>
-          <Box display="flex" justifyContent="space-between" mt={2}>
-            <Button type="submit" variant="contained" color="primary">
+          <Box display="flex" justifyContent={alignment} mt={2}>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: colors.button.primary,
+                '&:hover': { backgroundColor: colors.button.primaryHover },
+                color: '#fff',
+              }}
+            >
               Save
             </Button>
-            <Button variant="outlined" color="secondary" onClick={handleCancel}>
+            <Button
+              variant="outlined"
+              sx={{
+                backgroundColor: colors.button.secondary,
+                '&:hover': { backgroundColor: colors.button.secondaryHover },
+                color: '#fff',
+              }}
+              onClick={handleCancel}
+            >
               Cancel
             </Button>
           </Box>
@@ -137,36 +204,44 @@ const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
               overflowWrap: 'break-word',
               '& > :nth-of-type(2)': {
                 fontSize: '0.95rem',
-                color: '#555',
+                color: colors.text,
               },
             }}
           >
-            <Typography sx={{ fontWeight: 'bold' }}>ID:</Typography>
+            <Typography sx={{ fontWeight: 'bold', color: colors.text }}>ID:</Typography>
             <Typography>{user?.userID || 'N/A'}</Typography>
 
-            <Typography sx={{ fontWeight: 'bold' }}>Email:</Typography>
+            <Typography sx={{ fontWeight: 'bold', color: colors.text }}>Email:</Typography>
             <Typography>{user?.email || 'N/A'}</Typography>
 
-            <Typography sx={{ fontWeight: 'bold' }}>First Name:</Typography>
+            <Typography sx={{ fontWeight: 'bold', color: colors.text }}>First Name:</Typography>
             <Typography>{formData.firstName}</Typography>
 
-            <Typography sx={{ fontWeight: 'bold' }}>Last Name:</Typography>
+            <Typography sx={{ fontWeight: 'bold', color: colors.text }}>Last Name:</Typography>
             <Typography>{formData.lastName}</Typography>
 
-            <Typography sx={{ fontWeight: 'bold' }}>Location ID:</Typography>
+            <Typography sx={{ fontWeight: 'bold', color: colors.text }}>Location ID:</Typography>
             <Typography>{formData.locationID}</Typography>
 
-            <Typography sx={{ fontWeight: 'bold' }}>Account Type:</Typography>
+            <Typography sx={{ fontWeight: 'bold', color: colors.text }}>Account Type:</Typography>
             <Typography>{accountType}</Typography>
 
-            <Typography sx={{ fontWeight: 'bold' }}>Account Status:</Typography>
+            <Typography sx={{ fontWeight: 'bold', color: colors.text }}>Account Status:</Typography>
             <Typography>{accStatus || 'N/A'}</Typography>
           </Box>
         </CardContent>
       )}
       {!isEditing && (
-        <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained" color="primary" onClick={() => setIsEditing(true)}>
+        <CardActions sx={{ justifyContent: alignment }}>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: colors.button.primary,
+              '&:hover': { backgroundColor: colors.button.primaryHover },
+              color: '#fff',
+            }}
+            onClick={() => setIsEditing(true)}
+          >
             Update
           </Button>
         </CardActions>
