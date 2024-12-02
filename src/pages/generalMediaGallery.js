@@ -102,79 +102,112 @@ const MediaGallery = () => {
   };
 
   return (
-    <div className={styles.homeContainer}>
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <h1 className={styles.title}>Media Gallery Lookup</h1>
-
-        {childProfiles.length > 0 ? (
-          <FormControl style={{ marginBottom: '20px', minWidth: '200px' }}>
-            <InputLabel id="select-child-label">Select Child</InputLabel>
-            <Select
-              labelId="select-child-label"
-              value={selectedChildID}
-              onChange={(e) => handleChildSelect(e.target.value)}
-              label="Select Child"
-            >
-              {childProfiles.map((profile, index) => (
-                <MenuItem key={index} value={profile.childID}>
-                  {profile.firstName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        ) : (
-          <Typography variant="body1" color="error" style={{ marginBottom: '20px' }}>
-            No child profile related to this account.
-          </Typography>
-        )}
-
-        {showResults && (
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            {error && <p className={styles.error}>{error}</p>}
-            <div className={styles.mediaList} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginTop: '20px' }}>
-              {mediaFiles.length > 0 ? (
-                mediaFiles.map((file, index) => (
-                  <div key={index} className={styles.mediaItem} style={{ textAlign: 'center' }}>
-                    {file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? (
-                      <Image
-                        src="/icons/videoIcon.png"
-                        alt={`Media ID: ${file.mediaID}`}
-                        width={200}
-                        height={200}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => openMediaModal(file)}
-                      />
-                    ) : (
-                      <Image
-                        src={file.url}
-                        alt={`Media ID: ${file.mediaID}`}
-                        width={200}
-                        height={200}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => openMediaModal(file)}
-                      />
-                    )}
-                    <p>{file.mediaID.length > 30 ? `${file.mediaID.substring(0, 30)}...` : file.mediaID}</p>
-                  </div>
-                ))
-              ) : (
-                <p>No media files found.</p>
-              )}
-            </div>
-
-            <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-              <Button variant="outlined" onClick={handlePreviousPage} disabled={page === 1}>
-                Previous
-              </Button>
-              <span>Page: {page}</span>
-              <Button variant="outlined" onClick={handleNextPage} disabled={(page * pageLimit) >= filteredMediaEntries.length}>
-                Next
-              </Button>
-            </div>
+    <div style={{ textAlign: 'center', marginTop: '20px' }}>
+      {/* Title Section */}
+      <Typography
+        variant="h4"
+        align="center"
+        sx={{
+          fontWeight: 'bold',
+          color: '#000',
+          marginBottom: '20px',
+          marginTop: '20px',
+        }}
+      >
+        Media Gallery Lookup
+      </Typography>
+  
+      {/* Child Profile Selection */}
+      {childProfiles.length > 0 ? (
+        <FormControl style={{ marginBottom: '20px', minWidth: '200px' }}>
+          <InputLabel id="select-child-label">Select Child</InputLabel>
+          <Select
+            labelId="select-child-label"
+            value={selectedChildID}
+            onChange={(e) => handleChildSelect(e.target.value)}
+            label="Select Child"
+          >
+            {childProfiles.map((profile, index) => (
+              <MenuItem key={index} value={profile.childID}>
+                {profile.firstName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ) : (
+        <Typography variant="body1" color="error" style={{ marginBottom: '20px' }}>
+          No child profile related to this account.
+        </Typography>
+      )}
+  
+      {/* Results Section */}
+      {showResults && (
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          {error && (
+            <Typography variant="body1" color="error" style={{ marginBottom: '10px' }}>
+              {error}
+            </Typography>
+          )}
+          <div
+            className={styles.mediaList}
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: '20px',
+              marginTop: '10px',
+            }}
+          >
+            {mediaFiles.length > 0 ? (
+              mediaFiles.map((file, index) => (
+                <div key={index} className={styles.mediaItem} style={{ textAlign: 'center' }}>
+                  {file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? (
+                    <Image
+                      src="/icons/videoIcon.png"
+                      alt={`Media ID: ${file.mediaID}`}
+                      width={200}
+                      height={200}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => openMediaModal(file)}
+                    />
+                  ) : (
+                    <Image
+                      src={file.url}
+                      alt={`Media ID: ${file.mediaID}`}
+                      width={200}
+                      height={200}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => openMediaModal(file)}
+                    />
+                  )}
+                  <p>{file.mediaID.length > 30 ? `${file.mediaID.substring(0, 30)}...` : file.mediaID}</p>
+                </div>
+              ))
+            ) : (
+              <Typography variant="body1" color="error" style={{ marginTop: '10px' }}>
+                No media files found.
+              </Typography>
+            )}
           </div>
-        )}
-      </div>
-
+  
+          {/* Pagination */}
+          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            <Button variant="outlined" onClick={handlePreviousPage} disabled={page === 1}>
+              Previous
+            </Button>
+            <span>Page: {page}</span>
+            <Button
+              variant="outlined"
+              onClick={handleNextPage}
+              disabled={(page * pageLimit) >= filteredMediaEntries.length}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
+  
+      {/* Modal */}
       <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
         <DialogContent>
           {selectedMedia && (
@@ -199,6 +232,7 @@ const MediaGallery = () => {
       </Dialog>
     </div>
   );
+  
 };
 
 export default MediaGallery;
