@@ -74,7 +74,7 @@ const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
   };
 
   return (
-    <Card sx={{ maxWidth: 600, mx: 'auto', mt: 4, boxShadow: 10, backgroundColor: "#f7f5f5" }}>
+    <Card sx={{ maxWidth: 600, mx: 'auto', mt: 4, boxShadow: 10, backgroundColor: "#f7f5f5"}}>
       {isEditing ? (
         <Box component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>

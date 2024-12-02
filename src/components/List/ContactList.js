@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  TextField,
-  Button,
-} from '@mui/material';
+import { Box, Card, CardContent, CardActions, Typography, TextField, Button } from '@mui/material';
 import { styled } from '@mui/system';
-import ConfirmationModal from '@/components/Modal/ConfirmationModal'; 
+import ConfirmationModal from '@/components/Modal/ConfirmationModal';
 
 // Styled Buttons
 const AddContactButton = styled(Button)({
@@ -118,7 +110,7 @@ const ContactList = ({
   };
 
   return (
-    <Box> 
+    <Box>
       {contacts.length > 0 ? (
         contacts.map((contact) => (
           <Card
@@ -131,19 +123,19 @@ const ContactList = ({
             }}
           >
             <CardContent>
-              <Typography variant="h6">
-                {`${contact.firstName} ${contact.lastName}`}
-              </Typography>
+              <Typography variant="h6">{`${contact.firstName} ${contact.lastName}`}</Typography>
               <Typography>Phone: {contact.phoneNumber}</Typography>
               <Typography>Relationship: {contact.relationship}</Typography>
               <Typography>Address: {contact.address}</Typography>
             </CardContent>
             <CardActions>
               <EditButton onClick={() => handleEditContact(contact)}>Edit</EditButton>
-              <DeleteButton onClick={() => {
-                setContactToDelete(contact);
-                setModalOpen(true);
-              }}>
+              <DeleteButton
+                onClick={() => {
+                  setContactToDelete(contact);
+                  setModalOpen(true);
+                }}
+              >
                 Delete
               </DeleteButton>
             </CardActions>
@@ -154,7 +146,7 @@ const ContactList = ({
       )}
 
       {isAdding && (
-        <Box component="form" my={2}>
+        <Box component="form" my={3}>
           <TextField
             label="First Name"
             name="firstName"
@@ -162,6 +154,7 @@ const ContactList = ({
             onChange={handleInputChange}
             fullWidth
             required
+            sx={{ marginBottom: 1 }}
           />
           <TextField
             label="Last Name"
@@ -170,6 +163,7 @@ const ContactList = ({
             onChange={handleInputChange}
             fullWidth
             required
+            sx={{ marginBottom: 1 }}
           />
           <TextField
             label="Phone Number"
@@ -177,6 +171,7 @@ const ContactList = ({
             value={newContact.phoneNumber}
             onChange={handleInputChange}
             fullWidth
+            sx={{ marginBottom: 1 }}
           />
           <TextField
             label="Relationship"
@@ -184,6 +179,7 @@ const ContactList = ({
             value={newContact.relationship}
             onChange={handleInputChange}
             fullWidth
+            sx={{ marginBottom: 1 }}
           />
           <TextField
             label="Address"
@@ -192,7 +188,7 @@ const ContactList = ({
             onChange={handleInputChange}
             fullWidth
           />
-          <Box mt={2} display="flex" justifyContent="space-between">
+          <Box mt={1} display="flex" justifyContent="space-between">
             <AddContactButton onClick={handleSaveContact}>
               {editingContact ? 'Update' : 'Add'}
             </AddContactButton>
@@ -204,7 +200,7 @@ const ContactList = ({
       )}
 
       {!isAdding && (
-        <AddContactButton onClick={() => setIsAdding(true)} sx={{ mt: 2 }}>
+        <AddContactButton onClick={() => setIsAdding(true)} sx={{ mt: 2, mb: 2 }}>
           Add Contact
         </AddContactButton>
       )}
