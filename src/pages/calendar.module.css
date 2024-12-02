@@ -15,6 +15,53 @@
   margin: 0 auto;
 }
 
+/* Toolbar Styling for Calendar */
+.fc-toolbar {
+  display: flex;
+  flex-wrap: wrap; /* Enable wrapping for toolbar elements */
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px; /* Add spacing between buttons */
+}
+
+.fc-toolbar-title {
+  font-size: 1.5rem; /* Adjust title size for consistency */
+  margin-bottom: 10px; /* Add spacing below the title */
+}
+
+.fc-button-group {
+  display: flex;
+  flex-wrap: wrap; /* Ensure buttons wrap on smaller screens */
+  gap: 5px; /* Add spacing between buttons */
+}
+
+.fc-button {
+  padding: 5px 10px;
+  font-size: 0.9rem; /* Adjust button size for better visibility */
+}
+
+.fc-button-primary {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+  color: white;
+}
+
+.fc-button-primary:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+}
+
+.fc-button-secondary {
+  background-color: #f44336;
+  border-color: #f44336;
+  color: white;
+}
+
+.fc-button-secondary:hover {
+  background-color: #d32f2f;
+  border-color: #d32f2f;
+}
+
 /* Modal overlay styling */
 .overlay {
   background-color: rgba(0, 0, 0, 0.5);
@@ -92,4 +139,30 @@
   font-size: 2rem;
   margin-bottom: 1.5rem;
   text-align: center;
+}
+
+/* Responsive Styles for Mobile */
+@media (max-width: 600px) {
+  .fc-toolbar {
+    flex-direction: column; /* Stack toolbar elements vertically */
+    gap: 15px; /* Add spacing between stacked elements */
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.2rem; /* Adjust title size for smaller screens */
+    text-align: center;
+  }
+
+  .fc-button-group {
+    justify-content: center; /* Center buttons on mobile */
+    gap: 10px;
+  }
+
+  .calendarWrapper {
+    padding: 10px; /* Reduce padding for smaller screens */
+  }
+
+  .modal {
+    width: 90%; /* Adjust modal width for smaller screens */
+  }
 }

@@ -6,10 +6,11 @@ import { withAuth } from '@/hoc/withAuth';
 import { Box, Container, Typography, Button, Snackbar, Alert, Stack } from '@mui/material';
 import ProfileEditor from '@/components/Form/ProfileEditor';
 import ContactList from '@/components/List/ContactList';
+import { useTheme } from '@/components/ThemeContext';
 
 const ProfilePage = () => {
   const user = useUser();
-
+  const { darkMode, handMode } = useTheme(); // Access Dark Mode and Hand Mode
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
@@ -48,12 +49,25 @@ const ProfilePage = () => {
     paddingBottom: '5px',
   };
 
+  // Dynamic styles
+  const colors = {
+    text: darkMode ? '#f1f1f1' : '#333', // Light text for dark mode, dark text otherwise
+    background: darkMode ? '#121212' : '#ffffff', // Dark or light background
+    containerBackground: darkMode ? '#2c2c2c' : '#f7f9fc', // Slight contrast for container
+    borderColor: darkMode ? '#4CAF50' : '#4CAF50', // Border color for titles
+  };
+
+  const alignment = handMode === 'left' ? 'flex-start' : handMode === 'right' ? 'flex-end' : 'center';
+
   return (
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh', // Ensure the container fills the viewport
+        minHeight: '100vh',
+        backgroundColor: colors.background, // Page-wide background
+        color: colors.text, // Text color
+        transition: 'background-color 0.3s, color 0.3s',
       }}
     >
       <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -73,7 +87,16 @@ const ProfilePage = () => {
           {/* Left Section: Profile */}
           <Stack spacing={2} sx={{ flex: 1 }}>
             {/* Profile Title */}
-            <Typography variant="h4" align="center" sx={titleStyle}>
+            <Typography variant="h4" align="center" sx={{
+                fontWeight: 'bold',
+                fontSize: '1.8rem',
+                textTransform: 'uppercase',
+                color: colors.text,
+                borderBottom: `2px solid ${colors.borderColor}`,
+                display: 'inline-block',
+                paddingBottom: '5px',
+                mb: 2,
+              }}>
               Profile
             </Typography>
 
@@ -89,7 +112,20 @@ const ProfilePage = () => {
           {/* Right Section: Contacts */}
           <Stack spacing={2} sx={{ flex: 1 }}>
             {/* Contacts Title */}
-            <Typography variant="h4" align="center" sx={titleStyle}>
+            <Typography
+              variant="h4"
+              align="center"
+              sx={{
+                fontWeight: 'bold',
+                fontSize: '1.8rem',
+                textTransform: 'uppercase',
+                color: colors.text,
+                borderBottom: `2px solid ${colors.borderColor}`,
+                display: 'inline-block',
+                paddingBottom: '5px',
+                mb: 2,
+              }}
+            >
               Contacts
             </Typography>
 

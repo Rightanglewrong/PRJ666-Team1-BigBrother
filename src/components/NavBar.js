@@ -76,11 +76,12 @@ const NavBar = () => {
             <Button
               color="inherit"
               sx={{
-                fontSize: '1.8rem',
+                fontSize: { xs: '1.5rem', sm: '1.8rem' }, // Slightly smaller font size for mobile
                 fontWeight: 'bold',
                 textTransform: 'none',
                 color: '#fff',
                 textDecoration: 'none',
+                paddingLeft: 0, // Remove default padding for extra alignment
               }}
             >
               Big Brother
