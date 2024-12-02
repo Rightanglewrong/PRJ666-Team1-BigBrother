@@ -111,6 +111,7 @@ const AdminChild = () => {
           });
           return prev;
         }
+        updatedData.locationID = user.locationID;
         updatedData.age = calculateAge(value);
       }
       return updatedData;
