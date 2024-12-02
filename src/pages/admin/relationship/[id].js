@@ -144,8 +144,7 @@ export default function Relationships() {
                 setRelationships(prevRelationships =>
                     prevRelationships.filter(relation => relation.relationshipID !== deleteRelation)
                 );
-                setShowSnackbar(true)
-            } catch (error) {
+                } catch (error) {
                 setErrorMessage(`Error deleting relationship: ${error.message}`);
                 setShowSnackbar(true);
             }
