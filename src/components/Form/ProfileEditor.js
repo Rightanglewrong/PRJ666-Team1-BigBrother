@@ -74,7 +74,7 @@ const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
   };
 
   return (
-    <Card sx={{ maxWidth: 600, mx: 'auto', mt: 4, boxShadow: 10, backgroundColor: "#f7f5f5"}}>
+    <Card sx={{ maxWidth: 600, mx: 'auto', mt: 4, boxShadow: 10, backgroundColor: '#f7f5f5' }}>
       {isEditing ? (
         <Box component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
@@ -125,7 +125,22 @@ const ProfileEditor = ({ user, onUpdateProfile, onError, onSuccess }) => {
         </Box>
       ) : (
         <CardContent>
-          <Box display="grid" gridTemplateColumns="150px 1fr" gap={1}>
+          <Box
+            display="grid"
+            gap={1}
+            sx={{
+              gridTemplateColumns: {
+                xs: '120px 1fr', // Mobile size
+                sm: '150px 1fr', // Full size (small and above)
+              },
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word',
+              '& > :nth-of-type(2)': {
+                fontSize: '0.95rem',
+                color: '#555',
+              },
+            }}
+          >
             <Typography sx={{ fontWeight: 'bold' }}>ID:</Typography>
             <Typography>{user?.userID || 'N/A'}</Typography>
 
