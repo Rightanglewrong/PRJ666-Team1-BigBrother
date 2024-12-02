@@ -23,12 +23,10 @@ export default function ProgressReportLanding() {
   const [childID, setChildID] = useState('');
   const [message, setMessage] = useState('');
   const [childProfiles, setChildProfiles] = useState([]);
+  const [selectedChild, setSelectedChild] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Find the currently selected child's name
-  let selectedChild = null;
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -44,7 +42,6 @@ export default function ProgressReportLanding() {
 
         setChildProfiles(children || []);
         setMessage('');
-        selectedChild = childProfiles.find((child) => child.childID === childID);
       } catch (error) {
         if (error.message.includes('Unauthorized')) {
           setMessage('Session expired. Redirecting to login...');
@@ -60,6 +57,11 @@ export default function ProgressReportLanding() {
     };
     fetchUserData();
   }, [user, router]);
+
+  useEffect(() => {
+    const child = childProfiles.find((child) => child.childID === childID);
+    setSelectedChild(child || null);
+  }, [childID, childProfiles]);
 
   const handleCreateProgressReport = (e) => {
     e.preventDefault();
@@ -92,15 +94,15 @@ export default function ProgressReportLanding() {
 
     setIsLoading(true); // Start loading
     try {
-      const selectedChild = childProfiles.find((child) => child.childID === childID);
-      if (!selectedChild) {
+      const child = childProfiles.find((child) => child.childID === childID);
+      if (!child) {
         setErrorMessage('Invalid child selected.');
         setSnackbarOpen(true);
         setIsLoading(false); // Stop loading
         return;
       }
 
-      const suggestions = await generateSuggestions(childID, selectedChild.age);
+      const suggestions = await generateSuggestions(childID, child.age);
 
       // Redirect to the create page with suggestions as pre-filled data
       router.push({
@@ -153,7 +155,9 @@ export default function ProgressReportLanding() {
         <Select
           label="Select Child"
           value={childID}
-          onChange={(e) => setChildID(e.target.value)}
+          onChange={(e) => {
+            setChildID(e.target.value);
+          }}
           fullWidth
           displayEmpty
           required
