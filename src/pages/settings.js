@@ -42,11 +42,11 @@ const SettingsPage = () => {
         minHeight: '100vh', // Ensure the background covers the full height
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: darkMode ? '#121212' : '#f7f9fc', // Fallback for body styles
         transition: 'background-color 0.3s',
         px: { xs: 2, sm: 4 }, // Add horizontal padding for smaller screens
+        mt: 4,
       }}
     >
       <Container
