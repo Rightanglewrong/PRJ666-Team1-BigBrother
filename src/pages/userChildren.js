@@ -1,35 +1,36 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 import {
   Typography,
   Box,
-  Button,
   Card,
   CardContent,
   CardActionArea,
   Collapse,
   IconButton,
   Pagination,
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { retrieveChildProfileByID } from "../utils/childAPI";
-import { getRelationshipByParentID } from "../utils/relationshipAPI";
-import { useRouter } from "next/router";
-import SnackbarNotification from "../components/Modal/SnackBar"; // Import the Snackbar component
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { retrieveChildProfileByID } from '../utils/childAPI';
+import { getRelationshipByParentID } from '../utils/relationshipAPI';
+import { useRouter } from 'next/router';
+import { useUser } from '@/components/authenticate';
+import SnackbarNotification from '../components/Modal/SnackBar'; // Import the Snackbar component
 
 const UserChildren = () => {
+  const user = useUser();
   const [children, setChildren] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedCard, setExpandedCard] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const resultsPerPage = 3;
   const router = useRouter();
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (token && isInitialMount.current) {
       try {
-        const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode the token
+        const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode the token
         const userID = decodedToken.userID; // Extract the userID
         if (userID) {
           fetchChildrenProfiles(userID); // Fetch child profiles
@@ -37,11 +38,15 @@ const UserChildren = () => {
         isInitialMount.current = false; // Mark as not the initial mount
       } catch (error) {
         //console.error("Error decoding token:", error);
-        setSnackbar({ open: true, message: "Invalid token. Please log in again.", severity: "error" });
-        router.push("/login"); // Redirect to login page if token is invalid
+        setSnackbar({
+          open: true,
+          message: 'Invalid token. Please log in again.',
+          severity: 'error',
+        });
+        router.push('/login'); // Redirect to login page if token is invalid
       }
     } else if (!token) {
-      router.push("/login"); // Redirect to login page if no token is found
+      router.push('/login'); // Redirect to login page if no token is found
     }
   }, [router]);
 
@@ -76,30 +81,36 @@ const UserChildren = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const paginatedResults =
-    children.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage);
+  const paginatedResults = children.slice(
+    (currentPage - 1) * resultsPerPage,
+    currentPage * resultsPerPage
+  );
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-      <Typography variant="h4" component="h1">User&apos;s Children Profiles</Typography>
-      
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      <Typography variant="h3" mt={3}>
+        {user.firstName} {user.lastName}&apos;s Children
+      </Typography>
+
       {children.length === 0 ? (
         <Typography variant="h6" color="textSecondary" align="center">
           No child profiles found for the user.
         </Typography>
       ) : (
-        <Box sx={{ width: "50%", mt: 4 }}>
+        <Box sx={{ width: '50%', mt: 4 }}>
           {paginatedResults.map((child, index) => (
-            <Card key={index} sx={{ mb: 2, backgroundColor: "#f5f5f5" }}>
+            <Card key={index} sx={{ mb: 2, backgroundColor: '#f5f5f5' }}>
               <CardActionArea onClick={() => handleExpandClick(index)}>
-                <CardContent sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                <CardContent
+                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {child.lastName}, {child.firstName}
                   </Typography>
                   <IconButton
                     sx={{
-                      transform: expandedCard === index ? "rotate(180deg)" : "rotate(0deg)",
-                      transition: "transform 0.3s",
+                      transform: expandedCard === index ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.3s',
                     }}
                   >
                     <ExpandMoreIcon />
@@ -108,23 +119,37 @@ const UserChildren = () => {
               </CardActionArea>
               <Collapse in={expandedCard === index} timeout="auto" unmountOnExit>
                 <CardContent>
-                  <Typography variant="body2"><strong>Child ID:</strong> {child.childID}</Typography>
-                  <Typography variant="body2"><strong>First Name:</strong> {child.firstName}</Typography>
-                  <Typography variant="body2"><strong>Last Name:</strong> {child.lastName}</Typography>
-                  <Typography variant="body2"><strong>Birth Date:</strong> {child.birthDate}</Typography>
-                  <Typography variant="body2"><strong>Age:</strong> {child.age}</Typography>
+                  <Typography variant="body2">
+                    <strong>Child ID:</strong> {child.childID}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>First Name:</strong> {child.firstName}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Last Name:</strong> {child.lastName}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Birth Date:</strong> {child.birthDate}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Age:</strong> {child.age}
+                  </Typography>
                 </CardContent>
               </Collapse>
             </Card>
           ))}
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-            <Pagination
-              count={Math.ceil(children.length / resultsPerPage)}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-            />
-          </Box>
+
+          {/* Conditionally render Pagination */}
+          {children.length > resultsPerPage && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <Pagination
+                count={Math.ceil(children.length / resultsPerPage)}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+              />
+            </Box>
+          )}
         </Box>
       )}
 
