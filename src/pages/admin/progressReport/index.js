@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { retrieveChildrenByLocationID } from '../../../utils/childAPI';
 import { useUser } from '@/components/authenticate';
 import { generateSuggestions } from '@/utils/suggestionsAPI';
@@ -63,28 +63,6 @@ export default function ProgressReportLanding() {
     setSelectedChild(child || null);
   }, [childID, childProfiles]);
 
-  const handleCreateProgressReport = (e) => {
-    e.preventDefault();
-    if (!childID) {
-      setErrorMessage('Please select a child before proceeding.');
-      setSnackbarOpen(true);
-      return;
-    }
-    setErrorMessage('');
-    router.push(`/admin/progressReport/create?childID=${childID}`);
-  };
-
-  const handleViewProgressReports = (e) => {
-    e.preventDefault();
-    if (!childID) {
-      setErrorMessage('Please select a child before proceeding.');
-      setSnackbarOpen(true);
-      return;
-    }
-    setErrorMessage('');
-    router.push(`/admin/progressReport/child?childID=${childID}`);
-  };
-
   const handleGenerateSuggestionReport = async () => {
     if (!childID) {
       setErrorMessage('Please select a child before proceeding.');
@@ -92,31 +70,29 @@ export default function ProgressReportLanding() {
       return;
     }
 
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
     try {
       const child = childProfiles.find((child) => child.childID === childID);
       if (!child) {
         setErrorMessage('Invalid child selected.');
         setSnackbarOpen(true);
-        setIsLoading(false); // Stop loading
         return;
       }
 
       const suggestions = await generateSuggestions(childID, child.age);
 
-      // Redirect to the create page with suggestions as pre-filled data
       router.push({
         pathname: '/admin/progressReport/create',
         query: {
           childID,
-          suggestions: JSON.stringify(suggestions.suggestions), // Pass suggestions as a query param
+          suggestions: JSON.stringify(suggestions.suggestions),
         },
       });
     } catch (error) {
       setErrorMessage(error.message || 'Failed to generate AI suggestion report.');
       setSnackbarOpen(true);
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -179,12 +155,16 @@ export default function ProgressReportLanding() {
         <Button
           variant="contained"
           color="success"
-          onClick={handleCreateProgressReport}
-          component={Link}
-          href={`/admin/progressReport/create?childID=${childID}`}
           sx={{ textTransform: 'none' }}
+          disabled={!childID}
         >
-          Create Progress Report
+          <Link
+            href={`/admin/progressReport/create?childID=${childID}`}
+            passHref
+            style={{ color: 'inherit', textDecoration: 'none' }}
+          >
+            Create Progress Report
+          </Link>
         </Button>
 
         <Button
@@ -192,7 +172,7 @@ export default function ProgressReportLanding() {
           color="info"
           onClick={handleGenerateSuggestionReport}
           sx={{ textTransform: 'none' }}
-          disabled={isLoading} // Disable the button while loading
+          disabled={isLoading || !childID}
         >
           {isLoading ? <CircularProgress size={24} /> : 'Generate AI Suggestion Report'}
         </Button>
@@ -200,19 +180,28 @@ export default function ProgressReportLanding() {
         <Button
           variant="contained"
           color="success"
-          onClick={handleViewProgressReports}
-          component={Link}
-          href={`/admin/progressReport/child?childID=${childID}`}
           sx={{ textTransform: 'none' }}
-          disabled={!selectedChild} // Disable button if no child is selected
+          disabled={!childID}
         >
-          {selectedChild
-            ? `View ${selectedChild.firstName} ${selectedChild.lastName}'s Progress Reports`
-            : 'View Progress Reports'}
+          <Link
+            href={{
+              pathname: '/admin/progressReport/child',
+              query: {
+                childID,
+                firstName: selectedChild?.firstName,
+                lastName: selectedChild?.lastName,
+              },
+            }}
+            passHref
+            style={{ color: 'inherit', textDecoration: 'none' }}
+          >
+            {selectedChild
+              ? `View ${selectedChild.firstName} ${selectedChild.lastName}'s Progress Reports`
+              : 'View Progress Reports'}
+          </Link>
         </Button>
       </Box>
 
-      {/* Show SendWeeklyReports only if the user is an admin */}
       {user?.accountType === 'Admin' && <SendWeeklyReports locationID={user.locationID} />}
 
       <Button
@@ -224,7 +213,6 @@ export default function ProgressReportLanding() {
         Back to Admin
       </Button>
 
-      {/* SnackbarNotification for error messages */}
       <SnackbarNotification
         open={snackbarOpen}
         message={errorMessage}

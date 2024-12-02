@@ -4,20 +4,7 @@ import { retrieveProgressReportByChildID } from '../utils/progressReportAPI';
 import { retrieveChildProfileByID, retrieveChildrenByLocationID } from '../utils/childAPI';
 import { getRelationshipByParentID } from '../utils/relationshipAPI';
 import { getCurrentUser } from '../utils/api';
-import {
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Snackbar,
-  Alert,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Divider,
-} from '@mui/material';
+import { Container, Typography, Button, Box, Divider } from '@mui/material';
 
 export default function ProgressReport() {
   const router = useRouter();
