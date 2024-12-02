@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Dialog, DialogContent, Typography, DialogActions, Snackbar, Alert } from '@mui/material';
+import { Button, Dialog, DialogContent, Typography, DialogActions, Alert } from '@mui/material';
 import Image from 'next/image';
 import styles from '../HomePage.module.css';
 import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } from '../../utils/mediaAPI';
@@ -13,7 +13,8 @@ const AdminMediaGallery = () => {
   const [error, setError] = useState('');
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+  const [isClient, setIsClient] = useState(false);
+
 
   const pageLimit = 3;
 
@@ -29,11 +30,12 @@ const AdminMediaGallery = () => {
         fetchPaginatedMediaFiles(entries, 1);
       } catch (err) {
         setError("Failed to load media files.");
-        setSnackbar({ open: true, message: 'Failed to load media files.', severity: 'error' });
+  
       }
     };
 
     fetchData();
+    setIsClient(true);
   }, []);
 
   const fetchPaginatedMediaFiles = async (entries, pageNumber) => {
@@ -42,7 +44,7 @@ const AdminMediaGallery = () => {
       setMediaFiles(files);
     } catch (err) {
       setError("Failed to load paginated media files.");
-      setSnackbar({ open: true, message: 'Failed to load paginated media files.', severity: 'error' });
+   
     }
   };
 
@@ -84,20 +86,20 @@ const AdminMediaGallery = () => {
         fetchPaginatedMediaFiles(updatedEntries, newPage);
       } catch (error) {
         setError("Failed to delete media.");
-        setSnackbar({ open: true, message: 'Failed to delete media.', severity: 'error' });
+    
       }
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
 
   const formatSize = (sizeInBytes) => `${(sizeInBytes / 1024).toFixed(2)} KB`;
 
   const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   };
+
+  if (!isClient) return null;
+
 
   return (
     <div style={{ textAlign: 'center', marginTop: '20px' }}>
@@ -212,11 +214,7 @@ const AdminMediaGallery = () => {
         </DialogActions>
       </Dialog>
 
-      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+
     </div>
   );
 };
