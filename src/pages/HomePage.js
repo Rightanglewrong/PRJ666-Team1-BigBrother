@@ -17,9 +17,11 @@ import {
   Alert,
   Stack,
 } from '@mui/material';
+import { useTheme } from '@/components/ThemeContext'; // Import ThemeContext
 
 export default function HomePage() {
   const user = useUser();
+  const { darkMode } = useTheme(); // Access the darkMode state
   const [error, setError] = useState('');
   const router = useRouter(); // Initialize the router
 
@@ -50,16 +52,27 @@ export default function HomePage() {
     );
   }
 
+  // Define dark mode styles
+  const colors = {
+    background: darkMode ? '#121212' : '#f7f7f7',
+    text: darkMode ? '#f1f1f1' : '#333',
+    cardBackground: darkMode ? '#1e1e1e' : '#ffffff',
+    cardHover: darkMode ? '#333' : '#f7f7f7',
+    footerBackground: darkMode ? '#1e1e1e' : '#333',
+    footerText: darkMode ? '#f1f1f1' : 'white',
+  };
+
   return (
     <Box
       sx={{
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#f7f7f7', // light gray fallback
-        backgroundImage: "url('/background/background1.png')",
+        backgroundColor: colors.background,
+        backgroundImage: darkMode ? 'none' : "url('/background/background1.png')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        color: colors.text,
       }}
     >
       {error && (
@@ -153,7 +166,8 @@ export default function HomePage() {
                   alignItems: 'center',
                   textAlign: 'center',
                   p: { xs: 2, sm: 3 },
-                  '&:hover': { boxShadow: 6, transform: 'scale(1.05)' },
+                  backgroundColor: colors.cardHover,
+                  '&:hover': { backgroundColor: colors.cardHover, boxShadow: 6, transform: 'scale(1.05)' },
                   transition: 'all 0.3s',
                 }}
               >
@@ -167,14 +181,20 @@ export default function HomePage() {
                   <Typography
                     variant="h6"
                     fontWeight="bold"
-                    sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
+                    sx={{
+                      fontSize: { xs: '1rem', sm: '1.2rem' },
+                      color: darkMode ? '#f1f1f1' : '#333',
+                    }}
                   >
                     Meal Plan
                   </Typography>
                   <Typography
                     variant="body2"
                     color="textSecondary"
-                    sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+                    sx={{
+                      fontSize: { xs: '0.8rem', sm: '1rem' },
+                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
+                    }}
                   >
                     View and manage meal plans.
                   </Typography>
@@ -193,8 +213,9 @@ export default function HomePage() {
                   flexDirection: { xs: 'row', sm: 'column' },
                   alignItems: 'center',
                   textAlign: 'center',
-                  p: 3,
-                  '&:hover': { boxShadow: 6, transform: 'scale(1.05)' },
+                  p: { xs: 2, sm: 3 },
+                  backgroundColor: colors.cardHover,
+                  '&:hover': { backgroundColor: colors.cardHover, boxShadow: 6, transform: 'scale(1.05)' },
                   transition: 'all 0.3s',
                 }}
               >
@@ -208,14 +229,20 @@ export default function HomePage() {
                   <Typography
                     variant="h6"
                     fontWeight="bold"
-                    sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
+                    sx={{
+                      fontSize: { xs: '1rem', sm: '1.2rem' },
+                      color: darkMode ? '#f1f1f1' : '#333', // Explicitly set color for header text
+                    }}
                   >
                     Event Calendar
                   </Typography>
                   <Typography
                     variant="body2"
                     color="textSecondary"
-                    sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+                    sx={{
+                      fontSize: { xs: '0.8rem', sm: '1rem' },
+                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
+                    }}
                   >
                     Check upcoming events and activities.
                   </Typography>
@@ -235,7 +262,8 @@ export default function HomePage() {
                   alignItems: 'center',
                   textAlign: 'center',
                   p: { xs: 2, sm: 3 },
-                  '&:hover': { boxShadow: 6, transform: 'scale(1.05)' },
+                  backgroundColor: colors.cardHover,
+                  '&:hover': { backgroundColor: colors.cardHover, boxShadow: 6, transform: 'scale(1.05)' },
                   transition: 'all 0.3s',
                 }}
               >
@@ -249,14 +277,20 @@ export default function HomePage() {
                   <Typography
                     variant="h6"
                     fontWeight="bold"
-                    sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
+                    sx={{
+                      fontSize: { xs: '1rem', sm: '1.2rem' },
+                      color: darkMode ? '#f1f1f1' : '#333', // Explicitly set color for header text
+                    }}
                   >
                     Newsletter
                   </Typography>
                   <Typography
                     variant="body2"
                     color="textSecondary"
-                    sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+                    sx={{
+                      fontSize: { xs: '0.8rem', sm: '1rem' },
+                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
+                    }}
                   >
                     Stay updated with the latest news.
                   </Typography>
@@ -277,7 +311,8 @@ export default function HomePage() {
                     alignItems: 'center',
                     textAlign: 'center',
                     p: { xs: 2, sm: 3 },
-                    '&:hover': { boxShadow: 6, transform: 'scale(1.05)' },
+                    backgroundColor: colors.cardHover,
+                    '&:hover': { backgroundColor: colors.cardHover, boxShadow: 6, transform: 'scale(1.05)' },
                     transition: 'all 0.3s',
                   }}
                 >
@@ -313,8 +348,8 @@ export default function HomePage() {
       <Box
         sx={{
           py: 4,
-          backgroundColor: '#333',
-          color: 'white',
+          backgroundColor: colors.footerBackground,
+          color: colors.footerText,
           textAlign: 'center',
           mt: 'auto',
         }}
