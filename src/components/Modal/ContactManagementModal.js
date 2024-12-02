@@ -75,10 +75,7 @@ const ContactManagementModal = ({
                 </CardActions>
               </Card>
             ))
-          : //   <Typography variant="body2" color="textSecondary" align="center">
-            //     No contacts available for this user. Add one using the Add Contact button below.
-            //   </Typography>
-            !isAdding && (
+          : !isAdding && (
               <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
                 <Typography variant="body2" color="textSecondary" align="center">
                   No contacts available for this user. Add one using the Add Contact button below.

@@ -28,6 +28,7 @@ import {
 import { addContact, fetchContacts, updateContact, deleteContact } from '@/utils/contactApi'; // Import contact-related APIs
 import UserList from '@/components/List/UserList';
 import ContactManagementModal from '@/components/Modal/ContactManagementModal';
+import ConfirmationModal from '@/components/Modal/ConfirmationModal';
 import UpdateUserForm from '../../../Input/UpdateUserForm';
 
 const AdminUserService = () => {
@@ -35,7 +36,7 @@ const AdminUserService = () => {
   const router = useRouter();
   const [userID, setUserID] = useState('');
   const [accountType, setAccountType] = useState('');
-  const [locationID, setLocationID] = useState('');
+  const [locationID, setLocationID] = useState(user.locationID);
   const [updateData, setUpdateData] = useState({
     firstName: '',
     lastName: '',
@@ -326,11 +327,11 @@ const AdminUserService = () => {
 
   return (
     <Container maxWidth="md">
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h3" mt={3} align='center' gutterBottom>
         User Management
       </Typography>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h6">Get Users by Account Type and Location</Typography>
+        <Typography variant="h5" align='center'>Get Users by Account Type and Location</Typography>
         <Box display="flex" alignItems="center" gap={2} mt={2}>
           <FormControl fullWidth variant="outlined">
             <InputLabel>Account Type</InputLabel>{' '}
@@ -421,25 +422,14 @@ const AdminUserService = () => {
       </Snackbar>
 
       {deleteConfirmationModal && (
-      <Dialog
-        open={deleteConfirmationModal}
-        onClose={handleDeleteModalClose}
-        aria-labelledby="delete-confirmation"
-      >
-        <DialogTitle id="delete-confirmation">Confirm Delete</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete user {userToDelete?.firstName}?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteModalClose}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} color="error">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )}
+        <ConfirmationModal
+          open={deleteConfirmationModal}
+          title="Confirm Delete"
+          description={`Are you sure you want to delete user ${userToDelete?.firstName}?`}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleDeleteModalClose}
+        />
+      )}
     </Container>
   );
 };
