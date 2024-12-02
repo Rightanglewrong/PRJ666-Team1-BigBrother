@@ -109,121 +109,99 @@ const AdminMediaGallery = () => {
   if (!isClient) return null;
 
   return (
-    <div className={styles.homeContainer}>
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <h1 className={styles.title}>Media Gallery Lookup</h1>
-
-        {showResults && (
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            {error && <p className={styles.error}>{error}</p>}
-            <div className={styles.mediaList} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginTop: '20px' }}>
-              {mediaFiles.length > 0 ? (
-                mediaFiles.map((file, index) => (
-                  <div key={index} className={styles.mediaItem} style={{ textAlign: 'center' }}>
-                    {file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? (
-                      <Image
-                        src="/icons/videoIcon.png"
-                        alt={`Media ID: ${file.mediaID}`}
-                        width={200}
-                        height={200}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => openMediaModal(file)}
-                      />
-                    ) : (
-                      <Image
-                        src={file.url}
-                        alt={`Media ID: ${file.mediaID}`}
-                        width={200}
-                        height={200}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => openMediaModal(file)}
-                      />
-                    )}
-                    <p>{file.mediaID.length > 30 ? `${file.mediaID.substring(0, 30)}...` : file.mediaID}</p>
-                  </div>
-                ))
-              ) : (
-                <p>No media files found.</p>
-              )}
-            </div>
-
-            <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-              <Button variant="outlined" onClick={handlePreviousPage} disabled={page === 1}>
-                Previous
-              </Button>
-              <span>Page: {page}</span>
-              <Button variant="outlined" onClick={handleNextPage} disabled={(page * pageLimit) >= mediaEntries.length}>
-                Next
-              </Button>
-            </div>
+    <div style={{ textAlign: 'center', marginTop: '20px' }}>
+      {/* Title Section */}
+      <Typography
+        variant="h4"
+        align="center"
+        sx={{
+          fontWeight: 'bold',
+          color: '#000',
+          marginBottom: '20px',
+          marginTop: '20px',
+        }}
+      >
+        Media Gallery Lookup
+      </Typography>
+  
+      {/* Error Message */}
+      {error && (
+        <Typography
+          variant="body1"
+          align="center"
+          sx={{ color: 'red', marginBottom: '10px' }}
+        >
+          {error}
+        </Typography>
+      )}
+  
+      {/* Results Section */}
+      {showResults && (
+        <div style={{ textAlign: 'center', marginTop: '10px' }}>
+          <div
+            className={styles.mediaList}
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: '20px',
+              marginTop: '10px',
+            }}
+          >
+            {mediaFiles.length > 0 ? (
+              mediaFiles.map((file, index) => (
+                <div key={index} className={styles.mediaItem} style={{ textAlign: 'center' }}>
+                  {file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? (
+                    <Image
+                      src="/icons/videoIcon.png"
+                      alt={`Media ID: ${file.mediaID}`}
+                      width={200}
+                      height={200}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => openMediaModal(file)}
+                    />
+                  ) : (
+                    <Image
+                      src={file.url}
+                      alt={`Media ID: ${file.mediaID}`}
+                      width={200}
+                      height={200}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => openMediaModal(file)}
+                    />
+                  )}
+                  <p>{file.mediaID.length > 30 ? `${file.mediaID.substring(0, 30)}...` : file.mediaID}</p>
+                </div>
+              ))
+            ) : (
+              <Typography
+                variant="body1"
+                align="center"
+                sx={{ color: 'red', marginTop: '10px' }}
+              >
+                No results found.
+              </Typography>
+            )}
           </div>
-        )}
-      </div>
-
-      <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
-        <DialogContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {selectedMedia && (
-            <>
-              {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
-                <video width="600" height="400" controls>
-                  <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <Image src={selectedMedia.url} alt={`Enlarged Media ID: ${selectedMedia.mediaID}`} width={600} height={700} />
-              )}
-              <Typography variant="body1" style={{ marginTop: '10px', textAlign: 'center' }}>
-                <strong>Media ID:</strong> {selectedMedia.mediaID}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Description:</strong> {selectedMedia.description || 'No description available'}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Location ID:</strong> {selectedMedia.locationID}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Uploaded By:</strong> {selectedMedia.uploadedBy}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Child ID:</strong> {selectedMedia.childID}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Last Modified:</strong> {selectedMedia.LastModified ? new Date(selectedMedia.LastModified).toLocaleString() : 'N/A'}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Size:</strong> {selectedMedia.Size ? formatSize(selectedMedia.Size) : 'N/A'}
-              </Typography>
-              <Button variant="contained" color="secondary" style={{ marginTop: '20px' }} onClick={openDeleteConfirm}>
-                Delete
-              </Button>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isDeleteConfirmOpen} onClose={closeDeleteConfirm}>
-        <DialogContent>
-          <Typography variant="body1" style={{ textAlign: 'center' }}>
-            Are you sure you want to delete this media file?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDeleteConfirm} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDelete} color="secondary">
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+  
+          {/* Pagination */}
+          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            <Button variant="outlined" onClick={handlePreviousPage} disabled={page === 1}>
+              Previous
+            </Button>
+            <span>Page: {page}</span>
+            <Button
+              variant="outlined"
+              onClick={handleNextPage}
+              disabled={(page * pageLimit) >= mediaEntries.length}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
+  
+}
 export default AdminMediaGallery;
