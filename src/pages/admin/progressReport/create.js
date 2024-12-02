@@ -126,7 +126,11 @@ export default function CreateProgressReportPage() {
       };
       await createProgressReportInDynamoDB(newReport);
       setMessage('Progress Report created successfully');
-      router.push(`/admin/progressReport/child?childID=${childID}`);
+      if (user.accountType === "Admin") {
+          router.push(`/admin/progressReport/child?childID=${childID}`);
+      } else {
+         router.push(`/progressReport/child?childID=${childID}`);
+      }
     } catch (error) {
       setErrorMessage(`Error creating Progress Report: ${error.message}`);
     }

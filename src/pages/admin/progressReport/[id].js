@@ -33,10 +33,15 @@ export default function ViewProgressReportsPage() {
     if (childID) {
       try {
         const childReportData = await retrieveProgressReportByChildID(childID);
+        if (!childReportData || childReportData.length === 0) {
+            setRelationships([]); // Explicitly set an empty array if no data
+            return [];
+        }
+
+
         setChildReports(childReportData);
       } catch (error) {
-        setErrorMessage(`Error fetching child reports: ${error.message}`);
-        setSnackbarOpen(true);
+        setErrorMessage(`No child reports found!`);
       }
     }
   }, [childID]);
@@ -110,6 +115,7 @@ export default function ViewProgressReportsPage() {
         setMessage('Progress report deleted successfully.');
         setSnackbarOpen(true);
         setSelectedReportForDelete(null);
+        setChildReports([]);  
         fetchReportsByChildID();
       } catch (error) {
         setErrorMessage(`Error deleting report: ${error.message}`);

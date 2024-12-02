@@ -141,7 +141,6 @@ export default function Relationships() {
                 await deleteRelationshipFromDynamoDB(deleteRelation);
                 setDeleteRelation("");
                 setShowDeleteDialog(false);
-                const updatedRelationships = await fetchRelationships();
                 setRelationships(prevRelationships =>
                     prevRelationships.filter(relation => relation.relationshipID !== deleteRelation)
                 );

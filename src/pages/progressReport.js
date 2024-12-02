@@ -121,7 +121,7 @@ export default function ProgressReport() {
       const reports = await retrieveProgressReportByChildID(childID);
       setFilteredReports(reports);
     } catch (error) {
-      setMessage(`Error fetching progress reports: ${error.message}`);
+      setMessage(`No Progress Reports Found!`);
     }
   };
 
