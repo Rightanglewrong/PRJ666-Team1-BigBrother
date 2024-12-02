@@ -5,6 +5,12 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [colorblindMode, setColorblindMode] = useState("none"); // Modes: "none", "red-green", "blue-yellow"
   const [handMode, setHandMode] = useState('none'); // Default to "none" until selected
+  const [darkMode, setDarkMode] = useState(false); // Dark mode state
+
+  const setDarkModePreference = (enabled) => {
+    setDarkMode(enabled);
+    localStorage.setItem('darkMode', enabled);
+  };
 
   const setMode = (mode) => {
     setColorblindMode(mode);
@@ -19,6 +25,8 @@ export const ThemeProvider = ({ children }) => {
   useEffect(() => {
     const storedMode = localStorage.getItem("colorblindMode") || "none";
     const storedHandMode = localStorage.getItem("handMode") || "none";
+    const storedDarkMode = localStorage.getItem('darkMode') === 'true';
+    setDarkMode(storedDarkMode);
     setColorblindMode(storedMode);
     setHandMode(storedHandMode);
   }, []);
@@ -26,6 +34,8 @@ export const ThemeProvider = ({ children }) => {
   return (
     <ThemeContext.Provider
       value={{
+        darkMode,
+        setDarkMode: setDarkModePreference,
         colorblindMode,
         setMode,
         handMode,
