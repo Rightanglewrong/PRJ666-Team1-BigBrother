@@ -76,9 +76,30 @@ const styles = {
     accent: "#FF6F61",     // Coral/red-orange
     secondaryAccent: "#2A9D8F", // Teal
   },
+  dark: {
+    background: "#121212",
+    text: "#f1f1f1",
+    link: "#64b5f6", // Blue for links in dark mode
+    secondaryBackground: "#1E1E1E", // Slightly lighter for containers
+  },
+  fallback: {
+    background: "white",
+    text: "black",
+    link: "blue",
+    secondaryBackground: "#f7f7f7",
+  },
 };
 
 export const useThemeStyles = () => {
-  const { colorblindMode } = useTheme();
-  return styles[colorblindMode] || styles.none;
+  const { colorblindMode, darkMode } = useTheme();
+  if (darkMode) {
+    return {
+      text: darkMode ? "#f1f1f1" : "#333",
+      background: darkMode ? "#121212" : "#f7f9fc",
+      link: darkMode ? "#64b5f6" : "#3498db",
+      containerBackground: darkMode ? "#2c2c2c" : "#ffffff",
+    };
+  }
+  return styles[colorblindMode] || styles.fallback;
 };
+

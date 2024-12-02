@@ -52,10 +52,10 @@ const SettingsPage = () => {
       <Container
         maxWidth="md"
         sx={{
-          mt: 2,
-          mb: 2,
-          py: { xs: 0, md: 4 }, // Remove vertical padding on mobile
-          px: { xs: 0, md: 4 }, // Remove horizontal padding on mobile
+          mt: { xs: 1, md: 2 },
+          mb: { xs: 1, md: 2 },
+          py: { xs: 0, md: 4 },
+          px: { xs: 0, md: 4 },
           width: { xs: '100%', sm: '80%', md: '60%' }, // Dynamically set width
           backgroundColor: { xs: 'transparent', md: darkMode ? '#2c2c2c' : '#ffffff' }, // No background on mobile
           color: darkMode ? '#ffffff' : '#000000',
