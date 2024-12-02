@@ -6,6 +6,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { useTheme } from '@/components/ThemeContext';
 import {
   createCalendarEntryInDynamoDB,
   updateCalendarEntryInDynamoDB,
@@ -28,6 +29,8 @@ import styles from './calendar.module.css';
 
 const CalendarView = () => {
   const user = useUser();
+  const { darkMode, colorblindMode, handMode } = useTheme();
+
   const [events, setEvents] = useState([]);
   const [modalProps, setModalProps] = useState({
     open: false,
@@ -41,6 +44,19 @@ const CalendarView = () => {
     severity: 'error',
   });
   const [isAuthorized, setIsAuthorized] = useState(false);
+
+  // Dark mode and colorblind styles
+  const themeStyles = {
+    text: darkMode ? '#f1f1f1' : '#333',
+    background: darkMode ? '#121212' : '#ffffff',
+    container: darkMode ? '#1E1E1E' : '#f7f9fc',
+    button: {
+      primary: colorblindMode === 'red-green' ? '#1976d2' : colorblindMode === 'blue-yellow' ? '#6a0dad' : '#3498db',
+      danger: colorblindMode === 'red-green' ? '#d32f2f' : colorblindMode === 'blue-yellow' ? '#c62828' : '#e74c3c',
+    },
+  };
+
+  const handleAlignment = () => (handMode === 'left' ? 'flex-start' : handMode === 'right' ? 'flex-end' : 'center');
 
   const formatDateToYYYYMMDD = (date) => {
     if (!date) return '';
@@ -201,9 +217,21 @@ const CalendarView = () => {
   };
 
   return (
-    <div className={styles.calendarContainer}>
-      <h2>Daycare Event Calendar</h2>
-      <div className={styles.calendarWrapper}>
+    <Box sx={{ backgroundColor: themeStyles.background, color: themeStyles.text, minHeight: '100vh', p: 2 }}>
+      <Typography variant="h4" align="center" sx={{ mb: 3 }}>
+        Daycare Event Calendar
+      </Typography>
+      <Box
+        sx={{
+          backgroundColor: themeStyles.container,
+          p: 2,
+          borderRadius: 2,
+          '& .fc-toolbar': {
+            flexDirection: { xs: 'column', md: 'row' },
+            gap: 2,
+          },
+        }}
+      >
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
@@ -218,10 +246,10 @@ const CalendarView = () => {
           eventClick={handleEventClick}
           editable={false}
           droppable={true}
-          height={700}
+          height={800}
           aspectRatio={1.5}
         />
-      </div>
+      </Box>
 
       <Dialog open={modalProps.open} onClose={handleModalClose} fullWidth maxWidth="sm">
         <DialogTitle>
@@ -379,7 +407,7 @@ const CalendarView = () => {
         severity={snackbar.severity}
         onClose={handleCloseSnackbar}
       />
-    </div>
+     </Box>
   );
 };
 
