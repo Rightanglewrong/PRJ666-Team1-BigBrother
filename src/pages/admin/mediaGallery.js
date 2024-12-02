@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Dialog, DialogContent, Typography, DialogActions, Snackbar, Alert } from '@mui/material';
+import { Button, Dialog, DialogContent, Typography, DialogActions, Alert } from '@mui/material';
 import Image from 'next/image';
 import styles from '../HomePage.module.css';
 import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } from '../../utils/mediaAPI';
@@ -7,16 +7,14 @@ import { getCurrentUser } from '../../utils/api';
 
 const AdminMediaGallery = () => {
   const [locationID, setLocationID] = useState('');
-  const [defaultLocationID, setDefaultLocationID] = useState('');
   const [page, setPage] = useState(1);
   const [mediaEntries, setMediaEntries] = useState([]);
   const [mediaFiles, setMediaFiles] = useState([]);
   const [error, setError] = useState('');
-  const [isClient, setIsClient] = useState(false);
-  const [showResults, setShowResults] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+  const [isClient, setIsClient] = useState(false);
+
 
   const pageLimit = 3;
 
@@ -26,17 +24,13 @@ const AdminMediaGallery = () => {
         const user = await getCurrentUser();
         const userLocationID = user.locationID.toUpperCase();
         setLocationID(userLocationID);
-        setDefaultLocationID(userLocationID); // Save the default location ID
 
-        // Automatically fetch media for the user's location ID
         const entries = await fetchMediaByLocationID(userLocationID);
         setMediaEntries(entries);
-        setShowResults(true);
         fetchPaginatedMediaFiles(entries, 1);
       } catch (err) {
-        console.error("Failed to fetch media by location ID:", err);
         setError("Failed to load media files.");
-        setSnackbar({ open: true, message: 'No results found.', severity: 'error' });
+  
       }
     };
 
@@ -48,11 +42,9 @@ const AdminMediaGallery = () => {
     try {
       const files = await fetchPaginatedMedia(entries, pageNumber);
       setMediaFiles(files);
-      setError('');
     } catch (err) {
-      //console.error("Failed to fetch paginated media:", err);
       setError("Failed to load paginated media files.");
-      setSnackbar({ open: true, message: 'Failed to load paginated media files.', severity: 'error' });
+   
     }
   };
 
@@ -74,8 +66,6 @@ const AdminMediaGallery = () => {
 
   const closeMediaModal = () => setSelectedMedia(null);
 
-  const formatSize = (sizeInBytes) => `${(sizeInBytes / 1024).toFixed(2)} KB`;
-
   const openDeleteConfirm = () => setIsDeleteConfirmOpen(true);
 
   const closeDeleteConfirm = () => setIsDeleteConfirmOpen(false);
@@ -95,113 +85,138 @@ const AdminMediaGallery = () => {
         setPage(newPage);
         fetchPaginatedMediaFiles(updatedEntries, newPage);
       } catch (error) {
-        //console.error("Error deleting media:", error);
         setError("Failed to delete media.");
-        setSnackbar({ open: true, message: 'Failed to delete media.', severity: 'error' });
+    
       }
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
+
+  const formatSize = (sizeInBytes) => `${(sizeInBytes / 1024).toFixed(2)} KB`;
+
+  const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   };
 
   if (!isClient) return null;
 
+
   return (
     <div style={{ textAlign: 'center', marginTop: '20px' }}>
-      {/* Title Section */}
-      <Typography
-        variant="h4"
-        align="center"
-        sx={{
-          fontWeight: 'bold',
-          color: '#000',
-          marginBottom: '20px',
-          marginTop: '20px',
-        }}
-      >
+      <Typography variant="h4" align="center" sx={{ fontWeight: 'bold', marginBottom: '20px' }}>
         Media Gallery Lookup
       </Typography>
-  
-      {/* Error Message */}
+
       {error && (
-        <Typography
-          variant="body1"
-          align="center"
-          sx={{ color: 'red', marginBottom: '10px' }}
-        >
+        <Typography variant="body1" align="center" sx={{ color: 'red', marginBottom: '10px' }}>
           {error}
         </Typography>
       )}
-  
-      {/* Results Section */}
-      {showResults && (
-        <div style={{ textAlign: 'center', marginTop: '10px' }}>
-          <div
-            className={styles.mediaList}
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              gap: '20px',
-              marginTop: '10px',
-            }}
-          >
-            {mediaFiles.length > 0 ? (
-              mediaFiles.map((file, index) => (
-                <div key={index} className={styles.mediaItem} style={{ textAlign: 'center' }}>
-                  {file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? (
-                    <Image
-                      src="/icons/videoIcon.png"
-                      alt={`Media ID: ${file.mediaID}`}
-                      width={200}
-                      height={200}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => openMediaModal(file)}
-                    />
-                  ) : (
-                    <Image
-                      src={file.url}
-                      alt={`Media ID: ${file.mediaID}`}
-                      width={200}
-                      height={200}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => openMediaModal(file)}
-                    />
-                  )}
-                  <p>{file.mediaID.length > 30 ? `${file.mediaID.substring(0, 30)}...` : file.mediaID}</p>
-                </div>
-              ))
-            ) : (
-              <Typography
-                variant="body1"
-                align="center"
-                sx={{ color: 'red', marginTop: '10px' }}
-              >
-                No results found.
+
+      <div className={styles.mediaList} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
+        {mediaFiles.length > 0 ? (
+          mediaFiles.map((file, index) => (
+            <div key={index} style={{ textAlign: 'center' }}>
+              {file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? (
+                <Image
+                  src="/icons/videoIcon.png"
+                  alt={`Media ID: ${file.mediaID}`}
+                  width={200}
+                  height={200}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => openMediaModal(file)}
+                />
+              ) : (
+                <Image
+                  src={file.url}
+                  alt={`Media ID: ${file.mediaID}`}
+                  width={200}
+                  height={200}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => openMediaModal(file)}
+                />
+              )}
+              <Typography variant="body2">{truncateText(file.mediaID, 30)}</Typography>
+            </div>
+          ))
+        ) : (
+          <Typography variant="body1" sx={{ color: 'red', marginTop: '10px' }}>
+            No results found.
+          </Typography>
+        )}
+      </div>
+
+      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+        <Button variant="outlined" onClick={handlePreviousPage} disabled={page === 1}>
+          Previous
+        </Button>
+        <span>Page: {page}</span>
+        <Button variant="outlined" onClick={handleNextPage} disabled={(page * pageLimit) >= mediaEntries.length}>
+          Next
+        </Button>
+      </div>
+
+      <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
+        <DialogContent style={{ textAlign: 'center' }}>
+          {selectedMedia && (
+            <>
+              {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
+                <video width="600" height="400" controls>
+                  <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <Image src={selectedMedia.url} alt={selectedMedia.mediaID} width={600} height={700} />
+              )}
+              <Typography variant="body1" sx={{ marginTop: '10px' }}>
+                <strong>Media ID:</strong> {selectedMedia.mediaID}
               </Typography>
-            )}
-          </div>
-  
-          {/* Pagination */}
-          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-            <Button variant="outlined" onClick={handlePreviousPage} disabled={page === 1}>
-              Previous
-            </Button>
-            <span>Page: {page}</span>
-            <Button
-              variant="outlined"
-              onClick={handleNextPage}
-              disabled={(page * pageLimit) >= mediaEntries.length}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
+              <Typography variant="body1">
+                <strong>Description:</strong> {selectedMedia.description || 'No description available'}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Location ID:</strong> {selectedMedia.locationID}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Uploaded By:</strong> {selectedMedia.uploadedBy}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Child ID:</strong> {selectedMedia.childID}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Last Modified:</strong>{' '}
+                {selectedMedia.LastModified ? new Date(selectedMedia.LastModified).toLocaleString() : 'N/A'}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Size:</strong> {selectedMedia.Size ? formatSize(selectedMedia.Size) : 'N/A'}
+              </Typography>
+              <Button variant="contained" color="secondary" sx={{ marginTop: '20px' }} onClick={openDeleteConfirm}>
+                Delete
+              </Button>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteConfirmOpen} onClose={closeDeleteConfirm}>
+        <DialogContent>
+          <Typography variant="body1" sx={{ textAlign: 'center' }}>
+            Are you sure you want to delete this media file?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteConfirm} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="secondary">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
     </div>
   );
-  
-}
+};
+
 export default AdminMediaGallery;
