@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Card, CardContent, CardActions, Typography, TextField, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import ConfirmationModal from '@/components/Modal/ConfirmationModal';
@@ -44,6 +44,10 @@ const ContactList = ({
   const [modalOpen, setModalOpen] = useState(false); // Track modal state
   const [contactToDelete, setContactToDelete] = useState(null); // Track contact to delete
 
+  // Ref for the edit form
+  const formRef = useRef(null);
+
+
   // Load contacts
   useEffect(() => {
     const loadContacts = async () => {
@@ -83,6 +87,11 @@ const ContactList = ({
     setEditingContact(contact);
     setNewContact(contact);
     setIsAdding(true);
+
+    // Scroll to the form
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 0);
   };
 
   const handleDeleteContact = async () => {
@@ -132,6 +141,7 @@ const ContactList = ({
               <EditButton onClick={() => handleEditContact(contact)}>Edit</EditButton>
               <DeleteButton
                 onClick={() => {
+                  resetForm();
                   setContactToDelete(contact);
                   setModalOpen(true);
                 }}
@@ -146,7 +156,7 @@ const ContactList = ({
       )}
 
       {isAdding && (
-        <Box component="form" my={3}>
+        <Box component="form" my={3} ref={formRef}>
           <TextField
             label="First Name"
             name="firstName"
@@ -212,6 +222,7 @@ const ContactList = ({
         description={`Are you sure you want to delete the contact "${contactToDelete?.firstName} ${contactToDelete?.lastName}"?`}
         onConfirm={handleDeleteContact}
         onCancel={() => {
+          resetForm();
           setModalOpen(false);
           setContactToDelete(null);
         }}
