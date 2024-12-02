@@ -16,7 +16,6 @@ import {
   Snackbar,
   Alert,
   Stack,
-  Paper,
 } from '@mui/material';
 
 export default function HomePage() {
@@ -267,45 +266,47 @@ export default function HomePage() {
           </Grid>
 
           {/* Child Progress Report */}
-          <Grid item xs={12} sm={6} md={3}>
-            <Link href="/progressReport" passHref>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: { xs: 'row', sm: 'column' },
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  p: { xs: 2, sm: 3 },
-                  '&:hover': { boxShadow: 6, transform: 'scale(1.05)' },
-                  transition: 'all 0.3s',
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image="/icons/ProgressReport.png"
-                  alt="Progress Report Icon"
-                  sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
-                />
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    fontWeight="bold"
-                    sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
-                  >
-                    Child Progress
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
-                  >
-                    Track and celebrate your child’s development milestones.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Link>
-          </Grid>
+          {user.accountType === 'Parent' && (
+            <Grid item xs={12} sm={6} md={3}>
+              <Link href="/progressReport" passHref>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: { xs: 'row', sm: 'column' },
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    p: { xs: 2, sm: 3 },
+                    '&:hover': { boxShadow: 6, transform: 'scale(1.05)' },
+                    transition: 'all 0.3s',
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    image="/icons/ProgressReport.png"
+                    alt="Progress Report Icon"
+                    sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
+                  />
+                  <CardContent>
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
+                    >
+                      Child Progress
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+                    >
+                      Track and celebrate your child’s development milestones.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Link>
+            </Grid>
+          )}
         </Grid>
       </Container>
 

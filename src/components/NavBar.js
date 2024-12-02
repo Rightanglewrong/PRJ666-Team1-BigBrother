@@ -3,18 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Menu,
-  MenuItem,
-  Button,
-  Divider,
-  Select,
-  Box,
-} from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Menu, Button, Divider } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useUser } from '../components/authenticate';
 import styles from './NavBar.module.css';
@@ -99,7 +88,7 @@ const NavBar = () => {
           </Link>
         </Typography>
 
-       {/* <Box
+        {/* <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -235,22 +224,28 @@ const NavBar = () => {
                 </div>
               )}
 
-              <Link
-                href="/generalMediaGallery"
-                passHref
-                className={styles.dropdownItem}
-                onClick={handleMenuClose}
-              >
-                Media
-              </Link>
-              <Link
-                href="/userChildren"
-                passHref
-                className={styles.dropdownItem}
-                onClick={handleMenuClose}
-              >
-                Child Profiles
-              </Link>
+              {(accountType === 'Parent' || accountType === 'Staff') && (
+                <Link
+                  href="/generalMediaGallery"
+                  passHref
+                  className={styles.dropdownItem}
+                  onClick={handleMenuClose}
+                >
+                  Media
+                </Link>
+              )}
+
+              {(accountType === 'Parent' || accountType === 'Staff') && (
+                <Link
+                  href="/userChildren"
+                  passHref
+                  className={styles.dropdownItem}
+                  onClick={handleMenuClose}
+                >
+                  Child Profiles
+                </Link>
+              )}
+
               <Link
                 href="/mealPlan"
                 passHref
@@ -259,6 +254,7 @@ const NavBar = () => {
               >
                 Meal Plan
               </Link>
+
               <Link
                 href="/newsletter"
                 passHref
@@ -267,6 +263,7 @@ const NavBar = () => {
               >
                 Newsletter
               </Link>
+
               <Link
                 href="/message"
                 passHref
@@ -277,25 +274,27 @@ const NavBar = () => {
               </Link>
 
               {(accountType === 'Admin' || accountType === 'Staff') && (
-                <div>
-                  <Link
-                    href="/admin/staffMedia"
-                    passHref
-                    className={styles.dropdownItem}
-                    onClick={handleMenuClose}
-                  >
-                    Staff Media Upload
-                  </Link>
-                  <Link
-                    href="/admin"
-                    passHref
-                    className={styles.dropdownItem}
-                    onClick={handleMenuClose}
-                  >
-                    Admin Services
-                  </Link>
-                </div>
+                <Link
+                  href="/admin/staffMedia"
+                  passHref
+                  className={styles.dropdownItem}
+                  onClick={handleMenuClose}
+                >
+                  Staff Media Upload
+                </Link>
               )}
+
+              {accountType === 'Admin' && (
+                <Link
+                  href="/admin"
+                  passHref
+                  className={styles.dropdownItem}
+                  onClick={handleMenuClose}
+                >
+                  Admin Services
+                </Link>
+              )}
+
               <Divider sx={{ my: 1, backgroundColor: 'white' }} />
               <Link
                 href="/settings"
