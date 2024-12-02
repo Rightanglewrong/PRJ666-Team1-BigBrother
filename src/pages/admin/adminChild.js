@@ -111,6 +111,7 @@ const AdminChild = () => {
           });
           return prev;
         }
+        updatedData.locationID = user.locationID;
         updatedData.age = calculateAge(value);
       }
       return updatedData;
@@ -445,8 +446,8 @@ const AdminChild = () => {
           />
           <TextField
             label="Location ID"
-            value={createData.locationID || ""}
-            onChange={(e) => handleCreateInputChange("locationID", e.target.value)}
+            value={user.locationID || ""}
+            disabled
             fullWidth
             sx={{ mb: 2 }}
           />

@@ -7,6 +7,16 @@ const nextConfig = {
           destination: '/admin/progressReport/create', // Actual file path
         },
         {
+          source: '/progressReport/child', // Public URL path
+          destination: '/admin/progressReport/child', // Destination path with childID from the query parameter
+          has: [
+            {
+              type: 'query',
+              key: 'childID', // Ensure the query parameter 'childID' is present
+            },
+          ],
+        },
+        {
           source: '/relationship', // Public URL path without "admin"
           destination: '/admin/relationship', // Actual file path
         },

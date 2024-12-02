@@ -89,6 +89,12 @@ export default function Relationships() {
                 data = await getRelationshipByChildID(id);
             }
 
+
+            if (!data || data.length === 0) {
+                setRelationships([]); // Explicitly set an empty array if no data
+                return [];
+            }
+
             const enrichedRelationships = await Promise.all(
                 data.map(async (relation) => {
                     if (type === "parent") {
@@ -113,8 +119,7 @@ export default function Relationships() {
 
             setRelationships(enrichedRelationships || []);
         } catch (error) {
-            setErrorMessage("Error loading relationships. Please try again.");
-            setShowSnackbar(true);
+            setErrorMessage("No relationships found. Please try again.");
         }
     }, [id, type]);
 
@@ -136,7 +141,10 @@ export default function Relationships() {
                 await deleteRelationshipFromDynamoDB(deleteRelation);
                 setDeleteRelation("");
                 setShowDeleteDialog(false);
-                fetchRelationships(); 
+                setRelationships(prevRelationships =>
+                    prevRelationships.filter(relation => relation.relationshipID !== deleteRelation)
+                );
+                setShowSnackbar(true)
             } catch (error) {
                 setErrorMessage(`Error deleting relationship: ${error.message}`);
                 setShowSnackbar(true);
@@ -163,10 +171,12 @@ export default function Relationships() {
 
             const existingRelationships = await getRelationshipByParentID(editingRelation.parentID);
 
-            // Check if a relationship with the same childID already exists
+            // Check if a relationship with the same childID already exists, excluding the current relationship being edited
             if (
                 existingRelationships.some(
-                    (relationship) => relationship.childID === editingRelation.childID
+                    (relationship) =>
+                        relationship.childID === editingRelation.childID &&
+                        relationship.relationshipID !== editingRelation.relationshipID // Exclude the current one
                 )
             ) {
                 setErrorMessage(
@@ -177,7 +187,7 @@ export default function Relationships() {
             }
             await updateRelationshipInDynamoDB(editingRelation.relationshipID, editingRelation);
             setEditingRelation(null);
-            window.location.reload();
+            fetchRelationships();
         } catch (error) {
             setErrorMessage("Failed to update relationship. Please try again.");
             setShowSnackbar(true);

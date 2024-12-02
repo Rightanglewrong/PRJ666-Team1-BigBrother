@@ -299,6 +299,8 @@ useEffect(() => {
           type="incoming"
           handleOpenModal={handleOpenModal}
           handleNameClick={handleNameClick}
+          userDetails={userDetails}
+
 
         />
       )}
@@ -308,6 +310,8 @@ useEffect(() => {
         type="outgoing"
           handleOpenModal={handleOpenModal}
           handleNameClick={handleNameClick}
+          userDetails={userDetails}
+
 
         />
       )}
@@ -317,6 +321,7 @@ useEffect(() => {
           type="all"
           handleOpenModal={handleOpenModal}
           handleNameClick={handleNameClick}
+          userDetails={userDetails}
 
         />
       )}
@@ -452,7 +457,7 @@ useEffect(() => {
   );
 }
 
-function MessageTable({ messages, type, handleOpenModal, handleNameClick }) {
+function MessageTable({ messages, type, handleOpenModal, handleNameClick, userDetails }) {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -479,23 +484,31 @@ function MessageTable({ messages, type, handleOpenModal, handleNameClick }) {
               <TableCell>{message.title}</TableCell>
               {type !== "outgoing" && (
                 <TableCell>
-                <span
-                  onClick={() => handleNameClick(message.sender)} 
-                  style={{ cursor: 'pointer', color: 'blue' }}
-                >
-                  {message.senderName}
-                </span>
-              </TableCell>
+                  {message.sender !== userDetails.userID ? (
+                    <span
+                      onClick={() => handleNameClick(message.sender)} 
+                      style={{ cursor: 'pointer', color: 'blue' }}
+                    >
+                      {message.senderName}
+                    </span>
+                  ) : (
+                    `${userDetails.firstName} ${userDetails.lastName}`
+                  )}
+                </TableCell>
               )}
               {type !== "incoming" && (
                 <TableCell>
-                <span
-                  onClick={() => handleNameClick(message.receiver)} 
-                  style={{ cursor: 'pointer', color: 'blue' }}
-                >
-                  {message.receiverName}
-                </span>
-              </TableCell>
+                  {message.receiver !== userDetails.userID ? (
+                    <span
+                      onClick={() => handleNameClick(message.receiver)} 
+                      style={{ cursor: 'pointer', color: 'blue' }}
+                    >
+                      {message.receiverName}
+                    </span>
+                  ) : (
+                    `${userDetails.firstName} ${userDetails.lastName}`
+                  )}
+                </TableCell>
               )}
               {type === "all" && (
                 <TableCell>{message.messageType}</TableCell>
@@ -519,6 +532,7 @@ function MessageTable({ messages, type, handleOpenModal, handleNameClick }) {
             </TableRow>
           ))}
         </TableBody>
+
       </Table>
     </TableContainer>
   );
