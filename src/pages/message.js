@@ -129,7 +129,7 @@ export default function Messages() {
 
     }));
       const allMessagesList = [...receivedMessagesWithNames, ...sentMessagesWithNames]
-      
+      allMessagesList.sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
       setAllMessages(allMessagesList);
       setFilteredMessages(allMessagesList);
       
@@ -230,11 +230,11 @@ useEffect(() => {
   };
 
   const handleDelete = async () => {
-    if (selectedMessage && deleteType) {
+    if (selectedMessage) {
       try {
-        if (deleteType === "incoming") {
+        if (selectedMessage.messageType === "Incoming") {
           await markMessageAsDeletedByReceiver(selectedMessage.messageID);
-        } else if (deleteType === "outgoing") {
+        } else if (selectedMessage.messageType === "Outgoing") {
           await markMessageAsDeletedBySender(selectedMessage.messageID);
         }
         setSuccessMessage("Message deleted successfully.");
@@ -300,7 +300,6 @@ useEffect(() => {
           handleOpenModal={handleOpenModal}
           handleNameClick={handleNameClick}
           userDetails={userDetails}
-
 
         />
       )}
@@ -514,7 +513,7 @@ function MessageTable({ messages, type, handleOpenModal, handleNameClick, userDe
                 <TableCell>{message.messageType}</TableCell>
               )}
               <TableCell>{message.content}</TableCell>
-              <TableCell>{message.datePosted}</TableCell>
+              <TableCell>{new Date(message.datePosted).toLocaleDateString('en-CA')}</TableCell>
               <TableCell>
                 <button
                   onClick={() => handleOpenModal(message, type)}
