@@ -133,7 +133,6 @@ export default function NewsletterDetailPage() {
     const token = localStorage.getItem('token');
     const subject = newsletter.title;
     const content = newsletter.content;
-
     try {
       for (const accountType of selectedAccountTypes) {
         await sendEmailsToUsers(token, accountType, user.locationID, subject, content);

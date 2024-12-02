@@ -1,10 +1,10 @@
 // src/pages/newsletter/index.js
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { getAllNewsletters } from "@/utils/newsletterAPI";
-import { useTheme } from "@/components/ThemeContext"; // Import ThemeContext
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { getAllNewsletters } from '@/utils/newsletterAPI';
+import { useTheme } from '@/components/ThemeContext'; // Import ThemeContext
 import {
   Container,
   Typography,
@@ -16,53 +16,51 @@ import {
   Snackbar,
   Box,
   Pagination,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import { useUser } from "@/components/authenticate";
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { useUser } from '@/components/authenticate';
 
 export default function NewsletterIndex() {
   const user = useUser();
   const { colorblindMode } = useTheme(); // Access the colorblind mode from ThemeContext
   const [newsletters, setNewsletters] = useState([]);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const newslettersPerPage = 5; // Adjust this value for the number of newsletters per page
-  const [handMode, setHandMode] = useState("none"); // State for hand mode
+  const [handMode, setHandMode] = useState('none'); // State for hand mode
 
-    // Load hand mode from localStorage
-    useEffect(() => {
-      const storedHandMode = localStorage.getItem("handMode") || "none";
-      setHandMode(storedHandMode);
-    }, []);
+  // Load hand mode from localStorage
+  useEffect(() => {
+    const storedHandMode = localStorage.getItem('handMode') || 'none';
+    setHandMode(storedHandMode);
+  }, []);
 
   // Define original and colorblind-friendly button colors
   const buttonColors = {
     original: {
-      primary: "#3498db",
-      secondary: "#2ecc71",
-      danger: "#e74c3c",
+      primary: '#3498db',
+      secondary: '#2ecc71',
+      danger: '#e74c3c',
     },
-    "red-green": {
-      primary: "#1976d2", // Replace red with blue shades
-      secondary: "#ff9800", // Replace green with orange shades
-      danger: "#d32f2f", // Replace danger red with a neutral dark
+    'red-green': {
+      primary: '#1976d2', // Replace red with blue shades
+      secondary: '#ff9800', // Replace green with orange shades
+      danger: '#d32f2f', // Replace danger red with a neutral dark
     },
-    "blue-yellow": {
-      primary: "#e77f24", // Replace blue with orange
-      secondary: "#3db48c", // Replace green with teal
-      danger: "#c62828", // Replace danger red with neutral dark
+    'blue-yellow': {
+      primary: '#e77f24', // Replace blue with orange
+      secondary: '#3db48c', // Replace green with teal
+      danger: '#c62828', // Replace danger red with neutral dark
     },
   };
 
-  const colors =
-    buttonColors[colorblindMode] || buttonColors["original"]; // Use appropriate colors based on mode
-
+  const colors = buttonColors[colorblindMode] || buttonColors['original']; // Use appropriate colors based on mode
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (!token) {
-      setMessage("User is not authenticated");
+      setMessage('User is not authenticated');
       return;
     }
 
@@ -75,8 +73,8 @@ export default function NewsletterIndex() {
         setNewsletters(sortedNewsletters);
       } catch (error) {
         setMessage(
-          error.message === "404: No Newsletters currently"
-            ? "No newsletters found."
+          error.message === '404: No Newsletters currently'
+            ? 'No newsletters found.'
             : `Error: ${error.message}`
         );
       } finally {
@@ -90,10 +88,7 @@ export default function NewsletterIndex() {
   // Calculate the newsletters to display on the current page
   const indexOfLastNewsletter = currentPage * newslettersPerPage;
   const indexOfFirstNewsletter = indexOfLastNewsletter - newslettersPerPage;
-  const currentNewsletters = newsletters.slice(
-    indexOfFirstNewsletter,
-    indexOfLastNewsletter
-  );
+  const currentNewsletters = newsletters.slice(indexOfFirstNewsletter, indexOfLastNewsletter);
 
   // Handle page change
   const handlePageChange = (event, value) => {
@@ -105,10 +100,10 @@ export default function NewsletterIndex() {
       <Container
         maxWidth="md"
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
         }}
       >
         <CircularProgress />
@@ -122,18 +117,18 @@ export default function NewsletterIndex() {
       sx={{
         mt: 4,
         p: 3,
-        backgroundColor: "#f7f9fc",
+        backgroundColor: '#f7f9fc',
         borderRadius: 2,
         boxShadow: 3,
         mb: 4,
-        overflow: "hidden",
+        overflow: 'hidden',
       }}
     >
       <Typography
         variant="h4"
         align="center"
         gutterBottom
-        sx={{ color: "#2c3e50", mb: 3, fontSize: "2.5rem", fontWeight: "bold" }}
+        sx={{ color: '#2c3e50', mb: 3, fontSize: '2.5rem', fontWeight: 'bold' }}
       >
         Newsletters
       </Typography>
@@ -142,48 +137,41 @@ export default function NewsletterIndex() {
         <Snackbar
           open={Boolean(message)}
           autoHideDuration={6000}
-          onClose={() => setMessage("")}
+          onClose={() => setMessage('')}
           message={message}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         />
       )}
 
-      {user &&
-        (user.accountType === "Admin" || user.accountType === "Staff") && (
-          <Box
-            textAlign={
-              handMode === "left"
-                ? "left"
-                : handMode === "right"
-                ? "right"
-                : "center"
-            }
-            sx={{ mt: 4 }}
+      {user && (user.accountType === 'Admin' || user.accountType === 'Staff') && (
+        <Box
+          textAlign={handMode === 'left' ? 'left' : handMode === 'right' ? 'right' : 'center'}
+          sx={{ mt: 4 }}
+        >
+          <Button
+            component={Link}
+            href="/newsletter/create"
+            variant="contained"
+            startIcon={<AddIcon />}
+            sx={{
+              backgroundColor: colors.secondary,
+              color: '#fff',
+              '&:hover': { backgroundColor: colors.primary },
+              textTransform: 'none',
+              fontWeight: 'bold',
+              width: '100%',
+            }}
           >
-            <Button
-              component={Link}
-              href="/newsletter/create"
-              variant="contained"
-              startIcon={<AddIcon />}
-              sx={{
-                backgroundColor: colors.secondary,
-                color: "#fff",
-                "&:hover": { backgroundColor: colors.primary },
-                textTransform: "none",
-                fontWeight: "bold",
-                width: "100%",
-              }}
-            >
-              Create New Newsletter
-            </Button>
-          </Box>
-        )}
+            Create New Newsletter
+          </Button>
+        </Box>
+      )}
 
       {newsletters.length > 0 ? (
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
+            display: 'flex',
+            flexDirection: 'column',
             gap: 3,
             mt: 3,
           }}
@@ -193,42 +181,36 @@ export default function NewsletterIndex() {
               <Card
                 variant="outlined"
                 sx={{
-                  backgroundColor: "#f9f9f9",
-                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-3px)",
-                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.15)",
+                  backgroundColor: '#f9f9f9',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
                   },
                   borderRadius: 2,
                 }}
               >
                 <CardContent>
-                  <Typography
-                    variant="h6"
-                    sx={{ color: "#2c3e50", fontWeight: "bold" }}
-                  >
+                  <Typography variant="h6" sx={{ color: '#2c3e50', fontWeight: 'bold' }}>
                     {newsletter.title}
                   </Typography>
                   <Typography
                     variant="body2"
                     sx={{
-                      color: "#7f8c8d",
+                      color: '#7f8c8d',
                       mt: 1,
                       mb: 1,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitBoxOrient: "vertical",
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitBoxOrient: 'vertical',
                       WebkitLineClamp: 3,
                     }}
                   >
                     {newsletter.content}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontSize: "0.9rem", color: "#95a5a6" }}
-                  >
+                  <Typography variant="body2" sx={{ fontSize: '0.9rem', color: '#95a5a6' }}>
                     {new Date(`${newsletter.createdAt}T00:00:00`).toLocaleDateString()}
                   </Typography>
                 </CardContent>
@@ -237,24 +219,21 @@ export default function NewsletterIndex() {
                     pl: 2,
                     pb: 2,
                     justifyContent:
-                      handMode === "left"
-                        ? "flex-start"
-                        : handMode === "right"
-                        ? "flex-end"
-                        : "left",
+                      handMode === 'left'
+                        ? 'flex-start'
+                        : handMode === 'right'
+                        ? 'flex-end'
+                        : 'left',
                   }}
                 >
-                  <Link
-                    href={`/newsletter/${newsletter.newsletterID}`}
-                    passHref
-                  >
+                  <Link href={`/newsletter/${newsletter.newsletterID}`} passHref>
                     <Button
                       variant="contained"
                       sx={{
                         backgroundColor: colors.primary,
-                        color: "#fff",
-                        "&:hover": { backgroundColor: "#2980b9" },
-                        textTransform: "none",
+                        color: '#fff',
+                        '&:hover': { backgroundColor: '#2980b9' },
+                        textTransform: 'none',
                       }}
                     >
                       Expand
@@ -269,7 +248,7 @@ export default function NewsletterIndex() {
         <Typography
           variant="body2"
           align="center"
-          sx={{ color: "#7f8c8d", fontSize: "1.2rem", mt: 3 }}
+          sx={{ color: '#7f8c8d', fontSize: '1.2rem', mt: 3 }}
         >
           No newsletters found.
         </Typography>
@@ -282,7 +261,7 @@ export default function NewsletterIndex() {
           page={currentPage}
           onChange={handlePageChange}
           color={
-            colorblindMode === "blue-yellow" ? "secondary" : "primary" // Use "secondary" for blue-yellow mode
+            colorblindMode === 'blue-yellow' ? 'secondary' : 'primary' // Use "secondary" for blue-yellow mode
           }
         />
       </Box>
