@@ -1,242 +1,117 @@
+// src/pages/admin/progressReport/[id]
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import {
-  retrieveProgressReportByChildID,
-  updateProgressReportInDynamoDB,
-  deleteProgressReportFromDynamoDB,
-} from '../../../utils/progressReportAPI';
-import { Container, Typography, Box, Button, TextField } from '@mui/material';
+import { retrieveProgressReportByChildID } from '../../../utils/progressReportAPI';
+import { useUser } from '@/components/authenticate';
+import { Container, Typography, Box, Divider, Button, Pagination } from '@mui/material';
 import SnackbarNotification from '@/components/Modal/SnackBar';
-import ConfirmationModal from '@/components/Modal/ConfirmationModal';
-import CustomCard from '@/components/Card/CustomCard';
+import ProgressReportCard from '@/components/Card/ProgressReportCard';
 
 export default function ViewProgressReportsPage() {
+  const user = useUser();
   const router = useRouter();
   const [childID, setChildID] = useState('');
+  const [childName, setChildName] = useState(''); // Child's full name
   const [childReports, setChildReports] = useState([]);
   const [message, setMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [updateReportTitle, setUpdateReportTitle] = useState('');
-  const [updateReportContent, setUpdateReportContent] = useState('');
-  const [updateFields, setUpdateFields] = useState(Array(5).fill(''));
-  const [selectedReportForUpdate, setSelectedReportForUpdate] = useState(null);
-  const [selectedReportForDelete, setSelectedReportForDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
+  const reportsPerPage = 5; // Reports per page
+  const isAdmin = user.accountType === 'Admin';
 
+  // Set the child ID and name from the router query
   useEffect(() => {
     if (router.query.childID) {
       setChildID(router.query.childID);
     }
-  }, [router.query.childID]);
+    if (router.query.firstName && router.query.lastName) {
+      setChildName(`${router.query.firstName} ${router.query.lastName}`);
+    }
+  }, [router.query]);
 
+  // Fetch progress reports by child ID
   const fetchReportsByChildID = useCallback(async () => {
     if (childID) {
       try {
         const childReportData = await retrieveProgressReportByChildID(childID);
-        if (!childReportData || childReportData.length === 0) {
-            setRelationships([]); // Explicitly set an empty array if no data
-            return [];
+        if (childReportData && childReportData.length > 0) {
+          // Sort reports by `datePosted` in descending order (newest first)
+          const sortedReports = childReportData.sort(
+            (a, b) => new Date(b.datePosted) - new Date(a.datePosted)
+          );
+          setChildReports(sortedReports);
+        } else {
+          setChildReports([]); // Handle cases where no reports are found
         }
-
-
-        setChildReports(childReportData);
       } catch (error) {
-        setErrorMessage(`No child reports found!`);
+        setMessage(`Error fetching child reports: ${error.message}`);
+        setSnackbarOpen(true);
       }
     }
   }, [childID]);
 
+  // Fetch reports on initial load or when child ID changes
   useEffect(() => {
     fetchReportsByChildID();
   }, [fetchReportsByChildID, childID]);
 
-  const parseReportContent = (content) => {
-    if (content && typeof content === 'string') {
-      const contentArray = content.split('|').map((item) => item.trim());
-      const [subject, progressTrend, comments, action] = contentArray;
+  // Calculate paginated reports
+  const indexOfLastReport = currentPage * reportsPerPage;
+  const indexOfFirstReport = indexOfLastReport - reportsPerPage;
+  const currentReports = childReports.slice(indexOfFirstReport, indexOfLastReport);
 
-      return (
-        <Box>
-          {subject && <div><strong>Subject:</strong> {subject}</div>}
-          {progressTrend && <div><strong>Progress Trend:</strong> {progressTrend}</div>}
-          {comments && <div><strong>Comments:</strong> {comments}</div>}
-          {action && <div><strong>Action:</strong> {action}</div>}
-        </Box>
-      );
-    }
-    return null;
-  };
-
-  const handleSelectReportForUpdate = (report) => {
-    setSelectedReportForUpdate(report);
-    setSelectedReportForDelete(null);
-    setUpdateReportTitle(report.reportTitle);
-
-    const contentArray = report.content.split('|').map((item) => item.trim());
-    setUpdateFields(contentArray.length > 1 ? contentArray : []);
-    setUpdateReportContent(contentArray.length > 1 ? '' : report.content);
-  };
-
-  const handleUpdate = async () => {
-    if (selectedReportForUpdate) {
-      try {
-        const updatedContent = updateFields.some((field) => field)
-          ? updateFields.filter(Boolean).join(' | ')
-          : updateReportContent;
-
-        const updateData = {
-          reportTitle: updateReportTitle,
-          content: updatedContent,
-        };
-
-        await updateProgressReportInDynamoDB(selectedReportForUpdate.progressReportID, updateData);
-        setMessage('Progress report updated successfully.');
-        setSnackbarOpen(true);
-        setSelectedReportForUpdate(null);
-        setUpdateReportTitle('');
-        setUpdateReportContent('');
-        setUpdateFields(Array(4).fill(''));
-        fetchReportsByChildID();
-      } catch (error) {
-        setErrorMessage(`Error updating report: ${error.message}`);
-        setSnackbarOpen(true);
-      }
-    }
-  };
-
-  const handleDeleteClick = (reportID) => {
-    setSelectedReportForDelete(reportID);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (selectedReportForDelete) {
-      try {
-        await deleteProgressReportFromDynamoDB(selectedReportForDelete);
-        setMessage('Progress report deleted successfully.');
-        setSnackbarOpen(true);
-        setSelectedReportForDelete(null);
-        setChildReports([]);  
-        fetchReportsByChildID();
-      } catch (error) {
-        setErrorMessage(`Error deleting report: ${error.message}`);
-        setSnackbarOpen(true);
-      }
-    }
-  };
-
-  const handleCancelUpdate = () => {
-    setSelectedReportForUpdate(null);
-    setUpdateReportTitle('');
-    setUpdateReportContent('');
-    setUpdateFields(Array(4).fill(''));
-  };
-
-  const handleBack = () => {
-    router.push('/admin/progressReport');
-  };
-
-  const getFieldLabel = (index) => {
-    const labels = ['Subject', 'Progress Trend', 'Details', 'Suggestions'];
-    return labels[index] || `Field ${index + 1}`;
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>Progress Reports</Typography>
+      <Typography variant="h3" align="center" mt={2} gutterBottom>
+        Progress Reports for {childName || 'Child'}
+      </Typography>
+      <Divider />
       <Box display="flex" flexWrap="wrap" gap={2}>
-        {childReports.length > 0 ? (
-          childReports.map((report) => (
-            <Box key={report.progressReportID} flexBasis={{ xs: '100%', sm: '48%', md: '30%' }}>
-              <CustomCard
-                title={report.reportTitle}
-                content={parseReportContent(report.content)}
-                actions={
-                  <>
-                    <Button
-                      onClick={() => handleSelectReportForUpdate(report)}
-                      variant="outlined"
-                      color="primary"
-                    >
-                      Update
-                    </Button>
-                    <Button
-                      onClick={() => handleDeleteClick(report.progressReportID)}
-                      variant="outlined"
-                      color="error"
-                    >
-                      Delete
-                    </Button>
-                  </>
-                }
-              />
-            </Box>
+        {currentReports.length > 0 ? (
+          currentReports.map((report) => (
+            <ProgressReportCard
+              key={report.progressReportID}
+              report={report}
+              isAdmin={isAdmin}
+              fetchReportsByChildID={fetchReportsByChildID} // Pass down the refresh function
+              childName={childName} // Pass child's name to the card
+            />
           ))
         ) : (
-          <Typography>No reports found for this child.</Typography>
+          <Typography>No progress reports found for {childName || 'this child'}.</Typography>
         )}
       </Box>
 
-      {selectedReportForUpdate && (
-        <Box mt={3}>
-          <Typography variant="h5">Update Progress Report</Typography>
-          <TextField
-            label="Report Title"
-            fullWidth
-            margin="normal"
-            value={updateReportTitle}
-            onChange={(e) => setUpdateReportTitle(e.target.value)}
+      {/* Pagination Component */}
+      {childReports.length > reportsPerPage && (
+        <Box display="flex" justifyContent="center" mt={3}>
+          <Pagination
+            count={Math.ceil(childReports.length / reportsPerPage)}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
           />
-          {updateFields.length > 0 ? (
-            updateFields.map((field, index) => (
-              <TextField
-                key={index}
-                label={getFieldLabel(index)}
-                fullWidth
-                margin="normal"
-                value={field}
-                onChange={(e) => {
-                  const newFields = [...updateFields];
-                  newFields[index] = e.target.value;
-                  setUpdateFields(newFields);
-                }}
-              />
-            ))
-          ) : (
-            <TextField
-              label="Report Content"
-              fullWidth
-              multiline
-              rows={4}
-              margin="normal"
-              value={updateReportContent}
-              onChange={(e) => setUpdateReportContent(e.target.value)}
-            />
-          )}
-          <Box mt={2}>
-            <Button onClick={handleUpdate} variant="contained" color="primary">Save Changes</Button>
-            <Button onClick={handleCancelUpdate} variant="outlined" color="secondary" sx={{ ml: 2 }}>
-              Cancel
-            </Button>
-          </Box>
         </Box>
       )}
 
-      <ConfirmationModal
-        open={!!selectedReportForDelete}
-        title="Confirm Delete"
-        description="Are you sure you want to delete this progress report? This action cannot be undone."
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setSelectedReportForDelete(null)}
-      />
-
       <SnackbarNotification
         open={snackbarOpen}
-        message={errorMessage || message}
-        severity={errorMessage ? 'error' : 'success'}
+        message={message}
+        severity="error"
         onClose={() => setSnackbarOpen(false)}
       />
 
-      <Button variant="contained" onClick={handleBack} sx={{ mt: 4, marginBottom: 2 }}>Return to Previous Page</Button>
+      <Button
+        variant="contained"
+        onClick={() => router.push('/admin/progressReport')}
+        sx={{ mt: 4, marginBottom: 2 }}
+      >
+        Return to Admin
+      </Button>
     </Container>
   );
 }

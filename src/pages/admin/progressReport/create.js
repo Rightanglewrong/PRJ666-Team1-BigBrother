@@ -1,3 +1,4 @@
+// src/pages/admin/progressReport/create.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { createProgressReportInDynamoDB } from '../../../utils/progressReportAPI';
@@ -30,6 +31,8 @@ export default function CreateProgressReportPage() {
   const [progressTrending, setProgressTrending] = useState('');
   const [details, setDetails] = useState('');
   const [recommendedActivity, setRecommendedActivity] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
 
   const [errorMessage, setErrorMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -87,12 +90,14 @@ export default function CreateProgressReportPage() {
       const fetchChildProfile = async () => {
         try {
           const profile = await retrieveChildProfileByID(childID);
-          setChildName(`${profile.child.child.firstName} ${profile.child.child.lastName}`);
+          const childData = profile.child.child;
+          setChildName(`${childData.firstName} ${childData.lastName}`);
+          setFirstName(childData.firstName);
+          setLastName(childData.lastName);
         } catch (error) {
           setErrorMessage(`Error fetching child profile: ${error.message}`);
         }
       };
-
       fetchChildProfile();
     }
   }, [childID]);
@@ -126,10 +131,17 @@ export default function CreateProgressReportPage() {
       };
       await createProgressReportInDynamoDB(newReport);
       setMessage('Progress Report created successfully');
-      if (user.accountType === "Admin") {
-          router.push(`/admin/progressReport/child?childID=${childID}`);
+      if (user.accountType === 'Admin') {
+        router.push({
+          pathname: `/admin/progressReport/child`,
+          query: { childID, firstName, lastName },
+        });
       } else {
-         router.push(`/progressReport/child?childID=${childID}`);
+        router.push({
+          pathname: `/progressReport/child`,
+          query: { childID, firstName, lastName },
+        }); // I CHANGED THIS JUSTIN
+        // router.push(`/progressReport/child?childID=${childID}`);
       }
     } catch (error) {
       setErrorMessage(`Error creating Progress Report: ${error.message}`);
@@ -223,9 +235,9 @@ export default function CreateProgressReportPage() {
               slotProps={{
                 input: {
                   style: {
-                    resize: 'vertical', 
-                    overflow: 'scroll', 
-                    minHeight: '100px', 
+                    resize: 'vertical',
+                    overflow: 'scroll',
+                    minHeight: '100px',
                   },
                 },
               }}
