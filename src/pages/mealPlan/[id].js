@@ -21,7 +21,7 @@ import {
 export default function EditMealPlanPage() {
   const router = useRouter();
   const user = useUser();
-  const { colorblindMode } = useTheme(); // Access colorblind mode
+  const { colorblindMode, darkMode } = useTheme(); // Access theme context for dark mode and colorblind mode
   const { id } = router.query;
   const [mealPlan, setMealPlan] = useState({
     startDate: "",
@@ -35,14 +35,14 @@ export default function EditMealPlanPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Define original colors
-  const originalColors = {
-    background: "#FFFAF0",
-    textPrimary: "#2c3e50",
-    textSecondary: "#3498db",
-    fieldBackground: "#f5f5f5",
-    buttonBackground: "#3498db",
-    buttonHover: "#2980b9",
+  // Define base colors
+  const baseColors = {
+    background: darkMode ? "#121212" : "#FFFFFF",
+    textPrimary: darkMode ? "#FFFFFF" : "#2c3e50",
+    textSecondary: darkMode ? "#90CAF9" : "#3498db",
+    fieldBackground: darkMode ? "#1E1E1E" : "#f5f5f5",
+    buttonBackground: darkMode ? "#90CAF9" : "#3498db",
+    buttonHover: darkMode ? "#64B5F6" : "#2980b9",
   };
 
   // Define colorblind-friendly overrides
@@ -63,9 +63,9 @@ export default function EditMealPlanPage() {
     },
   };
 
-  // Merge original colors with colorblind overrides
+  // Merge base colors with colorblind mode overrides
   const colors = {
-    ...originalColors,
+    ...baseColors,
     ...(colorblindMode !== "none" ? colorblindOverrides[colorblindMode] : {}),
   };
 
@@ -125,23 +125,36 @@ export default function EditMealPlanPage() {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="50vh"
+        sx={{ backgroundColor: colors.background, color: colors.textPrimary }}
+      >
         <CircularProgress />
       </Box>
     );
   }
 
   return (
+    <Box
+      sx={{
+        backgroundColor: colors.background,
+        color: colors.textPrimary,
+        minHeight: "100vh",
+        pt: 4,
+        pb: 4,
+      }}
+    >
     <Container
       maxWidth="sm"
       sx={{
-        mt: 4,
         p: 3,
-        backgroundColor: colors.background,
+        backgroundColor: darkMode ? "#1E1E1E" : "#FFFAF0",
         borderRadius: 2,
         boxShadow: 3,
         mb: 4,
-        color: colors.textPrimary,
       }}
     >
       <Typography
@@ -169,14 +182,20 @@ export default function EditMealPlanPage() {
       <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {/* Date Fields */}
         <Typography variant="h6" sx={{ color: colors.textSecondary, fontWeight: "bold" }}>Duration</Typography>
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <TextField
             label="Start Date"
             type="date"
             name="startDate"
             value={mealPlan.startDate}
             onChange={handleInputChange}
-            InputLabelProps={{ shrink: true }}
+            InputLabelProps={{
+              shrink: true,
+              style: { color: colors.textPrimary },
+            }}
+            InputProps={{
+              style: { color: colors.textPrimary, backgroundColor: colors.fieldBackground },
+            }}
             required
           />
           <TextField
@@ -185,7 +204,13 @@ export default function EditMealPlanPage() {
             name="endDate"
             value={mealPlan.endDate}
             onChange={handleInputChange}
-            InputLabelProps={{ shrink: true }}
+            InputLabelProps={{
+              shrink: true,
+              style: { color: colors.textPrimary },
+            }}
+            InputProps={{
+              style: { color: colors.textPrimary, backgroundColor: colors.fieldBackground },
+            }}
             required
           />
         </Box>
@@ -202,7 +227,12 @@ export default function EditMealPlanPage() {
           required
           multiline
           rows={2}
-          sx={{ backgroundColor: colors.fieldBackground }}
+          InputLabelProps={{
+            style: { color: colors.textPrimary },
+          }}
+          InputProps={{
+            style: { color: colors.textPrimary, backgroundColor: colors.fieldBackground },
+          }}
         />
         <TextField
           label="Lunch"
@@ -212,7 +242,12 @@ export default function EditMealPlanPage() {
           required
           multiline
           rows={2}
-          sx={{ backgroundColor: colors.fieldBackground }}
+          InputLabelProps={{
+                style: { color: colors.textPrimary },
+              }}
+              InputProps={{
+                style: { color: colors.textPrimary, backgroundColor: colors.fieldBackground },
+              }}
         />
         <TextField
           label="Snack"
@@ -222,7 +257,12 @@ export default function EditMealPlanPage() {
           required
           multiline
           rows={2}
-          sx={{ backgroundColor: colors.fieldBackground }}
+          InputLabelProps={{
+            style: { color: colors.textPrimary },
+          }}
+          InputProps={{
+            style: { color: colors.textPrimary, backgroundColor: colors.fieldBackground },
+          }}
         />
 
         <Divider sx={{ my: 2 }} />
@@ -235,6 +275,12 @@ export default function EditMealPlanPage() {
           value={mealPlan.allergens}
           onChange={handleInputChange}
           variant="outlined"
+          InputLabelProps={{
+            style: { color: colors.textPrimary },
+          }}
+          InputProps={{
+            style: { color: colors.textPrimary, backgroundColor: colors.fieldBackground },
+          }}
         />
         <TextField
           label="Alternatives"
@@ -242,6 +288,12 @@ export default function EditMealPlanPage() {
           value={mealPlan.alternatives}
           onChange={handleInputChange}
           variant="outlined"
+          InputLabelProps={{
+            style: { color: colors.textPrimary },
+          }}
+          InputProps={{
+            style: { color: colors.textPrimary, backgroundColor: colors.fieldBackground },
+          }}
         />
 
         {/* Submit Button */}
@@ -260,5 +312,6 @@ export default function EditMealPlanPage() {
         </Button>
       </Box>
     </Container>
+    </Box>
   );
 }
