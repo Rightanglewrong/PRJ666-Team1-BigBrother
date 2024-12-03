@@ -1,5 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
-import { Button, Dialog, DialogContent, Typography, DialogActions, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Card,
+  CardMedia,
+  CardContent,
+} from '@mui/material';
 import Image from 'next/image';
 import styles from './HomePage.module.css';
 import { fetchMediaByUserID, fetchPaginatedMedia, deleteMediaByMediaID } from '../utils/mediaAPI';
@@ -31,7 +43,7 @@ const MediaGallery = () => {
       if (userID) {
         handleAutoSubmit(userID);
       }
-      isInitialMount.current = false; // Mark as not the initial mount
+      isInitialMount.current = false;
     } else {
       router.push('/login');
     }
@@ -48,14 +60,13 @@ const MediaGallery = () => {
       for (const entry of entries) {
         const profile = await retrieveChildProfileByID(entry.childID);
         if (profile) {
-          profiles.push({ childID: entry.childID, firstName: profile.child.child.firstName });
+          profiles.push({ childID: entry.childID, firstName: profile.child.child.firstName, lastName: profile.child.child.lastName });
         }
       }
 
       const uniqueProfiles = Array.from(new Set(profiles.map(JSON.stringify))).map(JSON.parse);
       setChildProfiles(uniqueProfiles);
     } catch (err) {
-      //console.error("Failed to fetch media by user ID:", err);
       setError("Failed to load media files.");
     }
   };
@@ -74,7 +85,6 @@ const MediaGallery = () => {
       setMediaFiles(files);
       setError('');
     } catch (err) {
-      //console.error("Failed to fetch paginated media:", err);
       setError("Failed to load paginated media files.");
     }
   };
@@ -103,7 +113,6 @@ const MediaGallery = () => {
 
   return (
     <div style={{ textAlign: 'center', marginTop: '20px' }}>
-      {/* Title Section */}
       <Typography
         variant="h4"
         align="center"
@@ -116,8 +125,7 @@ const MediaGallery = () => {
       >
         Media Gallery Lookup
       </Typography>
-  
-      {/* Child Profile Selection */}
+
       {childProfiles.length > 0 ? (
         <FormControl style={{ marginBottom: '20px', minWidth: '200px' }}>
           <InputLabel id="select-child-label">Select Child</InputLabel>
@@ -129,7 +137,7 @@ const MediaGallery = () => {
           >
             {childProfiles.map((profile, index) => (
               <MenuItem key={index} value={profile.childID}>
-                {profile.firstName}
+                {`${profile.lastName}, ${profile.firstName}`}
               </MenuItem>
             ))}
           </Select>
@@ -139,8 +147,7 @@ const MediaGallery = () => {
           No child profile related to this account.
         </Typography>
       )}
-  
-      {/* Results Section */}
+
       {showResults && (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           {error && (
@@ -149,7 +156,6 @@ const MediaGallery = () => {
             </Typography>
           )}
           <div
-            className={styles.mediaList}
             style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -160,28 +166,23 @@ const MediaGallery = () => {
           >
             {mediaFiles.length > 0 ? (
               mediaFiles.map((file, index) => (
-                <div key={index} className={styles.mediaItem} style={{ textAlign: 'center' }}>
-                  {file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? (
-                    <Image
-                      src="/icons/videoIcon.png"
-                      alt={`Media ID: ${file.mediaID}`}
-                      width={200}
-                      height={200}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => openMediaModal(file)}
-                    />
-                  ) : (
-                    <Image
-                      src={file.url}
-                      alt={`Media ID: ${file.mediaID}`}
-                      width={200}
-                      height={200}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => openMediaModal(file)}
-                    />
-                  )}
-                  <p>{file.mediaID.length > 30 ? `${file.mediaID.substring(0, 30)}...` : file.mediaID}</p>
-                </div>
+                <Card key={index} style={{ width: 250, cursor: 'pointer' }} onClick={() => openMediaModal(file)}>
+                  <CardMedia
+                    component={file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? 'img' : 'img'}
+                    image={
+                      file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv')
+                        ? '/icons/videoIcon.png'
+                        : file.url
+                    }
+                    alt={`Media ID: ${file.mediaID}`}
+                    height="140"
+                  />
+                  <CardContent>
+                    <Typography variant="body2" sx={{ textAlign: 'center' }}>
+                      {file.mediaID.length > 30 ? `${file.mediaID.substring(0, 30)}...` : file.mediaID}
+                    </Typography>
+                  </CardContent>
+                </Card>
               ))
             ) : (
               <Typography variant="body1" color="error" style={{ marginTop: '10px' }}>
@@ -189,8 +190,7 @@ const MediaGallery = () => {
               </Typography>
             )}
           </div>
-  
-          {/* Pagination */}
+
           <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
             <Button variant="outlined" onClick={handlePreviousPage} disabled={page === 1}>
               Previous
@@ -206,8 +206,7 @@ const MediaGallery = () => {
           </div>
         </div>
       )}
-  
-      {/* Modal */}
+
       <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
         <DialogContent>
           {selectedMedia && (
@@ -232,7 +231,6 @@ const MediaGallery = () => {
       </Dialog>
     </div>
   );
-  
 };
 
 export default MediaGallery;
