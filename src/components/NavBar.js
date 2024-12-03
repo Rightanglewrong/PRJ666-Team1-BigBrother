@@ -236,7 +236,7 @@ const NavBar = () => {
                 </Link>
               )}
 
-              {(accountType === 'Parent' || accountType === 'Staff') && (
+              {(accountType === 'Parent') && (
                 <Link
                   href="/userChildren"
                   passHref
@@ -244,6 +244,16 @@ const NavBar = () => {
                   onClick={handleMenuClose}
                 >
                   Child Profiles
+                </Link>
+              )}
+              {(accountType === 'Staff') && (
+                <Link
+                  href="/admin/staffChildProfiles"
+                  passHref
+                  className={styles.dropdownItem}
+                  onClick={handleMenuClose}
+                >
+                  View Child Profiles
                 </Link>
               )}
 

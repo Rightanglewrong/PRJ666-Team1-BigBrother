@@ -1,5 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Button, Dialog, DialogContent, Typography, DialogActions, Alert } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  Typography,
+  DialogActions,
+  Alert,
+  Card,
+  CardMedia,
+  CardContent,
+} from '@mui/material';
 import Image from 'next/image';
 import styles from '../HomePage.module.css';
 import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } from '../../utils/mediaAPI';
@@ -15,7 +25,6 @@ const AdminMediaGallery = () => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
-
   const pageLimit = 3;
 
   useEffect(() => {
@@ -30,7 +39,6 @@ const AdminMediaGallery = () => {
         fetchPaginatedMediaFiles(entries, 1);
       } catch (err) {
         setError("Failed to load media files.");
-  
       }
     };
 
@@ -44,7 +52,6 @@ const AdminMediaGallery = () => {
       setMediaFiles(files);
     } catch (err) {
       setError("Failed to load paginated media files.");
-   
     }
   };
 
@@ -86,11 +93,9 @@ const AdminMediaGallery = () => {
         fetchPaginatedMediaFiles(updatedEntries, newPage);
       } catch (error) {
         setError("Failed to delete media.");
-    
       }
     }
   };
-
 
   const formatSize = (sizeInBytes) => `${(sizeInBytes / 1024).toFixed(2)} KB`;
 
@@ -99,7 +104,6 @@ const AdminMediaGallery = () => {
   };
 
   if (!isClient) return null;
-
 
   return (
     <div style={{ textAlign: 'center', marginTop: '20px' }}>
@@ -113,31 +117,33 @@ const AdminMediaGallery = () => {
         </Typography>
       )}
 
-      <div className={styles.mediaList} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
+      <div
+        className={styles.mediaList}
+        style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}
+      >
         {mediaFiles.length > 0 ? (
           mediaFiles.map((file, index) => (
-            <div key={index} style={{ textAlign: 'center' }}>
-              {file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? (
-                <Image
-                  src="/icons/videoIcon.png"
-                  alt={`Media ID: ${file.mediaID}`}
-                  width={200}
-                  height={200}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => openMediaModal(file)}
-                />
-              ) : (
-                <Image
-                  src={file.url}
-                  alt={`Media ID: ${file.mediaID}`}
-                  width={200}
-                  height={200}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => openMediaModal(file)}
-                />
-              )}
-              <Typography variant="body2">{truncateText(file.mediaID, 30)}</Typography>
-            </div>
+            <Card
+              key={index}
+              style={{ width: 250, cursor: 'pointer' }}
+              onClick={() => openMediaModal(file)}
+            >
+              <CardMedia
+                component={file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv') ? 'img' : 'img'}
+                image={
+                  file.mediaID.endsWith('.mp4') || file.mediaID.endsWith('.mkv')
+                    ? '/icons/videoIcon.png'
+                    : file.url
+                }
+                alt={`Media ID: ${file.mediaID}`}
+                height="140"
+              />
+              <CardContent>
+                <Typography variant="body2" sx={{ textAlign: 'center' }}>
+                  {truncateText(file.mediaID, 30)}
+                </Typography>
+              </CardContent>
+            </Card>
           ))
         ) : (
           <Typography variant="body1" sx={{ color: 'red', marginTop: '10px' }}>
@@ -156,6 +162,7 @@ const AdminMediaGallery = () => {
         </Button>
       </div>
 
+      {/* Modal and Dialog Components */}
       <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
         <DialogContent style={{ textAlign: 'center' }}>
           {selectedMedia && (
@@ -213,8 +220,6 @@ const AdminMediaGallery = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-
     </div>
   );
 };
