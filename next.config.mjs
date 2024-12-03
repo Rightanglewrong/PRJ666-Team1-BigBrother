@@ -28,7 +28,19 @@ const nextConfig = {
         {
         source: '/relationship/:childID', // Public URL path without "admin"
         destination: '/admin/relationship/:childID', // Actual file path
+        },
+
+        {
+          source: '/staffMedia', // Public URL path without "admin"
+          destination: '/admin/staffMedia', // Actual file path
+        }, 
+
+        {
+          source: '/admin/adminMedia', // Public URL path without "admin"
+          destination: '/admin/staffMedia', // Actual file path
         }
+
+
       ];
     },
   };

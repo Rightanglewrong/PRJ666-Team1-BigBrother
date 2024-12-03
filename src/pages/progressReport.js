@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+// src/pages/admin/progressReport/[id]
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { retrieveProgressReportByChildID } from '../utils/progressReportAPI';
 import { retrieveChildProfileByID, retrieveChildrenByLocationID } from '../utils/childAPI';
 import { getRelationshipByParentID } from '../utils/relationshipAPI';
 import { getCurrentUser } from '../utils/api';
-import { Container, Typography, Button, Box, Divider } from '@mui/material';
+import { Container, Typography, Box, Divider, Snackbar } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Button } from '@mui/material';
+import ProgressReportCard from '@/components/Card/ProgressReportCard';
 
 export default function ProgressReport() {
   const router = useRouter();
@@ -13,13 +16,13 @@ export default function ProgressReport() {
   const [userDetails, setUserDetails] = useState(null);
   const [userId, setUserId] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
-  const [showErrorModal, setShowErrorModal] = useState(false);
   const [childProfiles, setChildProfiles] = useState([]);
   const [selectedChildID, setSelectedChildID] = useState(null);
   const [filteredReports, setFilteredReports] = useState([]);
   const [currentChildProfile, setCurrentChildProfile] = useState('');
   const [selectedReport, setSelectedReport] = useState(null);
 
+  // Fetching user details and child profiles on component load
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -42,13 +45,13 @@ export default function ProgressReport() {
           }
         }
       } catch (error) {
-        //console.error("Error fetching user data:", error);
         setErrorMessage('Failed to load user details. Please log in again.');
       }
     };
     fetchUserDetails();
   }, []);
 
+  // Function to fetch child profiles by unique child IDs
   const fetchChildProfiles = async (uniqueChildIDs) => {
     try {
       const childProfileData = await Promise.all(
@@ -56,10 +59,9 @@ export default function ProgressReport() {
           try {
             const childData = await retrieveChildProfileByID(id);
             if (!childData) {
-              //console.warn(`No data found for child with ID ${id}`);
               return null;
             }
-            const { childID, firstName, lastName, age, birthDate, ...rest } = childData.child.child;
+            const { childID, firstName, lastName, age, birthDate } = childData.child.child;
             return {
               childID,
               firstName,
@@ -68,31 +70,17 @@ export default function ProgressReport() {
               birthDate,
             };
           } catch (error) {
-            //console.error(`Error retrieving data for child ${id}:`, error);
             throw error;
           }
         })
       );
-      const validChildProfiles = childProfileData.filter((profile) => profile !== null).flat();
-      return validChildProfiles;
+      return childProfileData.filter((profile) => profile !== null);
     } catch (error) {
-      //console.error("Error fetching child profiles:", error);
       setErrorMessage('Failed to fetch child profiles.');
     }
   };
 
-  const handleCloseErrorModal = () => {
-    setShowErrorModal(false);
-  };
-
-  const handleReset = () => {
-    setSelectedChildID(null);
-    setFilteredReports([]);
-    setChildID('');
-    setMessage('');
-    setSelectedReport(null);
-  };
-
+  // Handling child profile click to load progress reports
   const handleChildClick = async (childID) => {
     setSelectedChildID(childID);
     setChildID(childID);
@@ -100,6 +88,7 @@ export default function ProgressReport() {
     try {
       const childData = await retrieveChildProfileByID(childID);
       setCurrentChildProfile(childData.child.child);
+      console.log(currentChildProfile);
     } catch (error) {
       setMessage(`Error fetching child profile: ${error.message}`);
     }
@@ -112,53 +101,23 @@ export default function ProgressReport() {
     }
   };
 
+  // Reset selected child and reports
+  const handleReset = () => {
+    setSelectedChildID(null);
+    setFilteredReports([]);
+    setChildID('');
+    setMessage('');
+    setSelectedReport(null);
+  };
+
+  // Handling progress report creation
   const handleCreateReportClick = () => {
     router.push(`/progressReport/create?childID=${selectedChildID}`);
   };
 
+  // Handling selected report display
   const handleReportClick = (report) => {
-    setSelectedReport(report); // Set selected report details
-  };
-
-  const parseReportContent = (content) => {
-    if (content && typeof content === 'string') {
-      if (content.includes('|')) {
-        const contentArray = content.split('|').map((item) => item.trim());
-        const [subject, progressTrend, comments, action] = contentArray;
-
-        return (
-          <div>
-            {subject && (
-              <div>
-                <strong>Subject:</strong> {subject}
-              </div>
-            )}
-            {progressTrend && (
-              <div>
-                <strong>Progress Trend:</strong> {progressTrend}
-              </div>
-            )}
-            {comments && (
-              <div>
-                <strong>Comments:</strong> {comments}
-              </div>
-            )}
-            {action && (
-              <div>
-                <strong>Action:</strong> {action}
-              </div>
-            )}
-          </div>
-        );
-      } else {
-        return (
-          <Typography>
-            <strong>Content:</strong> {content}
-          </Typography>
-        );
-      }
-    }
-    return null;
+    setSelectedReport(report);
   };
 
   return (
@@ -166,7 +125,7 @@ export default function ProgressReport() {
       <Typography variant="h3" mt={2} align="center" gutterBottom>
         Progress Reports
       </Typography>
-      <Divider></Divider>
+      <Divider />
       <Typography variant="body1" gutterBottom>
         {message}
       </Typography>
@@ -187,34 +146,19 @@ export default function ProgressReport() {
             </Box>
             <Box>
               {filteredReports.map((report) => (
-                <Box
+                <ProgressReportCard
                   key={report.progressReportID}
-                  onClick={() => handleReportClick(report)}
-                  sx={{
-                    border: '1px solid #ccc',
-                    borderRadius: '8px',
-                    padding: '16px',
-                    marginBottom: '16px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Typography variant="h6">{report.reportTitle}</Typography>
-                  {parseReportContent(report.content)}
-                  <Typography variant="caption">
-                    <em>Created by: {report.createdBy}</em> on {report.datePosted}
-                  </Typography>
-                </Box>
+                  report={report}
+                  handleReportClick={handleReportClick} // Pass the click handler for reports
+                  childName={`${currentChildProfile.firstName} ${currentChildProfile.lastName}`} // Pass child's full name
+                />
               ))}
             </Box>
 
             {selectedReport && (
               <Box>
                 <Typography variant="h4">{selectedReport.reportTitle}</Typography>
-                {selectedReport.content.includes('|') ? (
-                  <Box>{parseReportContent(selectedReport.content)}</Box>
-                ) : (
-                  <Typography variant="body1">{selectedReport.content}</Typography>
-                )}
+                <Typography variant="body1">{selectedReport.content}</Typography>
                 <Typography variant="caption">
                   <em>Created by: {selectedReport.createdBy}</em> on {selectedReport.datePosted}
                 </Typography>
@@ -233,60 +177,43 @@ export default function ProgressReport() {
               Select a Child Profile
             </Typography>
 
-            <Box>
-              {childProfiles.map((child) => (
-                <Box key={child.childID} sx={{ marginBottom: 2 }}>
-                  <Typography variant="h6">
-                    {child.firstName} {child.lastName}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Age:</strong> {child.age}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Birth Date:</strong> {child.birthDate}
-                  </Typography>
-                  <Button variant="outlined" onClick={() => handleChildClick(child.childID)}>
-                    View Progress Reports
-                  </Button>
-                </Box>
-              ))}
-            </Box>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>First Name</TableCell>
+                    <TableCell>Last Name</TableCell>
+                    <TableCell>Age</TableCell>
+                    <TableCell>Birth Date</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {childProfiles.map((child) => (
+                    <TableRow key={child.childID}>
+                      <TableCell>{child.firstName}</TableCell>
+                      <TableCell>{child.lastName}</TableCell>
+                      <TableCell>{child.age}</TableCell>
+                      <TableCell>{child.birthDate}</TableCell>
+                      <TableCell>
+                        <Button variant="outlined" onClick={() => handleChildClick(child.childID)}>
+                          View Progress Reports
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         )}
       </Box>
 
-      {showErrorModal && (
-        <Box
-          sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}
-        >
-          <Box
-            sx={{ backgroundColor: 'white', padding: '16px', borderRadius: '8px', width: '400px' }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Error
-            </Typography>
-            <Typography variant="body1">{errorMessage}</Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleCloseErrorModal}
-              sx={{ marginTop: '16px' }}
-            >
-              Close
-            </Button>
-          </Box>
-        </Box>
-      )}
+      <Snackbar
+        open={errorMessage != null}
+        message={errorMessage}
+        autoHideDuration={6000}
+        onClose={() => setErrorMessage(null)}
+      />
     </Container>
   );
 }

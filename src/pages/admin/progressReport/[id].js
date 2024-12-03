@@ -45,7 +45,6 @@ export default function ViewProgressReportsPage() {
         }
       } catch (error) {
         setMessage(`Error fetching child reports: ${error.message}`);
-        setSnackbarOpen(true);
       }
     }
   }, [childID]);
@@ -107,10 +106,16 @@ export default function ViewProgressReportsPage() {
 
       <Button
         variant="contained"
-        onClick={() => router.push('/admin/progressReport')}
+        onClick={() => {
+          if (user?.accountType === 'Admin') {
+            router.push('/admin/progressReport');
+          } else if (user?.accountType === 'Staff') {
+            router.push('/progressReport');
+          }
+        }}
         sx={{ mt: 4, marginBottom: 2 }}
       >
-        Return to Admin
+        {user?.accountType === 'Admin' ? 'Return to Progress Report Management' : 'Return to Child Profiles'}
       </Button>
     </Container>
   );

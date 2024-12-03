@@ -1,5 +1,5 @@
 // src/components/Card/ProgressReportCard.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -17,6 +17,7 @@ import {
 } from '../../utils/progressReportAPI';
 import SnackbarNotification from '@/components/Modal/SnackBar';
 import ConfirmationModal from '@/components/Modal/ConfirmationModal';
+import { retrieveUserByIDInDynamoDB } from '../../utils/userAPI';
 
 const ProgressReportCard = ({ report, isAdmin, fetchReportsByChildID, childName }) => {
   const [expanded, setExpanded] = useState(false);
@@ -27,10 +28,32 @@ const ProgressReportCard = ({ report, isAdmin, fetchReportsByChildID, childName 
   );
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: '' });
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [creatorName, setCreatorName] = useState('');
 
+  
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
+  const getCreatedName = async (creatorID) => {
+    try {
+      const user = await retrieveUserByIDInDynamoDB(creatorID); 
+      if (user && user.user.user.firstName && user.user.user.lastName) {
+        const fullName = `${user.user.user.firstName} ${user.user.user.lastName}`;
+        setCreatorName(fullName); 
+      } else {
+        setCreatorName('Unknown User'); 
+      }
+    } catch (error) {
+      setCreatorName('Error fetching name'); 
+    }
+  };
+
+  useEffect(() => {
+    if (report && report.createdBy) {
+      getCreatedName(report.createdBy); 
+    }
+  }, [report]);
 
   const parseReportContent = (content) => {
     if (content && typeof content === 'string') {
@@ -266,10 +289,12 @@ const ProgressReportCard = ({ report, isAdmin, fetchReportsByChildID, childName 
             <>
               {renderExpandedContent()}
               <Box mt={2}>
+                
                 <Typography variant="subtitle1" sx={{ textDecoration: 'underline' }}>
                   Created By
                 </Typography>
-                <Typography>{report.createdBy}</Typography>
+                <Typography>{creatorName}</Typography>
+                <Box mt={2}/>
                 <Typography variant="subtitle1" sx={{ textDecoration: 'underline' }}>
                   Date Posted
                 </Typography>

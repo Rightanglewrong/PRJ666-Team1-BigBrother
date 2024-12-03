@@ -170,8 +170,8 @@ export const getRelationshipByParentID = async (parentID) => {
     if (!response.ok) {
       const errorText = await response.text(); 
       //console.error("Error response:", errorText); 
-      throw new Error(errorText || "No Relationships found for the Parent ID");
-    }
+      return [];
+     }
 
     const data = await response.json();
     return data.entries; 
