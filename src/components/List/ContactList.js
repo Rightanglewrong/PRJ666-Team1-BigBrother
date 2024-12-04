@@ -52,7 +52,7 @@ const ContactList = ({
   // Dynamic styles based on modes
   const colors = {
     text: darkMode ? '#f1f1f1' : '#333',
-    background: darkMode ? '#121212' : '#f7f5f5',
+    background: darkMode ? '#121212' : '#ffffff',
     buttonPrimary:
       colorblindMode === 'red-green'
         ? '#1976d2'
