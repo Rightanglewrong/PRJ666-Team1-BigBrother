@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/components/authenticate';
 import Link from 'next/link';
-import CustomCard from '../../components/Card/CustomCard';
 import {
-  Button,
+  Box,
   Typography,
   Dialog,
   DialogTitle,
@@ -15,49 +14,49 @@ import {
   List,
   ListItem,
   ListItemText,
-  Box,
+  Grid,
+  Button,
 } from '@mui/material';
 import {
   getUsersByAccountTypeAndLocation,
   approveUser,
   deleteUserInDynamoDB,
 } from '../../utils/userAPI';
-import styles from '../HomePage.module.css';
+import { useTheme } from '@/components/ThemeContext';
 
 const AdminPage = () => {
   const user = useUser();
   const router = useRouter();
+  const { darkMode, colorblindMode } = useTheme(); // Access theme modes
 
   const [pendingUsers, setPendingUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const cardColors = {
+    cardBg: darkMode ? '#1e1e1e' : '#ffffff',
+    cardHover: darkMode ? '#2a2a2a' : '#f7f7f7',
+    textColor: darkMode ? '#f1f1f1' : '#333',
+    hoverTextColor: darkMode ? '#ffffff' : '#1976d2',
+  };
 
   // Fetch pending users when the page loads
   useEffect(() => {
     const fetchPendingUsers = async () => {
       try {
-        const accountTypes = ['Staff', 'Admin']; // Include both Staff and Admin
+        const accountTypes = ['Staff', 'Admin'];
         const promises = accountTypes.map((type) =>
           getUsersByAccountTypeAndLocation(type, user.locationID)
         );
 
         const responses = await Promise.all(promises);
-
-        // Consolidate users from all responses
         const allUsers = responses.flatMap((response) => (response?.users ? response.users : []));
-
-        // Filter users with PENDING status
         const pending = allUsers.filter((u) => u.accStatus === 'PENDING');
-
         setPendingUsers(pending);
 
-        // Open modal if there are pending users
         if (pending.length > 0) {
           setIsModalOpen(true);
         }
       } catch (error) {
-        //console.error('Error fetching pending users:', error);
-
-        // Handle invalid or expired token
         if (error.message === `Error fetching users: {"message":"Invalid or expired token"}`) {
           localStorage.removeItem('token');
           router.push('/login');
@@ -84,7 +83,7 @@ const AdminPage = () => {
       await approveUser(userID);
       setPendingUsers((prev) => prev.filter((u) => u.userID !== userID));
     } catch (error) {
-      //console.error('Error approving user:', error);
+      console.error('Error approving user:', error);
     }
   };
 
@@ -93,7 +92,7 @@ const AdminPage = () => {
       await deleteUserInDynamoDB(userID);
       setPendingUsers((prev) => prev.filter((u) => u.userID !== userID));
     } catch (error) {
-      //console.error('Error denying user:', error);
+      console.error('Error denying user:', error);
     }
   };
 
@@ -101,30 +100,42 @@ const AdminPage = () => {
 
   if (!user || user.accountType !== 'Admin') {
     return (
-      <Typography variant="h5" className={styles.error}>
+      <Typography variant="h5" sx={{ color: darkMode ? '#f1f1f1' : '#333', textAlign: 'center' }}>
         Unauthorized Access
       </Typography>
     );
   }
 
   return (
-    <div className={styles.homeContainer}>
-      <div className={styles.floatingCard}>
-        {/* Button to trigger the Pending Users Modal */}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={() => setIsModalOpen(true)}
-            disabled={pendingUsers.length === 0}
-            sx={{ mt: 2 }}
-          >
-            {`Show Pending Users ${pendingUsers.length > 0 ? `(${pendingUsers.length})` : ''}`}
-          </Button>
-        </Box>
-        <h1 className={styles.title}>Admin Dashboard</h1>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: darkMode ? '#121212' : '#f7f9fc',
+        color: darkMode ? '#f1f1f1' : '#333',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        py: 4,
+        px: 2,
+      }}
+    >
+      <Box
+        sx={{
+          backgroundColor: cardColors.cardBg,
+          borderRadius: 4,
+          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+          p: 4,
+          maxWidth: 900,
+          width: '100%',
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{ textAlign: 'center', fontWeight: 'bold', mb: 4, color: cardColors.textColor }}
+        >
+          Admin Dashboard
+        </Typography>
 
-        {/* Pending Users Modal */}
         <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="sm" fullWidth>
           <DialogTitle>Pending Users</DialogTitle>
           <DialogContent>
@@ -134,30 +145,29 @@ const AdminPage = () => {
                   <ListItem key={user.userID} divider>
                     <ListItemText
                       primary={
-                        <>
-                          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                            User Role: {user.accountType}
-                          </Typography>
-                          <Typography variant="body1">
-                            Name: {user.firstName} {user.lastName}
-                          </Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Email: {user.email}
-                          </Typography>
-                        </>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'inherit' }}>
+                          {`Role: ${user.accountType} | Name: ${user.firstName} ${user.lastName}`}
+                        </Typography>
                       }
+                      secondary={<Typography variant="body2">Email: {user.email}</Typography>}
                     />
                     <Box sx={{ display: 'flex', gap: 2 }}>
                       <Button
                         variant="contained"
-                        color="primary"
+                        sx={{
+                          backgroundColor: '#1976d2',
+                          '&:hover': { backgroundColor: '#1565c0' },
+                        }}
                         onClick={() => handleApproveUser(user.userID)}
                       >
                         Approve
                       </Button>
                       <Button
                         variant="contained"
-                        color="error"
+                        sx={{
+                          backgroundColor: '#f44336',
+                          '&:hover': { backgroundColor: '#d32f2f' },
+                        }}
                         onClick={() => handleDenyUser(user.userID)}
                       >
                         Deny
@@ -167,99 +177,68 @@ const AdminPage = () => {
                 ))}
               </List>
             ) : (
-              <Typography variant="body2" color="textSecondary">
-                No pending users found.
-              </Typography>
+              <Typography>No pending users.</Typography>
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseModal} color="secondary">
+            <Button onClick={handleCloseModal} sx={{ color: '#1976d2' }}>
               Close
             </Button>
           </DialogActions>
         </Dialog>
 
-        <div className={styles.gridSection}>
-          {/* Activity Log */}
-          <CustomCard
-            title="Activity Log"
-            content="View all administrative activity logs."
-            actions={
-              <Link href="/admin/activity-log">
-                <Button size="small" color="primary">
-                  Go to Activity Log
-                </Button>
+        <Grid container spacing={3}>
+          {[
+            { title: 'Activity Log', href: '/admin/activity-log', description: 'View logs' },
+            {
+              title: 'Progress Reports',
+              href: '/admin/progressReport',
+              description: 'Manage reports',
+            },
+            { title: 'Media', href: '/admin/mediaGallery', description: 'Manage media' },
+            {
+              title: 'Relationships',
+              href: '/admin/relationship',
+              description: 'Manage relationships',
+            },
+            {
+              title: 'Children',
+              href: '/admin/adminChild',
+              description: 'Manage children profiles',
+            },
+            { title: 'Users', href: '/admin/user', description: 'Manage user profiles' },
+          ].map(({ title, href, description }) => (
+            <Grid item xs={12} sm={6} key={title}>
+              <Link href={href} passHref>
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: 2,
+                    backgroundColor: cardColors.cardBg,
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
+                      backgroundColor: cardColors.cardHover,
+                    },
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+                    {title}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 3 }}>
+                    {description}
+                  </Typography>
+                </Box>
               </Link>
-            }
-          />
-
-          {/* Progress Reports */}
-          <CustomCard
-            title="Progress Reports"
-            content="Manage and view progress reports for children."
-            actions={
-              <Link href="/admin/progressReport">
-                <Button size="small" color="primary">
-                  Go to Progress Reports
-                </Button>
-              </Link>
-            }
-          />
-
-          {/* Media */}
-          <CustomCard
-            title="Media"
-            content="Upload and manage media files."
-            actions={
-              <Link href="/admin/mediaGallery">
-                <Button size="small" color="primary">
-                  Go to Media
-                </Button>
-              </Link>
-            }
-          />
-
-          {/* Relationships */}
-          <CustomCard
-            title="Relationships"
-            content="Manage relationships between children and guardians."
-            actions={
-              <Link href="/admin/relationship">
-                <Button size="small" color="primary">
-                  Go to Relationships
-                </Button>
-              </Link>
-            }
-          />
-
-          {/* Children */}
-          <CustomCard
-            title="Children"
-            content="View and manage children profiles."
-            actions={
-              <Link href="/admin/adminChild">
-                <Button size="small" color="primary">
-                  Go to Children
-                </Button>
-              </Link>
-            }
-          />
-
-          {/* Users */}
-          <CustomCard
-            title="Users"
-            content="View and manage User profiles."
-            actions={
-              <Link href="/admin/user">
-                <Button size="small" color="primary">
-                  Go to Users
-                </Button>
-              </Link>
-            }
-          />
-        </div>
-      </div>
-    </div>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Box>
   );
 };
 
