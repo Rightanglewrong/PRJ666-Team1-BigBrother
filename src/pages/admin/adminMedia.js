@@ -30,14 +30,19 @@ const MediaUploadPage = () => {
   const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
   const fileInputRef = useRef(null); // Create a ref for the file input
   const router = useRouter();
-  const { colorblindMode } = useTheme();
+  const { darkMode, colorblindMode, handMode } = useTheme();
 
   const colors = {
     buttonSecondary: colorblindMode === 'red-green' ? '#e77f24' : '#f44336',
     buttonSecondaryHover: colorblindMode === 'red-green' ? '#cc6f1f' : '#d32f2f',
     buttonPrimary: colorblindMode === 'blue-yellow' ? '#6a0dad' : '#1976d2',
     buttonPrimaryHover: colorblindMode === 'blue-yellow' ? '#580c91' : '#1565c0',
+    text: darkMode ? '#f1f1f1' : '#2c3e50',
+    background: darkMode ? '#121212' : '#f7f9fc',
   };
+
+  const alignment =
+    handMode === 'left' ? 'flex-start' : handMode === 'right' ? 'flex-end' : 'center';
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -155,102 +160,151 @@ const MediaUploadPage = () => {
   };
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{ mt: 8, mb: 4, p: 3, backgroundColor: '#f7f9fc', borderRadius: 2 }}
+    <Box
+      sx={{
+        backgroundColor: colors.background,
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: { xs: 'none', sm: 'center' },
+        py: { xs: 'none', sm: 4 },
+      }}
     >
-      <Typography variant="h4" align="center" gutterBottom>
-        Upload Picture/Video
-      </Typography>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+      <Container
+        maxWidth="sm"
+        sx={{
+          mt: { xs: 'none', sm: 4 },
+          mb: 4,
+          p: 3,
+          backgroundColor: colors.background,
+          borderRadius: 2,
+          boxShadow: { xs: 'none', sm: 3 }, // Hide shadow on mobile
+        }}
       >
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-          Choose File
+        <Typography variant="h4" align="center" gutterBottom sx={{ color: colors.text }}>
+          Upload Picture/Video
         </Typography>
-        <input
-          type="file"
-          onChange={handleFileUpload}
-          ref={fileInputRef}
-          style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
-        />
-
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-          Select Child
-        </Typography>
-        <Select
-          value={childID}
-          onChange={(e) => setChildID(e.target.value)}
-          displayEmpty
-          required
-          fullWidth
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
-          <MenuItem value="">
-            <em>Select a child</em>
-          </MenuItem>
-          {childProfiles.length > 0 ? (
-            childProfiles.map((child) => (
-              <MenuItem key={child.childID} value={child.childID}>
-                {child.firstName}
-              </MenuItem>
-            ))
-          ) : (
-            <MenuItem value="" disabled>
-              No child found
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.text }}>
+            Choose File
+          </Typography>
+          <input
+            type="file"
+            onChange={handleFileUpload}
+            ref={fileInputRef}
+            style={{
+              padding: '10px',
+              border: `1px solid ${colors.text}`,
+              borderRadius: '4px',
+              backgroundColor: colors.background,
+              color: colors.text,
+            }}
+          />
+
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.text }}>
+            Select Child
+          </Typography>
+          <Select
+            value={childID}
+            onChange={(e) => setChildID(e.target.value)}
+            displayEmpty
+            required
+            fullWidth
+            sx={{
+              backgroundColor: colors.background,
+              color: colors.text,
+              '.MuiSelect-icon': { color: colors.text },
+            }}
+          >
+            <MenuItem value="">
+              <em>Select a child</em>
             </MenuItem>
-          )}
-        </Select>
+            {childProfiles.length > 0 ? (
+              childProfiles.map((child) => (
+                <MenuItem key={child.childID} value={child.childID}>
+                  {child.firstName}
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem value="" disabled>
+                No child found
+              </MenuItem>
+            )}
+          </Select>
 
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-          Description
-        </Typography>
-        <TextField
-          placeholder="Enter description..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          multiline
-          rows={3}
-          fullWidth
-          inputProps={{ maxLength: 150 }}
-        />
-
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-          <Button
-            type="submit"
-            variant="contained"
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: colors.text }}>
+            Description
+          </Typography>
+          <TextField
+            placeholder="Enter description..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            multiline
+            rows={3}
+            fullWidth
+            inputProps={{ maxLength: 150 }}
             sx={{
-              backgroundColor: colors.buttonPrimary,
-              '&:hover': { backgroundColor: colors.buttonPrimaryHover },
+              backgroundColor: colors.background,
+              color: colors.text,
+              '& .MuiInputBase-input': { color: colors.text },
+            }}
+          />
+
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: {
+                xs:
+                  handMode === 'left'
+                    ? 'flex-start'
+                    : handMode === 'right'
+                    ? 'flex-end'
+                    : 'space-between',
+                sm: 'space-between', // Always space-between on non-mobile screens
+              },
+              gap: 2, // Adds consistent spacing between buttons
+              mt: 2,
             }}
           >
-            Upload
-          </Button>
-          <Button
-            onClick={handleCancel}
-            variant="contained"
-            sx={{
-              backgroundColor: colors.buttonSecondary,
-              '&:hover': { backgroundColor: colors.buttonSecondaryHover },
-            }}
-          >
-            Cancel
-          </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: colors.buttonPrimary,
+                '&:hover': { backgroundColor: colors.buttonPrimaryHover },
+              }}
+            >
+              Upload
+            </Button>
+            <Button
+              onClick={handleCancel}
+              variant="contained"
+              sx={{
+                backgroundColor: colors.buttonSecondary,
+                '&:hover': { backgroundColor: colors.buttonSecondaryHover },
+              }}
+            >
+              Cancel
+            </Button>
+          </Box>
         </Box>
-      </Box>
 
-      <Snackbar open={showSuccessSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
-          Upload Successful!
-        </Alert>
-      </Snackbar>
-      <Snackbar open={showErrorSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
-          {errorMessage}
-        </Alert>
-      </Snackbar>
-    </Container>
+        <Snackbar open={showSuccessSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+          <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+            Upload Successful!
+          </Alert>
+        </Snackbar>
+        <Snackbar open={showErrorSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+          <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
+            {errorMessage}
+          </Alert>
+        </Snackbar>
+      </Container>
+    </Box>
   );
 };
 
