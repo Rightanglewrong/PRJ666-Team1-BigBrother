@@ -115,15 +115,15 @@ const AdminPage = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        py: 4,
-        px: 2,
+        py: { xs: 'none', sm: 4 },
+        px: { xs: 'none', sm: 2 },
       }}
     >
       <Box
         sx={{
           backgroundColor: cardColors.cardBg,
-          borderRadius: 4,
-          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+          borderRadius: { xs: 'none', sm: 4 },
+          boxShadow: { xs: 'none', sm: '0 8px 16px rgba(0, 0, 0, 0.2)' },
           p: 4,
           maxWidth: 900,
           width: '100%',
