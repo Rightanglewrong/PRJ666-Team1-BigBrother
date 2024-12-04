@@ -65,6 +65,11 @@ export default function ProgressReportLanding() {
         setChildProfiles(null);
       }
     };
+
+    // Load hand mode from local storage
+    const storedHandMode = localStorage.getItem('handMode') || 'none';
+    setHandMode(storedHandMode);
+    
     fetchUserData();
   }, [user, router]);
 
@@ -218,7 +223,11 @@ export default function ProgressReportLanding() {
         <Button
           variant="contained"
           color="success"
-          sx={{ textTransform: 'none' }}
+          sx={{
+            textTransform: 'none',
+            backgroundColor: buttonColors.secondary,
+            '&:hover': { backgroundColor: buttonColors.hoverSecondary },
+          }}
           disabled={!childID}
         >
           <Link
@@ -240,13 +249,25 @@ export default function ProgressReportLanding() {
         </Button>
       </Box>
 
-      {user?.accountType === 'Admin' && <SendWeeklyReports locationID={user.locationID} />}
+      {user?.accountType === 'Admin' && (
+          <SendWeeklyReports
+            locationID={user.locationID}
+            sx={{
+              color: darkMode ? '#f1f1f1' : '#333',
+            }}
+          />
+        )}
 
       <Button
         variant="outlined"
         color="primary"
         onClick={() => router.push('/admin')}
-        sx={{ textTransform: 'none', mt: 2 }}
+        sx={{
+          textTransform: 'none',
+          mt: 2,
+          color: darkMode ? '#f1f1f1' : '#1976d2',
+          borderColor: darkMode ? '#444' : '#1976d2',
+        }}
       >
         Back to Admin
       </Button>
