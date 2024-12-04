@@ -22,7 +22,7 @@ import { useUser } from '@/components/authenticate';
 
 export default function NewsletterIndex() {
   const user = useUser();
-  const { colorblindMode } = useTheme(); // Access the colorblind mode from ThemeContext
+  const { darkMode, colorblindMode } = useTheme(); // Access dark mode and colorblind mode
   const [newsletters, setNewsletters] = useState([]);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -55,7 +55,13 @@ export default function NewsletterIndex() {
     },
   };
 
-  const colors = buttonColors[colorblindMode] || buttonColors['original']; // Use appropriate colors based on mode
+  const colors = {
+    ...buttonColors[colorblindMode] || buttonColors.original,
+    textPrimary: darkMode ? '#f1f1f1' : '#2c3e50',
+    textSecondary: darkMode ? '#d1d1d1' : '#7f8c8d',
+    cardBackground: darkMode ? '#1e1e1e' : '#f9f9f9',
+    containerBackground: darkMode ? '#121212' : '#f7f9fc',
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -104,6 +110,8 @@ export default function NewsletterIndex() {
           justifyContent: 'center',
           alignItems: 'center',
           minHeight: '100vh',
+          backgroundColor: colors.containerBackground,
+          color: colors.textPrimary,
         }}
       >
         <CircularProgress />
@@ -112,23 +120,24 @@ export default function NewsletterIndex() {
   }
 
   return (
+    <Box sx={{ backgroundColor: colors.containerBackground, minHeight: '100vh', py: 4 }}>
     <Container
       maxWidth="md"
       sx={{
-        mt: 4,
         p: 3,
-        backgroundColor: '#f7f9fc',
+        backgroundColor: colors.containerBackground,
         borderRadius: 2,
         boxShadow: 3,
         mb: 4,
         overflow: 'hidden',
+        color: colors.textPrimary,
       }}
     >
       <Typography
         variant="h4"
         align="center"
         gutterBottom
-        sx={{ color: '#2c3e50', mb: 3, fontSize: '2.5rem', fontWeight: 'bold' }}
+        sx={{ color: colors.textPrimary, mb: 3, fontSize: '2.5rem', fontWeight: 'bold' }}
       >
         Newsletters
       </Typography>
@@ -181,7 +190,7 @@ export default function NewsletterIndex() {
               <Card
                 variant="outlined"
                 sx={{
-                  backgroundColor: '#f9f9f9',
+                  backgroundColor: colors.cardBackground,
                   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                   transition: 'all 0.3s ease',
                   '&:hover': {
@@ -192,13 +201,13 @@ export default function NewsletterIndex() {
                 }}
               >
                 <CardContent>
-                  <Typography variant="h6" sx={{ color: '#2c3e50', fontWeight: 'bold' }}>
+                  <Typography variant="h6" sx={{ color: colors.textPrimary, fontWeight: 'bold' }}>
                     {newsletter.title}
                   </Typography>
                   <Typography
                     variant="body2"
                     sx={{
-                      color: '#7f8c8d',
+                      color: colors.textSecondary,
                       mt: 1,
                       mb: 1,
                       overflow: 'hidden',
@@ -210,7 +219,7 @@ export default function NewsletterIndex() {
                   >
                     {newsletter.content}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontSize: '0.9rem', color: '#95a5a6' }}>
+                  <Typography variant="body2" sx={{ fontSize: '0.9rem', color: colors.textSecondary }}>
                     {new Date(`${newsletter.createdAt}T00:00:00`).toLocaleDateString()}
                   </Typography>
                 </CardContent>
@@ -232,7 +241,7 @@ export default function NewsletterIndex() {
                       sx={{
                         backgroundColor: colors.primary,
                         color: '#fff',
-                        '&:hover': { backgroundColor: '#2980b9' },
+                        '&:hover': { backgroundColor: colors.primary },
                         textTransform: 'none',
                       }}
                     >
@@ -248,7 +257,7 @@ export default function NewsletterIndex() {
         <Typography
           variant="body2"
           align="center"
-          sx={{ color: '#7f8c8d', fontSize: '1.2rem', mt: 3 }}
+          sx={{ color: colors.textSecondary, fontSize: '1.2rem', mt: 3 }}
         >
           No newsletters found.
         </Typography>
@@ -266,5 +275,6 @@ export default function NewsletterIndex() {
         />
       </Box>
     </Container>
+    </Box>
   );
 }
