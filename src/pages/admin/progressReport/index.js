@@ -16,10 +16,12 @@ import {
 } from '@mui/material';
 import SendWeeklyReports from '@/components/weeklyReportSender';
 import SnackbarNotification from '@/components/Modal/SnackBar';
+import { useTheme } from '@/components/ThemeContext';
 
 export default function ProgressReportLanding() {
   const router = useRouter();
   const user = useUser();
+  const { darkMode, colorblindMode } = useTheme();
   const [childID, setChildID] = useState('');
   const [message, setMessage] = useState('');
   const [childProfiles, setChildProfiles] = useState([]);
@@ -27,6 +29,14 @@ export default function ProgressReportLanding() {
   const [errorMessage, setErrorMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [handMode, setHandMode] = useState('none');
+
+  const buttonColors = {
+    primary: colorblindMode === 'blue-yellow' ? '#6a0dad' : '#1976d2',
+    secondary: colorblindMode === 'blue-yellow' ? '#e77f24' : '#f44336',
+    hoverPrimary: colorblindMode === 'blue-yellow' ? '#580c91' : '#1565c0',
+    hoverSecondary: colorblindMode === 'blue-yellow' ? '#cc6f1f' : '#d32f2f',
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -101,35 +111,49 @@ export default function ProgressReportLanding() {
   };
 
   return (
+    <Box
+      sx={{
+        backgroundColor: darkMode ? '#121212' : '#f7f9fc',
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: { xs: 'none', sm: 'center' },
+        py: { xs: 'none', sm: 4 },
+      }}
+    >
     <Container
       maxWidth="sm"
       sx={{
-        mt: 4,
         p: 3,
-        backgroundColor: '#FFEBEE',
+        backgroundColor: darkMode ? '#1e1e1e' : '#FFEBEE',
         borderRadius: 2,
         boxShadow: 3,
-        mb: 4,
       }}
     >
       <Typography
         variant="h4"
         align="center"
         gutterBottom
-        sx={{ color: '#2c3e50', fontWeight: 'bold' }}
+        sx={{ color: darkMode ? '#f1f1f1' : '#2c3e50', fontWeight: 'bold' }}
       >
         Progress Report Management
       </Typography>
 
       {message && (
-        <Alert severity="info" onClose={() => setMessage('')}>
+        <Alert
+        severity="info"
+        onClose={() => setMessage('')}
+        sx={{
+          backgroundColor: darkMode ? '#2a2a2a' : undefined,
+          color: darkMode ? '#f1f1f1' : undefined,
+        }}
+      >
           {message}
         </Alert>
       )}
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Select
-          label="Select Child"
           value={childID}
           onChange={(e) => {
             setChildID(e.target.value);
@@ -137,6 +161,20 @@ export default function ProgressReportLanding() {
           fullWidth
           displayEmpty
           required
+          sx={{
+            '& .MuiSelect-select': {
+              color: darkMode ? '#f1f1f1' : '#333',
+            },
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: darkMode ? '#444' : '#ccc',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: darkMode ? '#f1f1f1' : '#1976d2',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: darkMode ? '#f1f1f1' : '#1976d2',
+            },
+          }}
         >
           <MenuItem value="">
             <em>Select a child</em>
@@ -220,5 +258,6 @@ export default function ProgressReportLanding() {
         onClose={handleSnackbarClose}
       />
     </Container>
+    </Box>
   );
 }
