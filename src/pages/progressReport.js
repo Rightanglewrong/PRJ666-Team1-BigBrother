@@ -203,19 +203,7 @@ export default function ProgressReport() {
                   {currentChildProfile.lastName}
                 </Typography>
 
-                {userDetails?.accountType === 'Staff' && (
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: colors.buttonPrimary,
-                      color: '#fff',
-                      '&:hover': { backgroundColor: colors.buttonSecondary },
-                    }}
-                    onClick={handleCreateReportClick}
-                  >
-                    Create 
-                  </Button>
-                )}
+                
               </Box>
               <Box>
                 {filteredReports.map((report) => (
@@ -242,7 +230,7 @@ export default function ProgressReport() {
                 </Box>
               )}
 
-              <Box mt={2}>
+              <Box  mt={2} display="flex" justifyContent="space-between" alignItems="center">
                 <Button
                   variant="contained"
                   onClick={handleReset}
@@ -254,6 +242,20 @@ export default function ProgressReport() {
                 >
                   Return to Child Profiles
                 </Button>
+
+                {userDetails?.accountType === 'Staff' && (
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: colors.buttonPrimary,
+                      color: '#fff',
+                      '&:hover': { backgroundColor: colors.buttonSecondary },
+                    }}
+                    onClick={handleCreateReportClick}
+                  >
+                    Create 
+                  </Button>
+                )}
               </Box>
             </Box>
           ) : (
