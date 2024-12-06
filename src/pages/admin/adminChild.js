@@ -63,7 +63,7 @@ const AdminChild = () => {
   };
 
   const buttonAlignment = {
-    xs: handMode === 'right' ? 'flex-end' : 'flex-start',
+    xs: handMode === 'right' ? 'flex-end' : 'center',
     md: 'center',
   };
 
@@ -288,7 +288,7 @@ const AdminChild = () => {
       <Typography variant="h4" component="h1" sx={{ color: colors.text, mb: 2 }}>
         Search for Child Profile
       </Typography>
-      <FormControl sx={{ width: '50%' }}>
+      <FormControl sx={{ width: '95%' }}>
         <InputLabel
           sx={{
             color: colors.text,
@@ -328,7 +328,7 @@ const AdminChild = () => {
           label={`Enter ${searchOption}`}
           variant="outlined"
           sx={{
-            width: '50%',
+            width: '75%',
             mt: 2,
             color: colors.text,
             '& .MuiOutlinedInput-root': {
@@ -376,7 +376,7 @@ const AdminChild = () => {
       )}
 
       {searchResult && (
-        <Box sx={{ mt: 4, width: '50%' }}>
+        <Box sx={{ mt: 4, width: '95%' }}>
           {searchResult.length === 0 ? (
             <Typography variant="h6" color="textSecondary" align="center">
               No results found.

@@ -15,9 +15,11 @@ import {
   TableRow,
   TableSortLabel,
   Button,
+  IconButton,
 } from '@mui/material';
 import ProgressReportCard from '@/components/Card/ProgressReportCard';
 import { useTheme } from '@/components/ThemeContext';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 export default function ProgressReport() {
   const router = useRouter();
@@ -203,19 +205,7 @@ export default function ProgressReport() {
                   {currentChildProfile.lastName}
                 </Typography>
 
-                {userDetails?.accountType === 'Staff' && (
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: colors.buttonPrimary,
-                      color: '#fff',
-                      '&:hover': { backgroundColor: colors.buttonSecondary },
-                    }}
-                    onClick={handleCreateReportClick}
-                  >
-                    Create 
-                  </Button>
-                )}
+                
               </Box>
               <Box>
                 {filteredReports.map((report) => (
@@ -242,7 +232,7 @@ export default function ProgressReport() {
                 </Box>
               )}
 
-              <Box mt={2}>
+              <Box  mt={2} display="flex" justifyContent="space-between" alignItems="center">
                 <Button
                   variant="contained"
                   onClick={handleReset}
@@ -254,10 +244,25 @@ export default function ProgressReport() {
                 >
                   Return to Child Profiles
                 </Button>
+
+                {userDetails?.accountType === 'Staff' && (
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: colors.buttonPrimary,
+                      color: '#fff',
+                      '&:hover': { backgroundColor: colors.buttonSecondary },
+                    }}
+                    onClick={handleCreateReportClick}
+                  >
+                    Create 
+                  </Button>
+                )}
               </Box>
             </Box>
           ) : (
             <Box>
+              
               <Typography variant="h5" gutterBottom sx={{ color: colors.text }}>
                 Select a Child Profile
               </Typography>
@@ -269,8 +274,8 @@ export default function ProgressReport() {
                       <TableCell sx={{ color: colors.text }}>First Name</TableCell>
                       <TableCell sx={{ color: colors.text }}>Last Name</TableCell>
                       <TableCell sx={{ color: colors.text }}>Age</TableCell>
-                      <TableCell sx={{ color: colors.text }}>Birth Date</TableCell>
-                      <TableCell sx={{ color: colors.text, width: "286px" }}></TableCell>
+                      <TableCell sx={{ color: colors.text }}>Birth Date </TableCell>
+                      <TableCell sx={{ color: colors.text }}>View</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -281,20 +286,12 @@ export default function ProgressReport() {
                         <TableCell sx={{ color: colors.text }}>{child.age}</TableCell>
                         <TableCell sx={{ color: colors.text }}>{child.birthDate}</TableCell>
                         <TableCell>
-                          <Button
-                            variant="outlined"
-                            sx={{
-                              color: colors.buttonPrimary,
-                              borderColor: colors.buttonPrimary,
-                              '&:hover': {
-                                backgroundColor: colors.buttonSecondary,
-                                color: '#fff',
-                              },
-                            }}
+                        <IconButton
+                            color="primary"
                             onClick={() => handleChildClick(child.childID)}
                           >
-                            View 
-                          </Button>
+                            <VisibilityIcon /> 
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
