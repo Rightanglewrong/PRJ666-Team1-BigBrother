@@ -23,6 +23,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Divider,
 } from '@mui/material';
 import {
   retrieveMessageByReceiverID,
@@ -61,6 +62,8 @@ export default function Messages() {
   const [filterLastName, setFilterLastName] = useState(null);
 
   const { darkMode, colorblindMode, handMode } = useTheme();
+
+  const { showDelete, setShowDelete } = useState(false);
 
   // Define original and colorblind-friendly button colors
   const buttonColors = {
@@ -268,6 +271,10 @@ export default function Messages() {
         handleCloseModal();
       }
     }
+  };
+
+  const handleShowDelete = () => {
+    setShowDelete(!showDelete);
   };
 
   const handleCreateMessage = async () => {
@@ -527,9 +534,6 @@ function MessageTable({ messages, type, handleOpenModal, handleNameClick, userDe
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>
-              <strong>Subject</strong>
-            </TableCell>
             {type === 'incoming' && (
               <TableCell>
                 <strong>From</strong>
@@ -548,24 +552,19 @@ function MessageTable({ messages, type, handleOpenModal, handleNameClick, userDe
                 <TableCell>
                   <strong>To</strong>
                 </TableCell>
-                <TableCell>
-                  <strong>Type</strong>
-                </TableCell>
               </>
             )}
-
             <TableCell>
               <strong>Content</strong>
             </TableCell>
             <TableCell>
-              <strong>Date</strong>
+              <strong> ... </strong>
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {messages.map((message) => (
             <TableRow key={message.messageID}>
-              <TableCell>{message.title}</TableCell>
               {type !== 'outgoing' && (
                 <TableCell>
                   {message.sender !== userDetails.userID ? (
@@ -594,21 +593,26 @@ function MessageTable({ messages, type, handleOpenModal, handleNameClick, userDe
                   )}
                 </TableCell>
               )}
-              {type === 'all' && <TableCell>{message.messageType}</TableCell>}
-              <TableCell>{message.content}</TableCell>
-              <TableCell>{new Date(message.datePosted).toLocaleDateString('en-CA')}</TableCell>
+              <TableCell>
+                <strong>{message.title}</strong>
+                <Divider />
+                {message.content}
+                <br />
+                <Divider />
+                <strong>{new Date(message.datePosted).toLocaleDateString('en-CA')}</strong>
+              </TableCell>
               <TableCell>
                 <button
                   onClick={() => handleOpenModal(message, type)}
                   style={{
                     color: 'white',
-                    backgroundColor: 'red',
+                    backgroundColor: '#f28c7a',
                     border: 'none',
                     padding: '5px 10px',
                     cursor: 'pointer',
                   }}
                 >
-                  Delete
+                  X
                 </button>
               </TableCell>
             </TableRow>
