@@ -10,6 +10,7 @@ import {
   CardMedia,
   CardContent,
   Box,
+  Container,
 } from '@mui/material';
 import Image from 'next/image';
 import styles from '../HomePage.module.css';
