@@ -270,6 +270,7 @@ export default function ProgressReport() {
                       <TableCell sx={{ color: colors.text }}>Last Name</TableCell>
                       <TableCell sx={{ color: colors.text }}>Age</TableCell>
                       <TableCell sx={{ color: colors.text }}>Birth Date</TableCell>
+                      <TableCell sx={{ color: colors.text, width: "286px" }}></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -292,7 +293,7 @@ export default function ProgressReport() {
                             }}
                             onClick={() => handleChildClick(child.childID)}
                           >
-                            View Progress Reports
+                            View 
                           </Button>
                         </TableCell>
                       </TableRow>

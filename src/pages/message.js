@@ -347,9 +347,9 @@ export default function Messages() {
               },
             }}
           >
-            <Tab label="Incoming Messages" />
-            <Tab label="Outgoing Messages" />
-            <Tab label="All Messages" />
+            <Tab label="Incoming" />
+            <Tab label="Outgoing" />
+            <Tab label="All" />
           </Tabs>
         </Box>
         <Box sx={{ marginBottom: 2 }}>
