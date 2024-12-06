@@ -46,28 +46,28 @@ export default function MealPlanIndex() {
     'red-green': {
       buttonPrimary: '#1976d2',
       buttonSecondary: '#e77f24',
-      durationBackground: '#E3F2FD',
-      allergensBackground: '#FFF4E6',
-      allergensText: '#1565C0', // Neutral gray to replace red
-      text: '#000', // Default black text
-      mealTitle: '#FF7043', // Blue shade to avoid red
+      durationBackground: darkMode ? '#2a2a2a' : '#E3F2FD',
+      allergensBackground: darkMode ? '#2a2a2a' : '#FFF4E6',
+      allergensText: '#1565C0', // Neutral gray
+      text: darkMode ? '#f1f1f1' : '#000', // Ensure dark mode text is readable
+      mealTitle: '#FF7043', // Adjusted for red-green vision
     },
     'blue-yellow': {
       buttonPrimary: '#e77f24',
       buttonSecondary: '#3db48c',
-      durationBackground: '#FFEBEE',
-      durationText: '#e77f24',
-      allergensBackground: '#FFEBEE',
-      allergensText: '#C62828', // Neutral gray to replace yellow
-      text: '#000', // Default black text
+      durationBackground: darkMode ? '#2a2a2a' : '#FFEBEE',
+      durationText: darkMode ? '#e77f24' : '#1565C0',
+      allergensBackground: darkMode ? '#2a2a2a' : '#FFEBEE',
+      allergensText: darkMode ? '#e57373' : '#C62828', // Ensure consistency
+      text: darkMode ? '#f1f1f1' : '#000',
       mealTitle: '#9147A9', // Purple to replace blue
     },
   };
 
-  // Merge original colors with colorblind overrides
+  // Merge colors with complete fallback
   const colors = {
     ...originalColors,
-    ...(colorblindMode !== 'none' ? colorblindOverrides[colorblindMode] : {}),
+    ...(colorblindMode && colorblindMode !== 'none' ? colorblindOverrides[colorblindMode] : {}),
   };
 
   useEffect(() => {
@@ -122,7 +122,11 @@ export default function MealPlanIndex() {
         <Typography
           variant="h4"
           align="center"
-          sx={{ fontWeight: 'bold', color: colors.text, mb: 3 }}
+          sx={{
+            fontWeight: 'bold',
+            color: colors.text, // Ensure text uses the dynamic color
+            mb: 3,
+          }}
         >
           Weekly Meal Plan
         </Typography>

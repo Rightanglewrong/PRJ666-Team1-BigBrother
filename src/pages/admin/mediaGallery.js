@@ -9,13 +9,17 @@ import {
   Card,
   CardMedia,
   CardContent,
+  Box,
+  Container,
 } from '@mui/material';
 import Image from 'next/image';
 import styles from '../HomePage.module.css';
 import { fetchMediaByLocationID, fetchPaginatedMedia, deleteMediaByMediaID } from '../../utils/mediaAPI';
 import { getCurrentUser } from '../../utils/api';
+import { useTheme } from '@/components/ThemeContext';
 
 const AdminMediaGallery = () => {
+  const { darkMode, colorblindMode } = useTheme(); // Access theme modes
   const [locationID, setLocationID] = useState('');
   const [page, setPage] = useState(1);
   const [mediaEntries, setMediaEntries] = useState([]);
@@ -24,6 +28,7 @@ const AdminMediaGallery = () => {
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [handMode, setHandMode] = useState('none');
 
   const pageLimit = 3;
 
@@ -37,6 +42,10 @@ const AdminMediaGallery = () => {
         const entries = await fetchMediaByLocationID(userLocationID);
         setMediaEntries(entries);
         fetchPaginatedMediaFiles(entries, 1);
+
+        // Load `handMode` from localStorage
+        const storedHandMode = localStorage.getItem('handMode') || 'none';
+        setHandMode(storedHandMode);
       } catch (err) {
         setError("Failed to load media files.");
       }
@@ -103,10 +112,24 @@ const AdminMediaGallery = () => {
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   };
 
+  const buttonColors = {
+    original: { primary: '#1976d2', secondary: '#f44336' },
+    'red-green': { primary: '#1565c0', secondary: '#cc6f1f' },
+    'blue-yellow': { primary: '#6a0dad', secondary: '#d32f2f' },
+  };
+
   if (!isClient) return null;
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '20px' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: darkMode ? '#121212' : '#f7f9fc',
+        color: darkMode ? '#f1f1f1' : '#333',
+        py: 4,
+      }}
+    >
+    <Container maxWidth="md">
       <Typography variant="h4" align="center" sx={{ fontWeight: 'bold', marginBottom: '20px' }}>
         Media Gallery Lookup
       </Typography>
@@ -220,7 +243,8 @@ const AdminMediaGallery = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Container>
+    </Box>
   );
 };
 

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { createProgressReportInDynamoDB } from '../../../utils/progressReportAPI';
 import { retrieveChildProfileByID } from '../../../utils/childAPI';
 import { useUser } from '@/components/authenticate';
+import { useTheme } from '@/components/ThemeContext'; // Import the theme context
 import {
   Container,
   Typography,
@@ -20,6 +21,7 @@ import SnackbarNotification from '@/components/Modal/SnackBar';
 export default function CreateProgressReportPage() {
   const router = useRouter();
   const user = useUser();
+  const { darkMode, colorblindMode } = useTheme(); // Access theme modes
 
   const [childID, setChildID] = useState('');
   const [reportTitle, setReportTitle] = useState('');
@@ -36,6 +38,34 @@ export default function CreateProgressReportPage() {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const baseColors = {
+    background: darkMode ? '#121212' : '#ffffff',
+    cardBackground: darkMode ? '#1e1e1e' : '#f5f5f5',
+    text: darkMode ? '#f1f1f1' : '#000000',
+    buttonPrimary: darkMode ? '#64b5f6' : '#1976d2',
+    buttonPrimaryHover: darkMode ? '#42a5f5' : '#1565c0',
+    buttonSecondary: darkMode ? '#81c784' : '#4caf50',
+    buttonSecondaryHover: darkMode ? '#66bb6a' : '#388e3c',
+  };
+  
+  const colorblindOverrides = {
+    'red-green': {
+      buttonPrimary: '#1976d2',
+      buttonSecondary: '#e77f24',
+      text: darkMode ? '#f1f1f1' : '#333333', // Adjusted for better contrast
+    },
+    'blue-yellow': {
+      buttonPrimary: '#e77f24',
+      buttonSecondary: '#3db48c',
+      text: darkMode ? '#f1f1f1' : '#333333', // Adjusted for better contrast
+    },
+  };
+  
+  const colors = {
+    ...baseColors,
+    ...(colorblindMode !== 'none' ? colorblindOverrides[colorblindMode] : {}),
+  };
 
   useEffect(() => {
     if (user && !(user.accountType === 'Admin' || user.accountType === 'Staff')) {
@@ -149,154 +179,180 @@ export default function CreateProgressReportPage() {
   };
 
   return (
-    <Container
-      maxWidth="sm"
+    <Box
       sx={{
-        mt: 4,
-        p: 3,
-        backgroundColor: '#FFEBEE',
-        borderRadius: 2,
-        boxShadow: 3,
-        mb: 4,
+        backgroundColor: colors.background,
+        color: colors.text,
+        minHeight: '100vh',
+        py: 4,
       }}
     >
-      <Typography
-        variant="h4"
-        align="center"
-        gutterBottom
-        sx={{ color: '#2c3e50', fontWeight: 'bold' }}
+      <Container
+        maxWidth="sm"
+        sx={{
+          backgroundColor: colors.cardBackground,
+          borderRadius: 2,
+          boxShadow: 3,
+          p: 3,
+        }}
       >
-        Create Progress Report
-      </Typography>
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
+          sx={{ color: colors.text, fontWeight: 'bold' }}
+        >
+          Create Progress Report
+        </Typography>
 
-      {message && (
-        <SnackbarNotification
-          open={Boolean(message)}
-          message={message}
-          severity="info"
-          onClose={() => setMessage('')}
-        />
-      )}
+        {message && (
+          <SnackbarNotification
+            open={Boolean(message)}
+            message={message}
+            severity="info"
+            onClose={() => setMessage('')}
+          />
+        )}
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-      >
-        <TextField label="Child Name" value={childName} required disabled />
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
+          <TextField
+            label="Child Name"
+            value={childName}
+            required
+            disabled
+            sx={{
+              '& .MuiInputBase-input': { color: colors.text },
+              '& .MuiInputLabel-root': { color: colors.text },
+            }}
+          />
 
-        <FormControl fullWidth required>
-          <InputLabel>Report Type</InputLabel>
-          <Select
-            value={reportType}
-            onChange={(e) => setReportType(e.target.value)}
-            label="Report Type"
-          >
-            <MenuItem value="simplified">Simplified</MenuItem>
-            <MenuItem value="detailed">Detailed</MenuItem>
-          </Select>
-        </FormControl>
+          <FormControl fullWidth required>
+            <InputLabel sx={{ color: colors.text }}>Report Type</InputLabel>
+            <Select
+              value={reportType}
+              onChange={(e) => setReportType(e.target.value)}
+              sx={{
+                color: colors.text,
+                '& .MuiSelect-icon': { color: colors.text },
+              }}
+            >
+              <MenuItem value="simplified">Simplified</MenuItem>
+              <MenuItem value="detailed">Detailed</MenuItem>
+            </Select>
+          </FormControl>
 
-        <TextField
-          label="Report Title"
-          value={reportTitle}
-          onChange={(e) => setReportTitle(e.target.value)}
-          required
-        />
+          <TextField
+            label="Report Title"
+            value={reportTitle}
+            onChange={(e) => setReportTitle(e.target.value)}
+            required
+            sx={{
+              '& .MuiInputBase-input': { color: colors.text },
+              '& .MuiInputLabel-root': { color: colors.text },
+            }}
+          />
 
-        {reportType === 'detailed' ? (
-          <>
+          {reportType === 'detailed' ? (
+            <>
+              <TextField
+                label="Subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                required
+              />
+              <TextField
+                label="Progress Trending"
+                value={progressTrending}
+                onChange={(e) => setProgressTrending(e.target.value)}
+                required
+              />
+              <TextField
+                label="Details"
+                multiline
+                rows={4}
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                required
+              />
+              <TextField
+                label="Recommended Activity for Improvement"
+                multiline
+                value={recommendedActivity}
+                onChange={(e) => setRecommendedActivity(e.target.value)}
+                required
+                slotProps={{
+                  input: {
+                    style: {
+                      resize: 'vertical',
+                      overflow: 'scroll',
+                      minHeight: '100px',
+                    },
+                  },
+                }}
+              />
+            </>
+          ) : (
             <TextField
-              label="Subject"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              required
-            />
-            <TextField
-              label="Progress Trending"
-              value={progressTrending}
-              onChange={(e) => setProgressTrending(e.target.value)}
-              required
-            />
-            <TextField
-              label="Details"
+              label="Content"
               multiline
               rows={4}
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
+              value={reportContent}
+              onChange={(e) => setReportContent(e.target.value)}
               required
-            />
-            <TextField
-              label="Recommended Activity for Improvement"
-              multiline
-              value={recommendedActivity}
-              onChange={(e) => setRecommendedActivity(e.target.value)}
-              required
+              sx={{
+                '& .MuiInputBase-input': { color: colors.text },
+                '& .MuiInputLabel-root': { color: colors.text },
+              }}
               slotProps={{
                 input: {
                   style: {
-                    resize: 'vertical',
-                    overflow: 'scroll',
-                    minHeight: '100px',
+                    resize: 'vertical', // Enable vertical resizing
+                    overflow: 'auto', // Handle overflow for large content
+                    minHeight: '100px', // Minimum height
+                    maxHeight: '500px', // Optional: Maximum height
                   },
                 },
               }}
             />
-          </>
-        ) : (
-          <TextField
-            label="Content"
-            multiline
-            rows={4}
-            value={reportContent}
-            onChange={(e) => setReportContent(e.target.value)}
-            required
-            slotProps={{
-              input: {
-                style: {
-                  resize: 'vertical', // Enable vertical resizing
-                  overflow: 'auto', // Handle overflow for large content
-                  minHeight: '100px', // Minimum height
-                  maxHeight: '500px', // Optional: Maximum height
-                },
-              },
+          )}
+
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{
+              backgroundColor: colors.buttonPrimary,
+              color: '#fff',
+              '&:hover': { backgroundColor: colors.buttonPrimaryHover },
             }}
-          />
-        )}
+          >
+            Create Progress Report
+          </Button>
 
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          sx={{
-            backgroundColor: '#3498db',
-            color: '#fff',
-            '&:hover': { backgroundColor: '#2980b9' },
-          }}
-        >
-          Create Progress Report
-        </Button>
+          <Button
+            variant="outlined"
+            sx={{
+              borderColor: colors.buttonPrimary,
+              color: colors.buttonPrimary,
+              '&:hover': { borderColor: colors.buttonPrimaryHover, color: colors.buttonPrimaryHover },
+            }}
+            onClick={() => router.back()}
+          >
+            Previous Page
+          </Button>
+        </Box>
 
-        <Button
-          variant="outlined"
-          fullWidth
-          sx={{
-            color: '#3498db',
-            borderColor: '#3498db',
-            '&:hover': { borderColor: '#2980b9', color: '#2980b9' },
-          }}
-          onClick={() => router.back()}
-        >
-          Previous Page
-        </Button>
-      </Box>
-
-      <SnackbarNotification
-        open={snackbarOpen}
-        message={errorMessage}
-        severity="error"
-        onClose={handleSnackbarClose}
-      />
-    </Container>
+        <SnackbarNotification
+          open={snackbarOpen}
+          message={errorMessage}
+          severity="error"
+          onClose={handleSnackbarClose}
+        />
+      </Container>
+    </Box>
   );
 }

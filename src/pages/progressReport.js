@@ -6,8 +6,18 @@ import { retrieveChildProfileByID, retrieveChildrenByLocationID } from '../utils
 import { getRelationshipByParentID } from '../utils/relationshipAPI';
 import { getCurrentUser } from '../utils/api';
 import { Container, Typography, Box, Divider, Snackbar } from '@mui/material';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Button } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Button,
+} from '@mui/material';
 import ProgressReportCard from '@/components/Card/ProgressReportCard';
+import { useTheme } from '@/components/ThemeContext';
 
 export default function ProgressReport() {
   const router = useRouter();
@@ -21,6 +31,36 @@ export default function ProgressReport() {
   const [filteredReports, setFilteredReports] = useState([]);
   const [currentChildProfile, setCurrentChildProfile] = useState('');
   const [selectedReport, setSelectedReport] = useState(null);
+  const { darkMode, colorblindMode } = useTheme();
+
+  // Define styles based on modes
+  const baseColors = {
+    background: darkMode ? '#121212' : '#fff',
+    text: darkMode ? '#f1f1f1' : '#000',
+    buttonPrimary: darkMode ? '#64b5f6' : '#1976d2',
+    buttonSecondary: darkMode ? '#81c784' : '#4caf50',
+    cardBackground: darkMode ? '#1e1e1e' : '#f5f5f5',
+    tableHeader: darkMode ? '#424242' : '#e3f2fd',
+    divider: darkMode ? '#616161' : '#e0e0e0',
+  };
+
+  const colorblindOverrides = {
+    'red-green': {
+      buttonPrimary: '#1976d2',
+      buttonSecondary: '#e77f24',
+      text: darkMode ? '#f1f1f1' : '#000',
+    },
+    'blue-yellow': {
+      buttonPrimary: '#e77f24',
+      buttonSecondary: '#3db48c',
+      text: darkMode ? '#f1f1f1' : '#000',
+    },
+  };
+
+  const colors = {
+    ...baseColors,
+    ...(colorblindMode !== 'none' ? colorblindOverrides[colorblindMode] : {}),
+  };
 
   // Fetching user details and child profiles on component load
   useEffect(() => {
@@ -121,99 +161,156 @@ export default function ProgressReport() {
   };
 
   return (
-    <Container>
-      <Typography variant="h3" mt={2} align="center" gutterBottom>
-        Progress Reports
-      </Typography>
-      <Divider />
-      <Typography variant="body1" gutterBottom>
-        {message}
-      </Typography>
+    <Box
+      sx={{
+        backgroundColor: colors.background, // Apply background color for the entire page
+        color: colors.text, // Apply text color
+        minHeight: '100vh', // Ensure it covers the full viewport height
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start', // Align the content at the top
+        py: 4, // Add vertical padding
+      }}
+    >
+      <Container
+        sx={{
+          backgroundColor: colors.cardBackground, // Container-specific background
+          color: colors.text, // Container-specific text color
+          borderRadius: 2,
+          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', // Optional shadow for emphasis
+          p: 3, // Padding inside the container
+        }}
+      >
+        <Typography
+          variant="h3"
+          align="center"
+          gutterBottom
+          sx={{ fontWeight: 'bold', color: colors.text }}
+        >
+          Progress Reports
+        </Typography>
+        <Divider sx={{ backgroundColor: colors.divider }} />
+        <Typography variant="body1" gutterBottom sx={{ color: colors.text }}>
+          {message}
+        </Typography>
 
-      <Box>
-        {selectedChildID ? (
-          <Box>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h5" gutterBottom>
-                Progress Reports for {currentChildProfile.firstName} {currentChildProfile.lastName}
+        <Box>
+          {selectedChildID ? (
+            <Box>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography variant="h5" gutterBottom sx={{ color: colors.text }}>
+                  Progress Reports for {currentChildProfile.firstName}{' '}
+                  {currentChildProfile.lastName}
+                </Typography>
+
+                {userDetails?.accountType === 'Staff' && (
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: colors.buttonPrimary,
+                      color: '#fff',
+                      '&:hover': { backgroundColor: colors.buttonSecondary },
+                    }}
+                    onClick={handleCreateReportClick}
+                  >
+                    Create Progress Report
+                  </Button>
+                )}
+              </Box>
+              <Box>
+                {filteredReports.map((report) => (
+                  <ProgressReportCard
+                    key={report.progressReportID}
+                    report={report}
+                    handleReportClick={handleReportClick} // Pass the click handler for reports
+                    childName={`${currentChildProfile.firstName} ${currentChildProfile.lastName}`} // Pass child's full name
+                  />
+                ))}
+              </Box>
+
+              {selectedReport && (
+                <Box>
+                  <Typography variant="h4" sx={{ color: colors.text }}>
+                    {selectedReport.reportTitle}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: colors.text }}>
+                    {selectedReport.content}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: colors.text }}>
+                    <em>Created by: {selectedReport.createdBy}</em> on {selectedReport.datePosted}
+                  </Typography>
+                </Box>
+              )}
+
+              <Box mt={2}>
+                <Button
+                  variant="contained"
+                  onClick={handleReset}
+                  sx={{
+                    backgroundColor: colors.buttonSecondary,
+                    color: '#fff',
+                    '&:hover': { backgroundColor: colors.buttonPrimary },
+                  }}
+                >
+                  Return to Child Profiles
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <Box>
+              <Typography variant="h5" gutterBottom sx={{ color: colors.text }}>
+                Select a Child Profile
               </Typography>
 
-              {userDetails?.accountType === 'Staff' && (
-                <Button variant="contained" color="primary" onClick={handleCreateReportClick}>
-                  Create Progress Report
-                </Button>
-              )}
-            </Box>
-            <Box>
-              {filteredReports.map((report) => (
-                <ProgressReportCard
-                  key={report.progressReportID}
-                  report={report}
-                  handleReportClick={handleReportClick} // Pass the click handler for reports
-                  childName={`${currentChildProfile.firstName} ${currentChildProfile.lastName}`} // Pass child's full name
-                />
-              ))}
-            </Box>
-
-            {selectedReport && (
-              <Box>
-                <Typography variant="h4">{selectedReport.reportTitle}</Typography>
-                <Typography variant="body1">{selectedReport.content}</Typography>
-                <Typography variant="caption">
-                  <em>Created by: {selectedReport.createdBy}</em> on {selectedReport.datePosted}
-                </Typography>
-              </Box>
-            )}
-
-            <Box mt={2}>
-              <Button variant="contained" onClick={handleReset} sx={{ marginRight: 2 }}>
-                Return to Child Profiles
-              </Button>
-            </Box>
-          </Box>
-        ) : (
-          <Box>
-            <Typography variant="h5" gutterBottom>
-              Select a Child Profile
-            </Typography>
-
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>First Name</TableCell>
-                    <TableCell>Last Name</TableCell>
-                    <TableCell>Age</TableCell>
-                    <TableCell>Birth Date</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {childProfiles.map((child) => (
-                    <TableRow key={child.childID}>
-                      <TableCell>{child.firstName}</TableCell>
-                      <TableCell>{child.lastName}</TableCell>
-                      <TableCell>{child.age}</TableCell>
-                      <TableCell>{child.birthDate}</TableCell>
-                      <TableCell>
-                        <Button variant="outlined" onClick={() => handleChildClick(child.childID)}>
-                          View Progress Reports
-                        </Button>
-                      </TableCell>
+              <TableContainer>
+                <Table>
+                  <TableHead sx={{ backgroundColor: colors.tableHeader }}>
+                    <TableRow>
+                      <TableCell sx={{ color: colors.text }}>First Name</TableCell>
+                      <TableCell sx={{ color: colors.text }}>Last Name</TableCell>
+                      <TableCell sx={{ color: colors.text }}>Age</TableCell>
+                      <TableCell sx={{ color: colors.text }}>Birth Date</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-        )}
-      </Box>
+                  </TableHead>
+                  <TableBody>
+                    {childProfiles.map((child) => (
+                      <TableRow key={child.childID}>
+                        <TableCell sx={{ color: colors.text }}>{child.firstName}</TableCell>
+                        <TableCell sx={{ color: colors.text }}>{child.lastName}</TableCell>
+                        <TableCell sx={{ color: colors.text }}>{child.age}</TableCell>
+                        <TableCell sx={{ color: colors.text }}>{child.birthDate}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outlined"
+                            sx={{
+                              color: colors.buttonPrimary,
+                              borderColor: colors.buttonPrimary,
+                              '&:hover': {
+                                backgroundColor: colors.buttonSecondary,
+                                color: '#fff',
+                              },
+                            }}
+                            onClick={() => handleChildClick(child.childID)}
+                          >
+                            View Progress Reports
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+        </Box>
 
-      <Snackbar
-        open={errorMessage != null}
-        message={errorMessage}
-        autoHideDuration={6000}
-        onClose={() => setErrorMessage(null)}
-      />
-    </Container>
+        <Snackbar
+          open={errorMessage != null}
+          message={errorMessage}
+          autoHideDuration={6000}
+          onClose={() => setErrorMessage(null)}
+        />
+      </Container>
+    </Box>
   );
 }

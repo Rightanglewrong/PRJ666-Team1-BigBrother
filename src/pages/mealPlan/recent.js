@@ -26,7 +26,7 @@ export default function RecentMealPlans() {
   const [errorMessage, setErrorMessage] = useState('');
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [mealPlanToDelete, setMealPlanToDelete] = useState(null);
-  const { colorblindMode } = useTheme(); // Access colorblind mode
+  const { darkMode, colorblindMode } = useTheme(); // Access dark mode and colorblind mode
   const [handMode, setHandMode] = useState('none'); // Hand mode state
 
    // Load hand mode from localStorage on component mount
@@ -35,12 +35,21 @@ export default function RecentMealPlans() {
     setHandMode(storedHandMode);
   }, []);
 
-  // Define original colors
-  const originalColors = {
-    buttonPrimary: '#d32f2f',
-    durationText: '#1565C0',
-    mealTitle: '#FF7043',
-    cardBackground: '#f5f5f5',
+    // Define original colors
+    const originalColors = {
+      background: '#ffffff',
+      textPrimary: '#333',
+      buttonPrimary: '#d32f2f',
+      durationText: '#1565C0',
+      mealTitle: '#FF7043',
+      cardBackground: '#ffffff',
+    };
+
+  // Define dark mode and colorblind overrides
+  const darkModeOverrides = {
+    background: '#121212',
+    textPrimary: '#f1f1f1',
+    cardBackground: '#1E1E1E',
   };
 
   // Define colorblind-friendly overrides
@@ -60,6 +69,7 @@ export default function RecentMealPlans() {
   // Merge original colors with colorblind overrides
   const colors = {
     ...originalColors,
+    ...(darkMode ? darkModeOverrides : {}),
     ...(colorblindMode !== 'none' ? colorblindOverrides[colorblindMode] : {}),
   };
 
@@ -112,7 +122,15 @@ export default function RecentMealPlans() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, p: 2, mb: 4 }}>
+    <Box sx={{ backgroundColor: colors.background, color: colors.textPrimary, minHeight: '100vh', p: 3 }}>
+    <Container maxWidth="md" sx={{
+        mt: 4,
+        p: 2,
+        mb: 4,
+        backgroundColor: colors.cardBackground,
+        borderRadius: 2,
+        color: colors.textPrimary, // Ensure text inherits the correct color
+      }}>
       <Typography
         variant="h4"
         align="center"
@@ -155,10 +173,10 @@ export default function RecentMealPlans() {
                   Meal Plan Duration
                 </Typography>
                 <Divider sx={{ my: 1 }} />
-                <Typography variant="body1">
+                <Typography variant="body1" sx={{ color: colors.textPrimary }}>
                   <strong>Start Date:</strong> {plan.startDate}
                 </Typography>
-                <Typography variant="body1">
+                <Typography variant="body1" sx={{ color: colors.textPrimary }}>
                   <strong>End Date:</strong> {plan.endDate}
                 </Typography>
                 <Divider sx={{ my: 2 }} />
@@ -172,7 +190,7 @@ export default function RecentMealPlans() {
                       >
                         {meal}
                       </Typography>
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ color: colors.textPrimary }}>
                         {plan[meal.toLowerCase()] || 'Not specified'}
                       </Typography>
                     </Box>
@@ -228,5 +246,6 @@ export default function RecentMealPlans() {
         onCancel={closeConfirmationModal}
       />
     </Container>
+    </Box>
   );
 }

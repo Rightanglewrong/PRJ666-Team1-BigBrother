@@ -14,9 +14,11 @@ import { retrieveChildProfileByID } from '../utils/childAPI';
 import { getRelationshipByParentID } from '../utils/relationshipAPI';
 import { useRouter } from 'next/router';
 import { useUser } from '@/components/authenticate';
+import { useTheme } from '@/components/ThemeContext'; // Import ThemeContext for modes
 import SnackbarNotification from '../components/Modal/SnackBar'; // Import the Snackbar component
 
 const UserChildren = () => {
+  const { darkMode, colorblindMode, handMode } = useTheme(); // Access theme modes
   const user = useUser();
   const [children, setChildren] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,6 +27,15 @@ const UserChildren = () => {
   const resultsPerPage = 3;
   const router = useRouter();
   const isInitialMount = useRef(true);
+
+  // Define colors dynamically based on modes
+  const colors = {
+    background: darkMode ? '#121212' : '#f7f9fc',
+    cardBackground: darkMode ? '#1e1e1e' : '#ffffff',
+    text: darkMode ? '#f1f1f1' : '#000000',
+    buttonPrimary: colorblindMode === 'blue-yellow' ? '#e77f24' : '#1976d2',
+    buttonSecondary: colorblindMode === 'red-green' ? '#3db48c' : '#4caf50',
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -87,22 +98,49 @@ const UserChildren = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-      <Typography variant="h3" mt={3}>
+    <Box
+      sx={{
+        backgroundColor: colors.background,
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 3,
+        py: 4,
+        px: 2,
+      }}
+    >
+      <Typography
+        variant="h3"
+        mt={3}
+        sx={{ color: colors.text, textAlign: 'center', fontWeight: 'bold' }}
+      >
         {user.firstName} {user.lastName}&apos;s Children
       </Typography>
 
       {children.length === 0 ? (
-        <Typography variant="h6" color="textSecondary" align="center">
+        <Typography variant="h6" sx={{ color: colors.text, textAlign: 'center' }}>
           No child profiles found for the user.
         </Typography>
       ) : (
         <Box sx={{ width: '50%', mt: 4 }}>
           {paginatedResults.map((child, index) => (
-            <Card key={index} sx={{ mb: 2, backgroundColor: '#f5f5f5' }}>
+            <Card
+              key={index}
+              sx={{
+                mb: 2,
+                backgroundColor: colors.cardBackground,
+                boxShadow: 3,
+              }}
+            >
               <CardActionArea onClick={() => handleExpandClick(index)}>
                 <CardContent
-                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    color: colors.text,
+                  }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {child.lastName}, {child.firstName}
@@ -111,6 +149,7 @@ const UserChildren = () => {
                     sx={{
                       transform: expandedCard === index ? 'rotate(180deg)' : 'rotate(0deg)',
                       transition: 'transform 0.3s',
+                      color: colors.text,
                     }}
                   >
                     <ExpandMoreIcon />
@@ -118,7 +157,7 @@ const UserChildren = () => {
                 </CardContent>
               </CardActionArea>
               <Collapse in={expandedCard === index} timeout="auto" unmountOnExit>
-                <CardContent>
+                <CardContent sx={{ color: colors.text }}>
                   <Typography variant="body2">
                     <strong>Child ID:</strong> {child.childID}
                   </Typography>
@@ -141,12 +180,24 @@ const UserChildren = () => {
 
           {/* Conditionally render Pagination */}
           {children.length > resultsPerPage && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: handMode === 'right' ? 'flex-end' : 'flex-start',
+                mt: 2,
+              }}
+            >
               <Pagination
                 count={Math.ceil(children.length / resultsPerPage)}
                 page={currentPage}
                 onChange={handlePageChange}
-                color="primary"
+                sx={{
+                  color: colors.buttonPrimary,
+                  '& .Mui-selected': {
+                    backgroundColor: colors.buttonPrimary,
+                    color: '#fff',
+                  },
+                }}
               />
             </Box>
           )}

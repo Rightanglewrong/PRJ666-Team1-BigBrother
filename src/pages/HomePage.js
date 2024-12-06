@@ -326,14 +326,18 @@ export default function HomePage() {
                     <Typography
                       variant="h6"
                       fontWeight="bold"
-                      sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}
+                      sx={{ fontSize: { xs: '1rem', sm: '1.2rem' },
+                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
+                     }}
                     >
                       Child Progress
                     </Typography>
                     <Typography
                       variant="body2"
                       color="textSecondary"
-                      sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+                      sx={{ fontSize: { xs: '0.8rem', sm: '1rem' },
+                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
+                    }}
                     >
                       Track and celebrate your child’s development milestones.
                     </Typography>
