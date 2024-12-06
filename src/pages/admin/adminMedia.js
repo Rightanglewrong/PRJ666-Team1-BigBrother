@@ -227,7 +227,7 @@ const MediaUploadPage = () => {
             {childProfiles.length > 0 ? (
               childProfiles.map((child) => (
                 <MenuItem key={child.childID} value={child.childID}>
-                  {child.firstName}
+                  {`${child.lastName}, ${child.firstName}`}
                 </MenuItem>
               ))
             ) : (
