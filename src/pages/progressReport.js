@@ -213,7 +213,7 @@ export default function ProgressReport() {
                     }}
                     onClick={handleCreateReportClick}
                   >
-                    Create Progress Report
+                    Create 
                   </Button>
                 )}
               </Box>
