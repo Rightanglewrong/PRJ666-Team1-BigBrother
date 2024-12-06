@@ -7,6 +7,7 @@ import {
 } from '../../utils/userAPI';
 import { getCurrentUser } from '@/utils/api';
 import { useUser } from '@/components/authenticate';
+import { useTheme } from '@/components/ThemeContext';
 import {
   Container,
   Typography,
@@ -35,6 +36,7 @@ const AdminUserService = () => {
   const user = useUser();
   const router = useRouter();
   const [userID, setUserID] = useState('');
+  const { darkMode, colorblindMode, handMode } = useTheme(); // Access theme modes
   const [accountType, setAccountType] = useState('');
   const [locationID, setLocationID] = useState(user.locationID);
   const [updateData, setUpdateData] = useState({
@@ -66,6 +68,16 @@ const AdminUserService = () => {
     address: '',
   });
   const [isAdding, setIsAdding] = useState(false);
+
+  // Define dynamic styles
+  const colors = {
+    background: darkMode ? '#121212' : '#f7f9fc',
+    text: darkMode ? '#f1f1f1' : '#000',
+    buttonPrimary: colorblindMode === 'blue-yellow' ? '#e77f24' : '#1976d2',
+    buttonSecondary: colorblindMode === 'red-green' ? '#3db48c' : '#4caf50',
+    alertError: colorblindMode === 'red-green' ? '#8c8c8c' : '#d32f2f',
+    alertText: darkMode ? '#ffab91' : '#000',
+  };
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -326,111 +338,182 @@ const AdminUserService = () => {
   };
 
   return (
-    <Container maxWidth="md">
-      <Typography variant="h3" mt={3} align='center' gutterBottom>
-        User Management
-      </Typography>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" align='center'>Get Users by Account Type and Location</Typography>
-        <Box display="flex" alignItems="center" gap={2} mt={2}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel>Account Type</InputLabel>{' '}
-            <Select
-              label="Account Type"
-              value={accountType}
-              onChange={(e) => setAccountType(e.target.value)}
-              fullWidth
-            >
-              <MenuItem value={''}>All</MenuItem>
-              <MenuItem value="Admin">Admin</MenuItem>
-              <MenuItem value="Staff">Staff</MenuItem>
-              <MenuItem value="Parent">Parent</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            label="Location ID"
-            variant="outlined"
-            value={user.locationID}
-            onChange={(e) => setLocationID(e.target.value.toUpperCase())}
-            fullWidth
-            disabled
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleGetUsersByAccountTypeAndLocation}
+    <Box
+      sx={{
+        backgroundColor: colors.background,
+        minHeight: '100vh',
+        py: { xs: 'none', sm: 4 },
+        px: { xs: 'none', sm: 2 },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 3,
+      }}
+    >
+      <Container
+        maxWidth="md"
+        sx={{
+          backgroundColor: { xs: 'none', sm: darkMode ? '#1e1e1e' : '#ffffff' },
+          borderRadius: 2,
+          p: 3,
+          boxShadow: { xs: 'none', sm: 2 },
+        }}
+      >
+        <Typography variant="h3" mt={3} align="center" gutterBottom sx={{ color: colors.text }}>
+          User Management
+        </Typography>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h5" align="center" sx={{ color: colors.text }}>
+            Get Users by Account Type and Location
+          </Typography>
+          <Box
+            display="flex"
+            flexDirection={{ xs: 'column', md: 'row' }}
+            alignItems="center"
+            gap={2}
+            mt={2}
           >
-            Get Users
+            <FormControl fullWidth variant="outlined">
+              <InputLabel
+                sx={{
+                  color: colors.text,
+                  '&.Mui-focused': { color: colors.buttonPrimary },
+                }}
+              >
+                Account Type
+              </InputLabel>{' '}
+              <Select
+                label="Account Type"
+                value={accountType}
+                onChange={(e) => setAccountType(e.target.value)}
+                sx={{
+                  color: colors.text,
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.text },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.buttonPrimary },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: colors.buttonPrimary,
+                  },
+                }}
+              >
+                <MenuItem value={''}>All</MenuItem>
+                <MenuItem value="Admin">Admin</MenuItem>
+                <MenuItem value="Staff">Staff</MenuItem>
+                <MenuItem value="Parent">Parent</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="Location ID"
+              variant="outlined"
+              value={user.locationID}
+              onChange={(e) => setLocationID(e.target.value.toUpperCase())}
+              fullWidth
+              disabled
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: colors.text },
+                  '&:hover fieldset': { borderColor: colors.buttonPrimary },
+                  '&.Mui-focused fieldset': { borderColor: colors.buttonPrimary },
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: colors.buttonPrimary,
+                color: '#fff',
+                '&:hover': { backgroundColor: colors.buttonSecondary },
+                alignSelf: { xs: handMode === 'right' ? 'flex-end' : 'flex-start' }, // Dynamic alignment
+              }}
+              onClick={handleGetUsersByAccountTypeAndLocation}
+            >
+              Get Users
+            </Button>
+          </Box>
+        </Box>
+
+        <ContactManagementModal
+          open={isContactModalOpen}
+          onClose={() => setIsContactModalOpen(false)}
+          user={userToViewContacts}
+          contacts={contacts}
+          isAdding={isAdding}
+          setIsAdding={setIsAdding}
+          newContact={newContact}
+          setNewContact={setNewContact}
+          contactToEdit={contactToEdit}
+          setContactToEdit={setContactToEdit}
+          onSaveContact={handleSaveContact}
+          onDeleteContact={handleDeleteContact}
+          resetContactForm={resetContactForm}
+        />
+
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ color: colors.text }}>
+            User List
+          </Typography>
+          <Paper elevation={2} sx={{ maxHeight: 300, overflow: 'auto', mt: 2, p: 2 }}>
+            <UserList
+              users={usersList}
+              selectedUserId={userID}
+              onSelect={handleUserSelect}
+              onViewContacts={handleViewContacts}
+              onDelete={(user) => {
+                setIsDeleting(true);
+                handleDeleteUser(user);
+              }}
+            />
+          </Paper>
+        </Box>
+
+        {isAdmin && userID && !isDeleting && (
+          <UpdateUserForm
+            updateData={updateData}
+            setUpdateData={setUpdateData}
+            handleUpdateUser={handleUpdateUser}
+            onCancel={() => setUserID(null)}
+          />
+        )}
+
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: { xs: handMode === 'right' ? 'flex-end' : 'flex-start', sm: 'center' },
+            mt: 2,
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={() => router.push('/admin')}
+            sx={{
+              color: colors.buttonPrimary,
+              borderColor: colors.buttonPrimary,
+              '&:hover': {
+                color: colors.buttonSecondary,
+                borderColor: colors.buttonSecondary,
+              },
+            }}
+          >
+            Back to Admin
           </Button>
         </Box>
-      </Box>
 
-      <ContactManagementModal
-        open={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        user={userToViewContacts}
-        contacts={contacts}
-        isAdding={isAdding}
-        setIsAdding={setIsAdding}
-        newContact={newContact}
-        setNewContact={setNewContact}
-        contactToEdit={contactToEdit}
-        setContactToEdit={setContactToEdit}
-        onSaveContact={handleSaveContact}
-        onDeleteContact={handleDeleteContact}
-        resetContactForm={resetContactForm}
-      />
+        <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
 
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6">User List</Typography>
-        <Paper elevation={2} sx={{ maxHeight: 300, overflow: 'auto', mt: 2, p: 2 }}>
-          <UserList
-            users={usersList}
-            selectedUserId={userID}
-            onSelect={handleUserSelect}
-            onViewContacts={handleViewContacts}
-            onDelete={(user) => {
-              setIsDeleting(true);
-              handleDeleteUser(user);
-            }}
+        {deleteConfirmationModal && (
+          <ConfirmationModal
+            open={deleteConfirmationModal}
+            title="Confirm Delete"
+            description={`Are you sure you want to delete user ${userToDelete?.firstName}?`}
+            onConfirm={handleConfirmDelete}
+            onCancel={handleDeleteModalClose}
           />
-        </Paper>
-      </Box>
-
-      {isAdmin && userID && !isDeleting && (
-        <UpdateUserForm
-          updateData={updateData}
-          setUpdateData={setUpdateData}
-          handleUpdateUser={handleUpdateUser}
-          onCancel={() => setUserID(null)}
-        />
-      )}
-
-      <Button
-        variant="outlined"
-        color="primary"
-        onClick={() => router.push('/admin')} // Navigates to the admin page
-        sx={{ textTransform: 'none', mt: 2 }}
-      >
-        Back to Admin
-      </Button>
-
-      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-
-      {deleteConfirmationModal && (
-        <ConfirmationModal
-          open={deleteConfirmationModal}
-          title="Confirm Delete"
-          description={`Are you sure you want to delete user ${userToDelete?.firstName}?`}
-          onConfirm={handleConfirmDelete}
-          onCancel={handleDeleteModalClose}
-        />
-      )}
-    </Container>
+        )}
+      </Container>
+    </Box>
   );
 };
 
