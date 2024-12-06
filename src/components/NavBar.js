@@ -225,9 +225,20 @@ const NavBar = () => {
                 </div>
               )}
 
-              {(accountType === 'Parent' || accountType === 'Staff') && (
+              {(accountType === 'Parent') && (
                 <Link
                   href="/generalMediaGallery"
+                  passHref
+                  className={styles.dropdownItem}
+                  onClick={handleMenuClose}
+                >
+                  Media
+                </Link>
+              )}
+
+              {(accountType === 'Staff') && (
+                <Link
+                  href="/admin/staffGallery"
                   passHref
                   className={styles.dropdownItem}
                   onClick={handleMenuClose}
