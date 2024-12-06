@@ -206,29 +206,51 @@ const MediaGallery = () => {
           </div>
         </div>
       )}
+<Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
+  <DialogContent
+    sx={{
+      textAlign: 'center',
+      width: '100%',
+      mx: 'auto', // Center horizontally
+    }}
+  >
+    {selectedMedia && (
+      <>
+        {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
+          <video
+            style={{
+              width: '100%', // Adjust to modal width
+              height: 'auto', // Maintain aspect ratio
+            }}
+            controls
+          >
+            <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <Image
+            src={selectedMedia.url}
+            alt={`Enlarged Media ID: ${selectedMedia.mediaID}`}
+            width={600}
+            height={700}
+            style={{
+              maxWidth: '100%', // Make the image responsive
+              height: 'auto', // Maintain aspect ratio
+            }}
+          />
+        )}
+        <Typography variant="body1" sx={{ marginTop: '10px', textAlign: 'center' }}>
+          <strong>Media ID:</strong> {selectedMedia.mediaID}
+        </Typography>
+        <Typography variant="body1" sx={{ textAlign: 'center' }}>
+          <strong>Description:</strong> {selectedMedia.description || 'No description available'}
+        </Typography>
+      </>
+    )}
+  </DialogContent>
+</Dialog>
 
-      <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
-        <DialogContent>
-          {selectedMedia && (
-            <>
-              {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
-                <video width="600" height="400" controls>
-                  <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <Image src={selectedMedia.url} alt={`Enlarged Media ID: ${selectedMedia.mediaID}`} width={600} height={700} />
-              )}
-              <Typography variant="body1" style={{ marginTop: '10px', textAlign: 'center' }}>
-                <strong>Media ID:</strong> {selectedMedia.mediaID}
-              </Typography>
-              <Typography variant="body1" style={{ textAlign: 'center' }}>
-                <strong>Description:</strong> {selectedMedia.description || 'No description available'}
-              </Typography>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 };

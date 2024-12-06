@@ -185,48 +185,96 @@ const AdminMediaGallery = () => {
         </Button>
       </div>
 
-      {/* Modal and Dialog Components */}
-      <Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
-        <DialogContent style={{ textAlign: 'center' }}>
-          {selectedMedia && (
-            <>
-              {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
-                <video width="600" height="400" controls>
-                  <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <Image src={selectedMedia.url} alt={selectedMedia.mediaID} width={600} height={700} />
-              )}
-              <Typography variant="body1" sx={{ marginTop: '10px' }}>
-                <strong>Media ID:</strong> {selectedMedia.mediaID}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Description:</strong> {selectedMedia.description || 'No description available'}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Location ID:</strong> {selectedMedia.locationID}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Uploaded By:</strong> {selectedMedia.uploadedBy}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Child ID:</strong> {selectedMedia.childID}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Last Modified:</strong>{' '}
-                {selectedMedia.LastModified ? new Date(selectedMedia.LastModified).toLocaleString() : 'N/A'}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Size:</strong> {selectedMedia.Size ? formatSize(selectedMedia.Size) : 'N/A'}
-              </Typography>
-              <Button variant="contained" color="secondary" sx={{ marginTop: '20px' }} onClick={openDeleteConfirm}>
-                Delete
-              </Button>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+   {/* Modal and Dialog Components */}
+<Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
+  <DialogContent
+    sx={{
+      textAlign: 'center',
+      width: '100%',
+      mx: 'auto', // Center horizontally
+    }}
+  >
+    {selectedMedia && (
+      <>
+        {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
+          <video
+            style={{
+              width: '100%', // Adjust to modal width
+              height: 'auto',
+            }}
+            controls
+          >
+            <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <Image
+            src={selectedMedia.url}
+            alt={selectedMedia.mediaID}
+            width={600}
+            height={700}
+            style={{
+              maxWidth: '100%', // Make the image responsive
+              height: 'auto',
+            }}
+          />
+        )}
+        <Typography variant="body1" sx={{ marginTop: '10px' }}>
+          <strong>Media ID:</strong> {selectedMedia.mediaID}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Description:</strong> {selectedMedia.description || 'No description available'}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Location ID:</strong> {selectedMedia.locationID}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Uploaded By:</strong> {selectedMedia.uploadedBy}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Child ID:</strong> {selectedMedia.childID}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Last Modified:</strong>{' '}
+          {selectedMedia.LastModified ? new Date(selectedMedia.LastModified).toLocaleString() : 'N/A'}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Size:</strong> {selectedMedia.Size ? formatSize(selectedMedia.Size) : 'N/A'}
+        </Typography>
+        <Button variant="contained" color="secondary" sx={{ marginTop: '20px' }} onClick={openDeleteConfirm}>
+          Delete
+        </Button>
+      </>
+    )}
+  </DialogContent>
+</Dialog>
+
+<Dialog
+  open={isDeleteConfirmOpen}
+  onClose={closeDeleteConfirm}
+  maxWidth="sm"
+  PaperProps={{
+    sx: {
+      m: 2,
+      padding: 2,
+    },
+  }}
+>
+  <DialogContent>
+    <Typography variant="body1" sx={{ textAlign: 'center' }}>
+      Are you sure you want to delete this media file?
+    </Typography>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={closeDeleteConfirm} color="primary">
+      Cancel
+    </Button>
+    <Button onClick={handleDelete} color="secondary">
+      Confirm
+    </Button>
+  </DialogActions>
+</Dialog>
+
 
       <Dialog open={isDeleteConfirmOpen} onClose={closeDeleteConfirm}>
         <DialogContent>
