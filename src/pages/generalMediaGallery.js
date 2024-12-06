@@ -206,71 +206,50 @@ const MediaGallery = () => {
           </div>
         </div>
       )}
-
-        <Dialog
-          open={!!selectedMedia}
-          onClose={closeMediaModal}
-          maxWidth="lg"
-          fullWidth
-          PaperProps={{
-            sx: {
-              m: 0, // Removes outer margin
-              overflow: 'hidden', // Prevents content overflow
-              height: '90vh', // Ensures the modal doesn't exceed 90% of the viewport height
-            },
-          }}
-        >
-          <DialogContent
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'flex-start', // Ensures content starts from the top
-              p: 2,
-              overflowY: 'auto', // Enables vertical scrolling for overflow
-              height: '100%', // Fills the modal space
+<Dialog open={!!selectedMedia} onClose={closeMediaModal} maxWidth="md">
+  <DialogContent
+    sx={{
+      textAlign: 'center',
+      width: '100%',
+      mx: 'auto', // Center horizontally
+    }}
+  >
+    {selectedMedia && (
+      <>
+        {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
+          <video
+            style={{
+              width: '100%', // Adjust to modal width
+              height: 'auto', // Maintain aspect ratio
             }}
+            controls
           >
-            {selectedMedia && (
-              <>
-                {selectedMedia.mediaID.endsWith('.mp4') || selectedMedia.mediaID.endsWith('.mkv') ? (
-                  <video
-                    controls
-                    style={{
-                      width: '100%',
-                      maxWidth: '600px', // Restricts width for larger screens
-                      maxHeight: '50vh', // Prevents video from exceeding half of the viewport height
-                      objectFit: 'contain',
-                    }}
-                  >
-                    <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
-                    Your browser does not support the video tag.
-                  </video>
-                ) : (
-                  <Image
-                    src={selectedMedia.url}
-                    alt={`Enlarged Media ID: ${selectedMedia.mediaID}`}
-                    layout="intrinsic"
-                    width={800}
-                    height={600}
-                    style={{
-                      width: '100%',
-                      maxWidth: '600px', // Restricts width for larger screens
-                      maxHeight: '50vh', // Ensures the image fits within half of the viewport height
-                      objectFit: 'contain',
-                    }}
-                  />
-                )}
-                <Typography variant="body1" sx={{ marginTop: '10px', textAlign: 'center' }}>
-                  <strong>Media ID:</strong> {selectedMedia.mediaID}
-                </Typography>
-                <Typography variant="body1" sx={{ textAlign: 'center' }}>
-                  <strong>Description:</strong> {selectedMedia.description || 'No description available'}
-                </Typography>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
+            <source src={selectedMedia.url} type={`video/${selectedMedia.mediaID.split('.').pop()}`} />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <Image
+            src={selectedMedia.url}
+            alt={`Enlarged Media ID: ${selectedMedia.mediaID}`}
+            width={600}
+            height={700}
+            style={{
+              maxWidth: '100%', // Make the image responsive
+              height: 'auto', // Maintain aspect ratio
+            }}
+          />
+        )}
+        <Typography variant="body1" sx={{ marginTop: '10px', textAlign: 'center' }}>
+          <strong>Media ID:</strong> {selectedMedia.mediaID}
+        </Typography>
+        <Typography variant="body1" sx={{ textAlign: 'center' }}>
+          <strong>Description:</strong> {selectedMedia.description || 'No description available'}
+        </Typography>
+      </>
+    )}
+  </DialogContent>
+</Dialog>
+
 
     </div>
   );
