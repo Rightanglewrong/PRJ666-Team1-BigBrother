@@ -4,7 +4,7 @@ import { withAuth } from '@/hoc/withAuth';
 //import styles from './adminMedia.module.css';
 import { getRelationshipByParentID } from '../../utils/relationshipAPI';
 import { getCurrentUser } from '../../utils/api';
-import { retrieveChildProfileByID } from '../../utils/childAPI';
+import { retrieveChildrenByLocationID } from '../../utils/childAPI';
 import { uploadMedia } from '../../utils/mediaAPI';
 import {
   Container,
@@ -55,27 +55,28 @@ const MediaUploadPage = () => {
 
       try {
         const userData = await getCurrentUser();
-        setUserDetails(userData);
+      
         if (userData) {
-          const relationshipData = await getRelationshipByParentID(userData.userID);
+          setUserDetails(userData);
+      
+          const relationshipData = await retrieveChildrenByLocationID(userData.locationID);
+      
           if (relationshipData && relationshipData.length > 0) {
-            const childrenProfiles = await Promise.all(
-              relationshipData.map(async (relation) => {
-                const childProfile = await retrieveChildProfileByID(relation.childID);
-                return { childID: relation.childID, firstName: childProfile.child.child.firstName };
-              })
-            );
-            setChildProfiles(childrenProfiles);
+            setChildProfiles(relationshipData);
           } else {
             setErrorMessage('No children found.');
             setShowErrorSnackbar(true);
           }
+        } else {
+          setErrorMessage('User data not found.');
+          setShowErrorSnackbar(true);
         }
       } catch (error) {
-        //console.error('Error fetching user data:', error);
-        setErrorMessage('Failed to load child profiles.');
+        console.error('An error occurred:', error);
+        setErrorMessage('Failed to load user or children data.');
         setShowErrorSnackbar(true);
       }
+      
     };
 
     fetchUserDetails();

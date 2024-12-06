@@ -271,8 +271,12 @@ export default function ProgressReportLanding() {
       >
         Back to Admin
       </Button>
-
-      <SnackbarNotification
+      
+      <Typography variant="body2" style={{ marginTop: '1em' }}>
+        <br />
+        * Previous Progress Reports Must Exist Before Generating An AI Suggestion Report
+      </Typography>      
+<SnackbarNotification
         open={snackbarOpen}
         message={errorMessage}
         severity="error"

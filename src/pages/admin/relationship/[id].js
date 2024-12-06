@@ -247,10 +247,10 @@ export default function Relationships() {
                                 Adult&apos;s Relation: {relation.parentRelation || "No relation available"}
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
-                                Adult&apos;s Email: {relation.email || "No email available"}
+                                Email: {relation.email || "No email available"}
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
-                                Adult&apos;s Phone: {relation.phoneNumber || "No phone available"}
+                                Phone: {relation.phoneNumber || "No phone available"}
                             </Typography>
                         </>
                     ) : (
