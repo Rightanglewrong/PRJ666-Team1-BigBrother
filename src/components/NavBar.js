@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AppBar, Toolbar, Typography, IconButton, Menu, Button, Divider } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Menu, Button, Divider, Box } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import DensityMediumIcon from '@mui/icons-material/DensityMedium';
 import { useUser } from '../components/authenticate';
 import styles from './NavBar.module.css';
 import { useTheme } from '@/components/ThemeContext'; // Import the theme context
@@ -59,7 +60,6 @@ const NavBar = () => {
             ? 'linear-gradient(90deg, #e77f24, #3db48c)' // Accessible palette
             : backgroundColor, // Default gradient
         transition: 'background 0.3s ease-in-out',
-        padding: '5px 20px',
         zIndex: 1000,
       }}
     >
@@ -71,70 +71,22 @@ const NavBar = () => {
         }}
       >
         {/* Logo Section */}
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Link href={isLoggedIn ? '/HomePage' : '/'} passHref>
-            <Button
-              color="inherit"
-              sx={{
-                fontSize: { xs: '1.5rem', sm: '1.8rem' }, // Slightly smaller font size for mobile
-                fontWeight: 'bold',
-                textTransform: 'none',
-                color: '#fff',
-                textDecoration: 'none',
-                paddingLeft: 0, // Remove default padding for extra alignment
-              }}
-            >
-              Big Brother
-            </Button>
-          </Link>
-        </Typography>
-
-        {/* <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            padding: '0 10px',
-          }}
-        >
-          <Select
-            value={colorblindMode}
-            onChange={(e) => setMode(e.target.value)}
+        <Link href={isLoggedIn ? '/HomePage' : '/'} passHref>
+          <Button
+            color="inherit"
             sx={{
-              '& .MuiPaper-root': {
-                background: menuBackgroundColor,
-                color: '#fff',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                '& .MuiMenuItem-root': {
-                  padding: '8px 16px',
-                  borderRadius: '4px',
-                  '&:hover': {
-                    backgroundColor: '#444',
-                  },
-                },
-              },
-            }}
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  backgroundColor: '#333',
-                  color: '#fff',
-                  borderRadius: '8px',
-                  '& .MuiMenuItem-root': {
-                    '&:hover': {
-                      backgroundColor: '#555',
-                    },
-                  },
-                },
-              },
+              fontSize: { xs: '1.5rem', sm: '1.8rem' }, // Slightly smaller font size for mobile
+              fontWeight: 'bold',
+              textTransform: 'none',
+              color: '#fff',
+              textDecoration: 'none',
+              paddingLeft: 0, // Remove default padding for extra alignment
+              minWidth: 'auto',
             }}
           >
-            <MenuItem value="none">No Colorblind</MenuItem>
-            <MenuItem value="red-green">Red-Green Mode</MenuItem>
-            <MenuItem value="blue-yellow">Blue-Yellow Mode</MenuItem>
-          </Select>
-        </Box> */}
+            Big Brother
+          </Button>
+        </Link>
 
         {/* Right Section */}
         {isLoggedIn && (
@@ -151,8 +103,8 @@ const NavBar = () => {
                 },
               }}
             >
-              <AccountCircleIcon />
-              <Typography
+              <DensityMediumIcon />
+              {/* <Typography
                 variant="body1"
                 sx={{
                   marginLeft: 1,
@@ -161,7 +113,7 @@ const NavBar = () => {
                 }}
               >
                 Welcome, {firstName}
-              </Typography>
+              </Typography> */}
             </IconButton>
 
             <Menu
@@ -188,7 +140,18 @@ const NavBar = () => {
                 className={styles.dropdownItem}
                 onClick={handleMenuClose}
               >
-                Profile
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    textDecoration: 'none',
+                    color: 'inherit',
+                  }}
+                >
+                  <AccountCircleIcon />
+                  <span>Profile</span>
+                </Box>
               </Link>
               <Link
                 href="/calendar"
@@ -225,7 +188,7 @@ const NavBar = () => {
                 </div>
               )}
 
-              {(accountType === 'Parent') && (
+              {accountType === 'Parent' && (
                 <Link
                   href="/generalMediaGallery"
                   passHref
@@ -236,7 +199,7 @@ const NavBar = () => {
                 </Link>
               )}
 
-              {(accountType === 'Staff') && (
+              {accountType === 'Staff' && (
                 <Link
                   href="/admin/staffGallery"
                   passHref
@@ -247,7 +210,7 @@ const NavBar = () => {
                 </Link>
               )}
 
-              {(accountType === 'Parent') && (
+              {accountType === 'Parent' && (
                 <Link
                   href="/userChildren"
                   passHref
@@ -257,7 +220,7 @@ const NavBar = () => {
                   Child Profiles
                 </Link>
               )}
-              {(accountType === 'Staff') && (
+              {accountType === 'Staff' && (
                 <Link
                   href="/admin/staffChildProfiles"
                   passHref
@@ -295,7 +258,7 @@ const NavBar = () => {
                 Messages
               </Link>
 
-              {(accountType === 'Admin') && (
+              {accountType === 'Admin' && (
                 <Link
                   href="/admin/adminMedia"
                   passHref
@@ -306,7 +269,7 @@ const NavBar = () => {
                 </Link>
               )}
 
-              {(accountType === 'Staff') && (
+              {accountType === 'Staff' && (
                 <Link
                   href="/staffMedia"
                   passHref
