@@ -13,7 +13,6 @@ import {
   DialogActions,
   List,
   ListItem,
-  ListItemText,
   Grid,
   Button,
 } from '@mui/material';
@@ -22,6 +21,7 @@ import {
   approveUser,
   deleteUserInDynamoDB,
 } from '../../utils/userAPI';
+import PendingUsersModal from '@/components/Modal/PendingUsersModal';
 import { useTheme } from '@/components/ThemeContext';
 
 const AdminPage = () => {
@@ -51,6 +51,7 @@ const AdminPage = () => {
         const responses = await Promise.all(promises);
         const allUsers = responses.flatMap((response) => (response?.users ? response.users : []));
         const pending = allUsers.filter((u) => u.accStatus === 'PENDING');
+        console.log(pending);
         setPendingUsers(pending);
 
         if (pending.length > 0) {
@@ -98,6 +99,8 @@ const AdminPage = () => {
 
   const handleCloseModal = () => setIsModalOpen(false);
 
+  const handleOpenModal = () => setIsModalOpen(true);
+
   if (!user || user.accountType !== 'Admin') {
     return (
       <Typography variant="h5" sx={{ color: darkMode ? '#f1f1f1' : '#333', textAlign: 'center' }}>
@@ -136,56 +139,35 @@ const AdminPage = () => {
           Admin Dashboard
         </Typography>
 
-        <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="sm" fullWidth>
-          <DialogTitle>Pending Users</DialogTitle>
-          <DialogContent>
-            {pendingUsers.length > 0 ? (
-              <List>
-                {pendingUsers.map((user) => (
-                  <ListItem key={user.userID} divider>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'inherit' }}>
-                          {`Role: ${user.accountType} | Name: ${user.firstName} ${user.lastName}`}
-                        </Typography>
-                      }
-                      secondary={<Typography variant="body2">Email: {user.email}</Typography>}
-                    />
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                      <Button
-                        variant="contained"
-                        sx={{
-                          backgroundColor: '#1976d2',
-                          '&:hover': { backgroundColor: '#1565c0' },
-                        }}
-                        onClick={() => handleApproveUser(user.userID)}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        variant="contained"
-                        sx={{
-                          backgroundColor: '#f44336',
-                          '&:hover': { backgroundColor: '#d32f2f' },
-                        }}
-                        onClick={() => handleDenyUser(user.userID)}
-                      >
-                        Deny
-                      </Button>
-                    </Box>
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Typography>No pending users.</Typography>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseModal} sx={{ color: '#1976d2' }}>
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
+        {/* Pending Users Button */}
+        <Box sx={{ mb: 4, textAlign: 'left' }}>
+          <Button
+            variant="outlined"
+            disabled={pendingUsers.length === 0}
+            onClick={handleOpenModal}
+            sx={{
+              borderColor: pendingUsers.length > 0 ? '#1976d2' : '#9e9e9e',
+              color: pendingUsers.length > 0 ? '#1976d2' : '#9e9e9e',
+              boxShadow: pendingUsers.length > 0 ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',
+              '&:hover': {
+                borderColor: pendingUsers.length > 0 ? '#1565c0' : '#9e9e9e',
+                boxShadow: pendingUsers.length > 0 ? '0 6px 12px rgba(0, 0, 0, 0.3)' : 'none',
+              },
+              backgroundColor: 'transparent', // Ensure the inside is uncolored
+              cursor: pendingUsers.length > 0 ? 'pointer' : 'not-allowed',
+            }}
+          >
+            {`Pending User(s) (${pendingUsers.length})`}
+          </Button>
+        </Box>
+
+        <PendingUsersModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          pendingUsers={pendingUsers}
+          onApprove={handleApproveUser}
+          onDeny={handleDenyUser}
+        />
 
         <Grid container spacing={3}>
           {[
