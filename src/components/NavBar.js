@@ -18,6 +18,8 @@ const NavBar = () => {
 
   const isLoggedIn = !!firstName; // Checks if user data is present to determine login status
 
+  const logo = '/icons/logo.png';
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     router.push('/');
@@ -55,7 +57,7 @@ const NavBar = () => {
       sx={{
         background:
           colorblindMode === 'red-green'
-            ? 'linear-gradient(90deg, #70a1d7, #b8e986)' // Accessible palette
+            ? 'linear-gradient(90deg, #70a1d7, #e6e986)' // Accessible palette
             : colorblindMode === 'blue-yellow'
             ? 'linear-gradient(90deg, #e77f24, #3db48c)' // Accessible palette
             : backgroundColor, // Default gradient
@@ -72,20 +74,17 @@ const NavBar = () => {
       >
         {/* Logo Section */}
         <Link href={isLoggedIn ? '/HomePage' : '/'} passHref>
-          <Button
-            color="inherit"
+          <Box
+            component="img"
+            src={logo}
+            alt="Big Brother Logo"
             sx={{
-              fontSize: { xs: '1.5rem', sm: '1.8rem' }, // Slightly smaller font size for mobile
-              fontWeight: 'bold',
-              textTransform: 'none',
-              color: '#fff',
-              textDecoration: 'none',
-              paddingLeft: 0, // Remove default padding for extra alignment
-              minWidth: 'auto',
+              mt: 0.7,
+              height: { xs: 40, sm: 50 }, // Increase height for mobile (xs) and larger screens (sm)
+              width: 'auto', // Automatically adjusts the width to keep aspect ratio
+              cursor: 'pointer', // Ensure it still acts as a clickable link
             }}
-          >
-            Big Brother
-          </Button>
+          />
         </Link>
 
         {/* Right Section */}
@@ -124,7 +123,7 @@ const NavBar = () => {
                 '& .MuiPaper-root': {
                   background:
                     colorblindMode === 'red-green'
-                      ? 'linear-gradient(90deg, #70a1d7, #b8e986)' // Red-Green mode colors
+                      ? 'linear-gradient(90deg, #70a1d7, #e6e986)' // Red-Green mode colors
                       : colorblindMode === 'blue-yellow'
                       ? 'linear-gradient(90deg, #e77f24, #3db48c)' // Blue-Yellow mode colors
                       : menuBackgroundColor, // Default menu background color
