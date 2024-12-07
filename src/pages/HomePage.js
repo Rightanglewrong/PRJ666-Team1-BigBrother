@@ -159,9 +159,8 @@ export default function HomePage() {
                 ]
               : []),
           ].map(({ href, imgSrc, title, description }, index) => (
-            <Link href={href} passHref>
+            <Link href={href} key={index} passHref>
               <Box
-                key={index}
                 sx={{
                   flex: '1 1 calc(25% - 16px)',
                   maxWidth: '300px',
