@@ -57,7 +57,7 @@ const NavBar = () => {
       sx={{
         background:
           colorblindMode === 'red-green'
-            ? 'linear-gradient(90deg, #70a1d7, #b8e986)' // Accessible palette
+            ? 'linear-gradient(90deg, #70a1d7, #e6e986)' // Accessible palette
             : colorblindMode === 'blue-yellow'
             ? 'linear-gradient(90deg, #e77f24, #3db48c)' // Accessible palette
             : backgroundColor, // Default gradient
@@ -123,7 +123,7 @@ const NavBar = () => {
                 '& .MuiPaper-root': {
                   background:
                     colorblindMode === 'red-green'
-                      ? 'linear-gradient(90deg, #70a1d7, #b8e986)' // Red-Green mode colors
+                      ? 'linear-gradient(90deg, #70a1d7, #e6e986)' // Red-Green mode colors
                       : colorblindMode === 'blue-yellow'
                       ? 'linear-gradient(90deg, #e77f24, #3db48c)' // Blue-Yellow mode colors
                       : menuBackgroundColor, // Default menu background color
