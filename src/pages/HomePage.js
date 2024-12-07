@@ -8,14 +8,13 @@ import {
   Box,
   Typography,
   Button,
-  Container,
-  Grid,
   Card,
   CardContent,
   CardMedia,
   Snackbar,
   Alert,
   Stack,
+  Container,
 } from '@mui/material';
 import { useTheme } from '@/components/ThemeContext'; // Import ThemeContext
 
@@ -117,236 +116,110 @@ export default function HomePage() {
       <Container
         maxWidth="lg"
         sx={{
-          flex: 1, // Ensures the main content takes up the available space
+          flex: 1,
           py: { xs: 4, md: 8 },
         }}
       >
-        <Grid container spacing={4} justifyContent="center">
-          {/* Dashboard */}
-          {/* <Grid item xs={12} sm={6} md={3}>
-            <Link href="/dashboard" passHref>
-              <Card
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: 4,
+          }}
+        >
+          {/* The card to show */}
+          {[
+            {
+              href: '/mealPlan',
+              imgSrc: '/icons/Mealplan.png',
+              title: 'Meal Plan',
+              description: 'View and manage meal plans.',
+            },
+            {
+              href: '/calendar',
+              imgSrc: '/icons/Calendar.png',
+              title: 'Event Calendar',
+              description: 'Check upcoming events and activities.',
+            },
+            {
+              href: '/newsletter',
+              imgSrc: '/icons/Newsletter.png',
+              title: 'Newsletter',
+              description: 'Stay updated with the latest news.',
+            },
+            ...(user.accountType === 'Parent'
+              ? [
+                  {
+                    href: '/progressReport',
+                    imgSrc: '/icons/ProgressReport.png',
+                    title: 'Child Progress',
+                    description: 'Track and celebrate your child’s development milestones.',
+                  },
+                ]
+              : []),
+          ].map(({ href, imgSrc, title, description }, index) => (
+            <Link href={href} passHref>
+              <Box
+                key={index}
                 sx={{
-                  height: '100%',
+                  flex: '1 1 calc(25% - 16px)',
+                  maxWidth: '300px',
+                  minWidth: '200px',
                   display: 'flex',
-                  flexDirection: { xs: 'row', sm: 'column' },
+                  flexDirection: 'column',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
                   textAlign: 'center',
-                  p: { xs: 2, sm: 3 },
-                  '&:hover': { boxShadow: 6, transform: 'scale(1.05)' },
-                  transition: 'all 0.3s',
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image="https://cdn-icons-png.flaticon.com/512/11068/11068821.png"
-                  alt="Dashboard Icon"
-                  sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
-                />
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}>
-                    Dashboard
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
-                    Overview of your childcare activities.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Link>
-          </Grid> */}
-
-          {/* Meal Plan */}
-          <Grid item xs={12} sm={6} md={3}>
-            <Link href="/mealPlan" passHref>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: { xs: 'row', sm: 'column' },
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  p: { xs: 2, sm: 3 },
-                  backgroundColor: colors.cardHover,
-                  '&:hover': { backgroundColor: colors.cardHover, boxShadow: 6, transform: 'scale(1.05)' },
-                  transition: 'all 0.3s',
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image="/icons/Mealplan.png"
-                  alt="Meal Plan Icon"
-                  sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
-                />
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    fontWeight="bold"
-                    sx={{
-                      fontSize: { xs: '1rem', sm: '1.2rem' },
-                      color: darkMode ? '#f1f1f1' : '#333',
-                    }}
-                  >
-                    Meal Plan
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{
-                      fontSize: { xs: '0.8rem', sm: '1rem' },
-                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
-                    }}
-                  >
-                    View and manage meal plans.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Link>
-          </Grid>
-
-          {/* Event Calendar */}
-          <Grid item xs={12} sm={6} md={3}>
-            <Link href="/calendar" passHref>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: { xs: 'row', sm: 'column' },
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  p: { xs: 2, sm: 3 },
-                  backgroundColor: colors.cardHover,
-                  '&:hover': { backgroundColor: colors.cardHover, boxShadow: 6, transform: 'scale(1.05)' },
-                  transition: 'all 0.3s',
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image="/icons/Calendar.png"
-                  alt="Event Calendar Icon"
-                  sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
-                />
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    fontWeight="bold"
-                    sx={{
-                      fontSize: { xs: '1rem', sm: '1.2rem' },
-                      color: darkMode ? '#f1f1f1' : '#333', // Explicitly set color for header text
-                    }}
-                  >
-                    Event Calendar
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{
-                      fontSize: { xs: '0.8rem', sm: '1rem' },
-                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
-                    }}
-                  >
-                    Check upcoming events and activities.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Link>
-          </Grid>
-
-          {/* Newsletter */}
-          <Grid item xs={12} sm={6} md={3}>
-            <Link href="/newsletter" passHref>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: { xs: 'row', sm: 'column' },
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  p: { xs: 2, sm: 3 },
-                  backgroundColor: colors.cardHover,
-                  '&:hover': { backgroundColor: colors.cardHover, boxShadow: 6, transform: 'scale(1.05)' },
-                  transition: 'all 0.3s',
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image="/icons/Newsletter.png"
-                  alt="Newsletter Icon"
-                  sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
-                />
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    fontWeight="bold"
-                    sx={{
-                      fontSize: { xs: '1rem', sm: '1.2rem' },
-                      color: darkMode ? '#f1f1f1' : '#333', // Explicitly set color for header text
-                    }}
-                  >
-                    Newsletter
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{
-                      fontSize: { xs: '0.8rem', sm: '1rem' },
-                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
-                    }}
-                  >
-                    Stay updated with the latest news.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Link>
-          </Grid>
-
-          {/* Child Progress Report */}
-          {user.accountType === 'Parent' && (
-            <Grid item xs={12} sm={6} md={3}>
-              <Link href="/progressReport" passHref>
-                <Card
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: { xs: 'row', sm: 'column' },
-                    alignItems: 'center',
-                    textAlign: 'center',
-                    p: { xs: 2, sm: 3 },
+                  p: 3,
+                  backgroundColor: colors.cardBackground,
+                  borderRadius: 2,
+                  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                  '&:hover': {
                     backgroundColor: colors.cardHover,
-                    '&:hover': { backgroundColor: colors.cardHover, boxShadow: 6, transform: 'scale(1.05)' },
-                    transition: 'all 0.3s',
+                    boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.15)',
+                    transform: 'scale(1.05)',
+                  },
+                  transition: 'all 0.3s',
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  image={imgSrc}
+                  alt={`${title} Icon`}
+                  sx={{
+                    width: { xs: 60, sm: 80 },
+                    height: { xs: 60, sm: 80 },
+                    mb: 2,
                   }}
-                >
-                  <CardMedia
-                    component="img"
-                    image="/icons/ProgressReport.png"
-                    alt="Progress Report Icon"
-                    sx={{ width: { xs: 50, sm: 80 }, height: { xs: 50, sm: 80 }, mb: { sm: 2 } }}
-                  />
-                  <CardContent>
-                    <Typography
-                      variant="h6"
-                      fontWeight="bold"
-                      sx={{ fontSize: { xs: '1rem', sm: '1.2rem' },
-                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
-                     }}
-                    >
-                      Child Progress
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      sx={{ fontSize: { xs: '0.8rem', sm: '1rem' },
-                      color: darkMode ? '#bdbdbd' : 'textSecondary', // Slightly lighter text in dark mode
+                />
+
+                <CardContent>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    sx={{
+                      fontSize: { xs: '1.5rem', sm: '1.6rem' },
+                      color: colors.text,
                     }}
-                    >
-                      Track and celebrate your child’s development milestones.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Link>
-            </Grid>
-          )}
-        </Grid>
+                  >
+                    {title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontSize: { xs: '1.1rem', sm: '1.1rem' },
+                      color: darkMode ? '#bdbdbd' : 'textSecondary',
+                      mt: 1,
+                    }}
+                  >
+                    {description}
+                  </Typography>
+                </CardContent>
+              </Box>
+            </Link>
+          ))}
+        </Box>
       </Container>
 
       <Box
