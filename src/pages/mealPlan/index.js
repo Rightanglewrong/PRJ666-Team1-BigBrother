@@ -181,8 +181,10 @@ export default function MealPlanIndex() {
                     boxShadow: 3,
                     borderRadius: 3,
                     p: 2,
+                    flex: '1 1 calc(33% - 16px)',
                     width: '30%',
-                    minWidth: '200px',
+                    minWidth: '250px',
+                    maxWidth: '350px',
                   }}
                 >
                   <CardContent>
@@ -192,13 +194,16 @@ export default function MealPlanIndex() {
                         fontWeight: 'bold',
                         textAlign: 'center',
                         color: colors.mealTitle,
-                        fontSize: '1.125rem',
+                        fontSize: '1.35rem',
                       }}
                     >
                       {meal}
                     </Typography>
                     <Divider sx={{ my: 1 }} />
-                    <Typography variant="body2" sx={{ mt: 1, color: colors.text }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ mt: 1, color: colors.text, fontSize: '1.1rem' }}
+                    >
                       {mealPlan[meal.toLowerCase()] || 'Not specified'}
                     </Typography>
                   </CardContent>
