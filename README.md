@@ -43,7 +43,18 @@
 * Payroll
 * Operational capabilities
 
-## MileStones
+## Tech Stack
+### Backend
+* NodeJS
+* AWS S3
+* AWS DynamoDB
+* OPENAI
+### Frontend
+* Material UI
+* NextJS
+* React
+
+## Milestones
 ### Milestone 1: Backend Implementation
 * Complete the database setup
 * Implement login functionality
@@ -74,10 +85,10 @@ For the backend API code and instructions
 * https://github.com/Rightanglewrong/PRJ666-Team1-BigBrother-Backend
 
 ## Technical Documents
-For our design references
+For our UI design references
 * https://www.figma.com/design/Wsyb8fYVWp7U8yHlzy8MAJ/PRJ5---Big-Brother?node-id=0-1&t=TM8w3RdTPOnibaq2-1 
   
-For our database and workflow specifications
+For our Data Flow Diagrams, Activity Diagram, Class Diagrams and workflow specifications
 * https://www.figma.com/board/qz6547qvOFw6dnzL0PVWww/Big-Brother?t=TM8w3RdTPOnibaq2-1
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
@@ -96,10 +107,10 @@ bun dev
 ```
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## List of deviations from 
+## List of deviations from original PRJ566 Plan
 * Ability to deny user messaging was not implemented
 * Progress report templates was cut back on in complexity and availability of options
-* AWS Cognito was replaced with homebrew auth implementation
+* AWS Cognito was replaced with homebrew authentication and authorization implementation
 
 ## How To Run
 The application is currently hosted on Heroku for the backend and Vercel for the frontend.
