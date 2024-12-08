@@ -124,11 +124,10 @@ export default function NewsletterDetailPage() {
     try {
       await updateNewsletter(token, id, {
         title: newsletter.title,
-        content: newsletter.content,
+        content: newsletter.content, 
       });
       setMessage('Newsletter updated successfully');
       setEditMode(false);
-      await fetchData();
     } catch (error) {
       setMessage('Error updating newsletter');
     }
