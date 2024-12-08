@@ -70,6 +70,11 @@ export default function NewsletterDetailPage() {
     return handMode === 'left' ? 'flex-start' : handMode === 'right' ? 'flex-end' : 'left';
   };
 
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return d.toLocaleDateString('en-CA');  // 'en-CA' format gives 'yyyy-mm-dd'
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!user) {
@@ -119,7 +124,7 @@ export default function NewsletterDetailPage() {
     try {
       await updateNewsletter(token, id, {
         title: newsletter.title,
-        content: newsletter.content,
+        content: newsletter.content, 
       });
       setMessage('Newsletter updated successfully');
       setEditMode(false);
@@ -303,7 +308,7 @@ export default function NewsletterDetailPage() {
                   Created At: {newsletter.createdAt}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 2, color: darkMode ? '#bdbdbd' : '#7f8c8d' }}>
-                  Updated At: {newsletter.updatedAt}
+                  Updated At: {formatDate(newsletter.updatedAt)}
                 </Typography>
 
                 {/* Edit Button */}
