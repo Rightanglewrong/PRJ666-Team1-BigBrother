@@ -10,6 +10,8 @@ import { useUser } from '../components/authenticate';
 import styles from './NavBar.module.css';
 import { useTheme } from '@/components/ThemeContext'; // Import the theme context
 
+import { useMediaQuery, useTheme as MuiTheme } from '@mui/material';
+
 const NavBar = () => {
   const { firstName, accountType } = useUser() || {};
   const [anchorEl, setAnchorEl] = useState(null); // Controls dropdown menu
@@ -17,6 +19,9 @@ const NavBar = () => {
   const { colorblindMode, setMode } = useTheme(); // Access colorblind mode and setter
 
   const isLoggedIn = !!firstName; // Checks if user data is present to determine login status
+
+  const muiTheme = MuiTheme(); // Use Material-UI theme to access breakpoints
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm')); // Check if screen size is small
 
   const logo = '/icons/logo.png';
 
@@ -90,30 +95,47 @@ const NavBar = () => {
         {/* Right Section */}
         {isLoggedIn && (
           <>
-            <IconButton
-              color="inherit"
-              onClick={handleMenuOpen}
-              sx={{
-                color: '#fff',
-                fontWeight: 600,
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  color: '#fbc531',
-                },
-              }}
-            >
-              <DensityMediumIcon />
-              {/* <Typography
-                variant="body1"
+            {isMobile ? (
+              <IconButton
+                color="inherit"
+                onClick={handleMenuOpen}
                 sx={{
-                  marginLeft: 1,
                   color: '#fff',
                   fontWeight: 600,
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    color: '#fbc531',
+                  },
                 }}
               >
-                Welcome, {firstName}
-              </Typography> */}
-            </IconButton>
+                <DensityMediumIcon />
+              </IconButton>
+            ) : (
+              <IconButton
+                color="inherit"
+                onClick={handleMenuOpen}
+                sx={{
+                  color: '#fff',
+                  fontWeight: 600,
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    color: '#fbc531',
+                  },
+                }}
+              >
+                <AccountCircleIcon />
+                <Typography
+                  variant="body1"
+                  sx={{
+                    marginLeft: 1,
+                    color: '#fff',
+                    fontWeight: 600,
+                  }}
+                >
+                  Welcome, {firstName}
+                </Typography>
+              </IconButton>
+            )}
 
             <Menu
               anchorEl={anchorEl}
@@ -143,13 +165,13 @@ const NavBar = () => {
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1,
+                    gap: isMobile ? 0.5 : 1, // No gap on mobile for the icon
                     textDecoration: 'none',
                     color: 'inherit',
                   }}
                 >
-                  <AccountCircleIcon />
                   <span>Profile</span>
+                  {isMobile && <AccountCircleIcon />} {/* Show icon only on mobile */}
                 </Box>
               </Link>
               <Link
