@@ -1,31 +1,33 @@
 # PRJ666 Project
-## Big Brother
+# Big Brother Inc.
 
-### Members
+## Members
 * Benny Yang: 112654223
 * Justin Lee: 121354229
 * Steven Zhang: 117054171
 * Alex Choi 177037215
 
-# Executive Summary
+## Executive Summary
   The "Big Brother" project was initiated in response to utilizing various tools to communicate with parents, track daily activities, manage health updates, and monitor developmental milestones. Our project aims to introduce a centralized solution that streamlines daycare management tasks while supporting educational objectives, thereby enhancing both the operational efficiency of daycare centers and the developmental outcomes for children.
+
 ## Description
   A centralized daycare management system that allows for the management and entry of data for the teachers on their students in attendance. Allowing for the logging of progress, activities, videos, pictures, and personal details of each student within the daycare and the communication of stored information to their respective parents.
+
 ## Value Statement
   An increased efficiency and management in data keeping and analysis in the field of child daycares. A streamlined application that will provide an intuitive and secure platform available for all child daycare providers that aims to make information access and recording as easy and efficient as possible.   
+
 ## Scope
 ### What is Included
 * Web platform
 * Image and Video storage
 * Templated data entry forms
-* Machine learning improvements based on child progress
+* Ai power activity suggestions
   * Based on progress reports
-  * Progresses 
-  * Special notes
 * Child Development Progress Reports 
   * Interests 
   * Habits
   * Weaknesses 
+  * Trending
 * Email notifications
 * Account Administration
 * Account creation
@@ -33,7 +35,6 @@
 * Meal tracking and menu reporting
 * Washroom and hydration tracking 
 * Preset text and choice options for quick data entry 
-* Colour-coded markers
   
 ### What is Not Included
 * IOS application
@@ -68,10 +69,20 @@
 * Finalize all documentation
 * Prepare and deliver the project presentation
 
+## Link to Backend API
+For the backend API code and instructions
+* https://github.com/Rightanglewrong/PRJ666-Team1-BigBrother-Backend
+
+## Technical Documents
+For our design references
+* https://www.figma.com/design/Wsyb8fYVWp7U8yHlzy8MAJ/PRJ5---Big-Brother?node-id=0-1&t=TM8w3RdTPOnibaq2-1 
+  
+For our database and workflow specifications
+* https://www.figma.com/board/qz6547qvOFw6dnzL0PVWww/Big-Brother?t=TM8w3RdTPOnibaq2-1
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
-
 First, run the development server:
 
 ```bash
@@ -83,24 +94,27 @@ pnpm dev
 # or
 bun dev
 ```
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## List of deviations from 
+* Ability to deny user messaging was not implemented
+* Progress report templates was cut back on in complexity and availability of options
+* AWS Cognito was replaces with homebrew auth implementation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How To Run
+The application is currently hosted on Heroku for the backend and Vercel for the frontend.
+* For the frontend, visit: https://prj-666-team1-big-brother.vercel.app/ 
+* For the backend, visit: https://big-brother-be-3d6ad173758c.herokuapp.com/
+  
+### A list of user login and password for public testing as well as their roles and the associated locationID
 
-## Learn More
+| Email                      | Password   | Role   | Location |
+|----------------------------|------------|--------|----------|
+| Kevin205@hotmail.com       | Apple!     | Admin  | L6E0B21  |
+| Sarah210@hotmail.com       | Apple!     | Admin  | L6E0B21  |
+| Green100@hotmail.com       | Apple!     | Staff  | L6E0B21  |
+| Nancy900@hotmail.com       | Apple!     | Staff  | L6E0B21  |
+| rahul.sharma@hotmail.com   | Apple123!  | Parent | L6E0B21  |
+| minjoon.kim.1224@gmail.com | Apple123!  | Parent | L6E0B21  |
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The user is also able to register their own account should they desire to. 
