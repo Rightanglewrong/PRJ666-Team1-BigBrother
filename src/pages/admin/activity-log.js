@@ -325,28 +325,57 @@ const ActivityLogPage = () => {
           backgroundColor: cardStyles.backgroundColor,
           borderRadius: '8px',
           boxShadow: cardStyles.boxShadow,
+          overflowX: 'auto', // Allows horizontal scrolling if needed
         }}
       >
-        <Table>
+        <Table
+          sx={{
+            minWidth: 410,
+            '& .MuiTableCell-root': {
+              padding: '8px 10px', // Reduce padding for table cells
+            },
+          }}
+        >
           <TableHead>
             <TableRow>
-              <TableCell sx={textStyles}>Activity Type</TableCell>
-              <TableCell sx={textStyles}>Description</TableCell>
-              <TableCell sx={textStyles}>User Email</TableCell>
-              <TableCell sx={textStyles}>Timestamp</TableCell>
+              <TableCell
+                sx={{
+                  ...textStyles,
+                  width: { xs: '5%', sm: '15%' }, // Wider on mobile, compact on larger screens
+                  textAlign: 'center', // Align text to the center
+                }}
+              >
+                Type
+              </TableCell>
+              <TableCell
+                sx={{
+                  ...textStyles,
+                  width: { xs: '32%', sm: '55%' }, // Adjust width for "Description" on mobile
+                }}
+              >
+                Description
+              </TableCell>
+              <TableCell
+                sx={{
+                  ...textStyles,
+                  width: { xs: '15%', sm: '30%' }, // Adjust "User Email" column width on mobile
+                }}
+              >
+                User Email
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {logs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} align="center" sx={textStyles}>
+                <TableCell colSpan={3} align="center" sx={textStyles}>
                   No logs found for the specified criteria.
                 </TableCell>
               </TableRow>
             ) : (
-              Object.values(logs).map((log) => (
+              logs.map((log) => (
                 <TableRow key={log.ID}>
-                  <TableCell sx={textStyles}>
+                  <TableCell sx={{ ...textStyles, textAlign: 'center' }}>
                     {(() => {
                       switch (log.activityType) {
                         case 1:
@@ -362,9 +391,32 @@ const ActivityLogPage = () => {
                       }
                     })()}
                   </TableCell>
-                  <TableCell sx={textStyles}>{log.desc}</TableCell>
-                  <TableCell sx={textStyles}>{log.userEmail}</TableCell>
-                  <TableCell sx={textStyles}>{log.timestamp}</TableCell>
+                  <TableCell
+                    sx={{
+                      ...textStyles,
+                      maxWidth: '110px', // Set a max width for the column
+                      wordWrap: 'break-word', // Ensure long text wraps
+                      whiteSpace: 'normal', // Allow wrapping
+                    }}
+                  >
+                    {log.desc}
+                    <br />
+                    <br />
+                    <strong>Time:</strong>
+                    <br />
+                    {log.timestamp}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      ...textStyles,
+                      maxWidth: '100px', // Set a max width for the column
+                      wordWrap: 'break-word', // Ensure long text wraps
+                      whiteSpace: 'normal', // Allow wrapping
+                    }}
+                    title={log.userEmail} // Tooltip with full email
+                  >
+                    {log.userEmail}
+                  </TableCell>
                 </TableRow>
               ))
             )}
