@@ -92,8 +92,18 @@ const ActivityLogPage = () => {
   };
 
   const buttonStyles = {
-    primary: colorblindMode === 'blue-yellow' ? '#ff8c00' : colorblindMode === 'red-green' ? '#e77f24' : '#1976d2',
-    primaryHover: colorblindMode === 'blue-yellow' ? '#ff7b00' : colorblindMode === 'red-green' ? '#cc6f1f' : '#1565c0',
+    primary:
+      colorblindMode === 'blue-yellow'
+        ? '#ff8c00'
+        : colorblindMode === 'red-green'
+        ? '#e77f24'
+        : '#1976d2',
+    primaryHover:
+      colorblindMode === 'blue-yellow'
+        ? '#ff7b00'
+        : colorblindMode === 'red-green'
+        ? '#cc6f1f'
+        : '#1565c0',
     danger: colorblindMode === 'blue-yellow' ? '#c62828' : '#f44336',
   };
 
@@ -320,7 +330,7 @@ const ActivityLogPage = () => {
         <Table>
           <TableHead>
             <TableRow>
-            <TableCell sx={textStyles}>Activity Type</TableCell>
+              <TableCell sx={textStyles}>Activity Type</TableCell>
               <TableCell sx={textStyles}>Description</TableCell>
               <TableCell sx={textStyles}>User Email</TableCell>
               <TableCell sx={textStyles}>Timestamp</TableCell>
@@ -336,7 +346,22 @@ const ActivityLogPage = () => {
             ) : (
               Object.values(logs).map((log) => (
                 <TableRow key={log.ID}>
-                  <TableCell sx={textStyles}>{log.activityType}</TableCell>
+                  <TableCell sx={textStyles}>
+                    {(() => {
+                      switch (log.activityType) {
+                        case 1:
+                          return 'Create';
+                        case 2:
+                          return 'Read';
+                        case 3:
+                          return 'Update';
+                        case 4:
+                          return 'Delete';
+                        default:
+                          return 'Unknown';
+                      }
+                    })()}
+                  </TableCell>
                   <TableCell sx={textStyles}>{log.desc}</TableCell>
                   <TableCell sx={textStyles}>{log.userEmail}</TableCell>
                   <TableCell sx={textStyles}>{log.timestamp}</TableCell>
