@@ -236,12 +236,12 @@ const CalendarView = () => {
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay',
+            left: 'title',
+            right: 'prev,next today',
           }}
           events={events}
           selectable={true}
+          longPressDelay={2}
           select={handleSelect}
           eventClick={handleEventClick}
           editable={false}
