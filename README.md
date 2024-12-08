@@ -99,7 +99,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## List of deviations from 
 * Ability to deny user messaging was not implemented
 * Progress report templates was cut back on in complexity and availability of options
-* AWS Cognito was replaces with homebrew auth implementation
+* AWS Cognito was replaced with homebrew auth implementation
 
 ## How To Run
 The application is currently hosted on Heroku for the backend and Vercel for the frontend.
