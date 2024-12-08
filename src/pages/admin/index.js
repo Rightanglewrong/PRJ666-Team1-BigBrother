@@ -51,7 +51,6 @@ const AdminPage = () => {
         const responses = await Promise.all(promises);
         const allUsers = responses.flatMap((response) => (response?.users ? response.users : []));
         const pending = allUsers.filter((u) => u.accStatus === 'PENDING');
-        console.log(pending);
         setPendingUsers(pending);
 
         if (pending.length > 0) {
