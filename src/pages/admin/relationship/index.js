@@ -67,10 +67,16 @@ export default function ParentAccountsLanding() {
         }
 
         const parents = await getUsersByAccountTypeAndLocation('Parent', user.locationID);
-        setParentProfiles(parents.users || []);
-
+        const sortedParents = (parents.users || []).sort((a, b) => 
+            a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName)
+        );
+        setParentProfiles(sortedParents);
+        
         const children = await retrieveChildrenByLocationID(user.locationID);
-        setChildProfiles(children || []);
+        const sortedChildren = (children || []).sort((a, b) => 
+            a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName)
+        );
+        setChildProfiles(sortedChildren);
       } catch (error) {
         if (error.message.includes('Unauthorized')) {
           setMessage('Session expired. Redirecting to login...');
